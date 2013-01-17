@@ -1,0 +1,99 @@
+@import url('bootstrap.css');
+@import url('jqueryui-bootstrap.css');
+@import url('font-custom.css');
+@import url('spectrum.css');
+
+.container {
+    width: 1018px;
+}
+.signinform {
+    display:none;
+}
+
+/* control bar */
+.control-panel {
+    padding-top: 12px;
+    padding-bottom: 6px;
+}
+.left-controls {
+    width: 80px;
+    text-align: right;
+}
+.load-controls {
+    width: 312px;
+    margin-left: 20px;
+}
+.zoom-controls {
+    width: 88px;
+}
+.paint-controls{
+    width: 280px;
+}
+.canvas-controls {
+    margin-right: 20px;
+}
+.right-controls {
+    width: 160px;
+    margin-top: 6px;
+}
+.searchbox {
+    width: 200px;
+}
+
+/* workspace bootstrap overrides */
+
+/* left tabs colorpicker */
+input.colorpicker {
+    width: 38px;
+    margin-bottom:2px;
+}
+.input-prepend .btn > i {
+    text-shadow:none;
+}
+.list-left {
+    float: left;
+}
+.list-left > li > .key-shortcut {
+    border-style: dotted;
+    border-width: 1px;
+    -webkit-border-radius: 3px;
+    -moz-border-radius: 3px;
+    border-radius: 3px;
+    padding: 2px;
+}
+.list-left > li > .icon-reorder {
+    cursor: move;
+    color: #bbb;
+}
+
+/* layer tab on right */
+.nav-tabs > li > a {
+    line-height:0px;
+}
+
+.nav-tabs > li.active > a:hover {
+    cursor: move;
+}
+
+.nav-tabs > li > a > div.controls > input {
+    margin-bottom:0px;
+    width:60px;
+}
+
+.nav-tabs > li > a > div.controls > i {
+    cursor: pointer;
+    margin-right:5px;
+}
+
+.nav-tabs > li > a > div.controls > i.icon-eye-open {
+    color: #333;
+}
+
+.nav-tabs > li.active > a > div.controls > i:hover {
+    color: #777;
+}
+
+.nav-tabs > li > a > div.controls > i.icon-eye-close {
+    color: #bbb;
+}
+

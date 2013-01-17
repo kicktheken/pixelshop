@@ -1,0 +1,304 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+<meta charset="utf-8" />
+<title>Pixelshop</title>
+<link rel="stylesheet" href="css/main-built.css" rel="stylesheet" />
+<script type="text/javascript">
+var c = document.getElementsByClassName("control-panel");
+if (!c || c.length < 1) { // for development
+    document.write('<link rel="stylesheet" href="css/main.css" rel="stylesheet" />');
+}
+</script>
+</head>
+
+<body>
+<div class="navbar navbar-static-top">
+    <div class="navbar-inner">
+        <div class="container">
+            <a class="brand" href="#">
+                <i class="icon-space-invaders"></i>Pixelshop
+            </a>
+            <ul class="nav pull-right">
+                <li class="dropdown">
+                    <a href="#" role="button" id="signin">
+                        Sign in <i class="icon-caret-down"></i>
+                    </a>
+                </li>
+                <!--form class="navbar-form pull-right">
+                    <input type="text" placeholder="Email" class="span2" />
+                    <input type="password" placeholder="Password" class="span2" />
+                    <input type="submit" value="Login" class="btn btn-inverse" />
+                </form-->
+            </ul>
+        </div>
+    </div>
+</div>
+<div class="control-panel">
+    <div class="container">
+        <div class="pull-left left-controls">&nbsp;
+            <!--div class="btn-group">
+                <button class="btn dropdown-toggle" data-toggle="dropdown">
+                    <i class="icon-palette"></i> <span class="caret"></span>
+                </button>
+                <ul class="dropdown-menu">
+                    <li><a href="#">Action</a></li>
+                    <li><a href="#">Another action</a></li>
+                    <li><a href="#">Something else here</a></li>
+                    <li class="divider"></li>
+                    <li><a href="#">Separated lin</a></li>
+                </ul>
+            </div-->
+        </div>
+        <div class="pull-left load-controls">
+            <div class="input-prepend input-append">
+                <div class="btn-group">
+                    <button class="btn btn-warning dropdown-toggle" data-toggle="dropdown">
+                        <i class="icon-folder-open-alt"></i> <span class="caret"></span>
+                    </button>
+                    <ul class="dropdown-menu">
+                        <li><a href="#">Action</a></li>
+                        <li><a href="#">Another action</a></li>
+                        <li><a href="#">Something else here</a></li>
+                        <li class="divider"></li>
+                        <li><a href="#">Separated lin</a></li>
+                    </ul>
+                </div>
+                <input type="text" class="searchbox" placeholder="Image Link or Search Library" />
+                <button class="btn btn-primary"><i class="icon-save"></i></button>
+                <!-- span class="add-on"><i class="icon-link"></i></span -->
+            </div>
+        </div>
+        <div class="pull-left zoom-controls">
+            <!--button class="btn btn-primary"><i class="icon-save"></i></button-->
+            <div class="btn-group">
+                <div class="btn-group">
+                    <button class="btn"><i class="icon-zoom-in"></i></button>
+                    <button class="btn"><i class="icon-zoom-out"></i></button>
+                </div>
+            </div>
+        </div>
+        <div class="pull-left paint-controls">
+            
+            <!--a class="btn btn-primary" href="#"><i class="icon-save"></i></a-->
+            <div class="btn-group">
+                <div class="btn-group" data-toggle="buttons-radio">
+                    <button class="btn"><i class="icon-pencil"></i></button>
+                    <button class="btn"><i class="icon-paint-format"></i></button>
+                    <button class="btn"><i class="icon-eraser"></i></button>
+                    <button class="btn"><i class="icon-hand"></i></button>
+                    <button class="btn"><i class="icon-screenshot"></i></button>
+                    <button class="btn"><i class="icon-sun"></i></button>
+                    <button class="btn"><i class="icon-moon"></i></button>
+                </div>
+            </div>
+        </div>
+        <div class="pull-left canvas-controls">
+            <button class="btn"><i class="icon-table"></i></button>
+        </div>
+        <div class="pull-left right-controls">
+            <button class="btn btn-mini"><i class="icon-plus"></i> Add new layer</button>
+            <!--a href="#"><i class="icon-plus"></i> Add new layer</a-->
+        </div>
+    </div>
+</div>
+
+        <!--button class="btn btn-danger" id="signin">Sign in or Register <i class="icon-caret-down"></i></button-->
+<div class="container">
+<div class="row">
+<div class="tabbable tabs-right">
+    <ul id="tabsort" class="nav nav-tabs">
+        <li class="active">
+            <a href="#" data-toggle="tab">
+                <div class="controls">
+                    <i class="icon-eye-open icon-large"></i>
+                    <input id="inputlayer1" type="text" placeholder="Layer 1" />
+                    <span class="help-inline">
+                        <canvas id="layer1" width="32" height="32" class="img-polaroid"></canvas>
+                    </span>
+                </div>
+            </a>
+        </li>
+        <li>
+            <a href="#" data-toggle="tab">
+                <div class="controls">
+                    <i class="icon-eye-close icon-large"></i>
+                    <input id="inputlayer2" type="text" placeholder="Layer 2" />
+                    <span class="help-inline">
+                        <canvas id="layer2" width="32" height="32" class="img-polaroid"></canvas>
+                    </span>
+                </div>
+            </a>
+        </li>
+        <li>
+            <a href="#" data-toggle="tab">
+                <div class="controls">
+                    <i class="icon-eye-open icon-large"></i>
+                    <input id="inputlayer3" type="text" placeholder="Layer 3" />
+                    <span class="help-inline">
+                        <canvas id="layer3" width="32" height="32" class="img-polaroid"></canvas>
+                    </span>
+                </div>
+            </a>
+        </li>
+        <li>
+            <a href="#" data-toggle="tab">
+                <div class="controls">
+                    <i class="icon-eye-open icon-large"></i>
+                    <input id="inputlayer4" type="text" placeholder="Layer 4" />
+                    <span class="help-inline">
+                        <canvas id="layer4" width="32" height="32" class="img-polaroid"></canvas>
+                    </span>
+                </div>
+            </a>
+        </li>
+        <li>
+            <a href="#" data-toggle="tab">
+                <div class="controls">
+                    <i class="icon-eye-open icon-large"></i>
+                    <input id="inputlayer5" type="text" placeholder="Layer 5" />
+                    <span class="help-inline">
+                        <canvas id="layer5" width="32" height="32" class="img-polaroid"></canvas>
+                    </span>
+                </div>
+            </a>
+        </li>
+        <li>
+            <a href="#" data-toggle="tab">
+                <div class="controls">
+                    <i class="icon-eye-open icon-large"></i>
+                    <input id="inputlayer6" type="text" placeholder="Layer 6" />
+                    <span class="help-inline">
+                        <canvas id="layer6" width="32" height="32" class="img-polaroid"></canvas>
+                    </span>
+                </div>
+            </a>
+        </li>
+        <li>
+            <a href="#" data-toggle="tab">
+                <div class="controls">
+                    <i class="icon-eye-open icon-large"></i>
+                    <input id="inputlayer7" type="text" placeholder="Layer 7" />
+                    <span class="help-inline">
+                        <canvas id="layer7" width="32" height="32" class="img-polaroid"></canvas>
+                    </span>
+                </div>
+            </a>
+        </li>
+        <li>
+            <a href="#" data-toggle="tab">
+                <div class="controls">
+                    <i class="icon-eye-open icon-large"></i>
+                    <input id="inputlayer8" type="text" placeholder="Layer 8" />
+                    <span class="help-inline">
+                        <canvas id="layer8" width="32" height="32" class="img-polaroid"></canvas>
+                    </span>
+                </div>
+            </a>
+        </li>
+    </ul>
+    <div class="tabs-left">
+        <ul class="nav nav-tabs list-left">
+            <li class="active">
+                <a href="#" data-toggle="tab">
+                    <input type="text" class="colorpicker" />&nbsp;
+                    <i class="icon-reorder"></i>
+                </a>
+            </li>
+            <li>
+                <a href="#" data-toggle="tab">
+                    <input type="text" class="colorpicker" />&nbsp;
+                    <i class="icon-reorder"></i>
+                </a>
+            </li>
+            <li>
+                <a href="#" data-toggle="tab">
+                    <input type="text" class="colorpicker" />&nbsp;
+                    <i class="icon-reorder"></i>
+                </a>
+            </li>
+            <li>
+                <a href="#" data-toggle="tab">
+                    <input type="text" class="colorpicker" />&nbsp;
+                    <i class="icon-reorder"></i>
+                </a>
+            </li>
+            <li>
+                <a href="#" data-toggle="tab">
+                    <input type="text" class="colorpicker" />&nbsp;
+                    <i class="icon-reorder"></i>
+                </a>
+            </li>
+            <li>
+                <a href="#" data-toggle="tab">
+                    <input type="text" class="colorpicker" />&nbsp;
+                    <i class="icon-reorder"></i>
+                </a>
+            </li>
+            <li>
+                <a href="#" data-toggle="tab">
+                    <input type="text" class="colorpicker" />&nbsp;
+                    <i class="icon-reorder"></i>
+                </a>
+            </li>
+            <li>
+                <a href="#" data-toggle="tab">
+                    <input type="text" class="colorpicker" />&nbsp;
+                    <i class="icon-reorder"></i>
+                </a>
+            </li>
+            <li>
+                <a href="#" data-toggle="tab">
+                    <input type="text" class="colorpicker" />&nbsp;
+                    <i class="icon-reorder"></i>
+                </a>
+            </li>
+            <li>
+                <a href="#" data-toggle="tab">
+                    <input type="text" class="colorpicker" />&nbsp;
+                    <i class="icon-reorder"></i>
+                </a>
+            </li>
+        </ul>
+    </div>
+    <div class="tab-content">
+        <canvas style="border:1px;" width="720px" height="600px" id="canvas"></canvas>
+    </div>
+</div> <!-- tabbable -->
+</div> <!-- row -->
+</div> <!-- container -->
+
+<div class="signinform">
+    <form>
+        <div class="input-prepend">
+            <span class="add-on"><i class="icon-envelope"></i></span>
+            <input class="span2" type="text" placeholder="Email address">
+        </div>
+        <div class="input-prepend">
+            <span class="add-on"><i class="icon-key"></i></span>
+            <input class="span2" type="password" placeholder="Password">
+        </div>
+        <label class="checkbox"><input type="checkbox" /> Remember me</label>
+        <input class="btn btn-danger" type="submit" value="Login" />
+    </form>
+</div>
+
+<!-- load scripts at end -->
+<script type="text/javascript" src="js/main-built.js"></script>
+<script type="text/javascript">
+var _gaq = _gaq || [];
+_gaq.push(['_setAccount', 'UA-24723549-2']);
+_gaq.push(['_trackPageview']);
+
+(function() {
+var ga = document.createElement('script'); ga.type = 'text/javascript'; ga.async = true;
+ga.src = ('https:' == document.location.protocol ? 'https://ssl' : 'http://www') + '.google-analytics.com/ga.js';
+var s = document.getElementsByTagName('script')[0]; s.parentNode.insertBefore(ga, s);
+})();
+if (typeof jQuery !== "function") { // for development
+    document.write("<scr"+"ipt data-main='js/home' src='js/lib/require.js'></scr"+"ipt>");
+}
+</script>
+
+</body>
+</html>
