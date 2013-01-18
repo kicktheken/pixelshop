@@ -71,15 +71,15 @@
     margin-right:5px;
 }
 
-#layer-tabbar .controls .icon-eye-open {
+#layer-tabbar .icon-eye-open {
     color: #333;
 }
 
-#layer-tabbar .active .controls i:hover {
+#layer-tabbar .active i:hover {
     color: #777;
 }
 
-#layer-tabbar .controls .icon-eye-close {
+#layer-tabbar .icon-eye-close {
     color: #bbb;
 }
 
