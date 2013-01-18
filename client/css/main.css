@@ -43,57 +43,43 @@
 /* workspace bootstrap overrides */
 
 /* left tabs colorpicker */
-input.colorpicker {
+#color-tabbar .colorpicker {
     width: 38px;
     margin-bottom:2px;
 }
-.input-prepend .btn > i {
-    text-shadow:none;
-}
-.list-left {
-    float: left;
-}
-.list-left > li > .key-shortcut {
-    border-style: dotted;
-    border-width: 1px;
-    -webkit-border-radius: 3px;
-    -moz-border-radius: 3px;
-    border-radius: 3px;
-    padding: 2px;
-}
-.list-left > li > .icon-reorder {
+#color-tabbar .icon-reorder {
     cursor: move;
     color: #bbb;
 }
 
 /* layer tab on right */
-.nav-tabs > li > a {
+#layer-tabbar a {
     line-height:0px;
 }
 
-.nav-tabs > li.active > a:hover {
+#layer-tabbar .active a:hover {
     cursor: move;
 }
 
-.nav-tabs > li > a > div.controls > input {
+#layer-tabbar input {
     margin-bottom:0px;
     width:60px;
 }
 
-.nav-tabs > li > a > div.controls > i {
+#layer-tabbar i {
     cursor: pointer;
     margin-right:5px;
 }
 
-.nav-tabs > li > a > div.controls > i.icon-eye-open {
+#layer-tabbar .controls .icon-eye-open {
     color: #333;
 }
 
-.nav-tabs > li.active > a > div.controls > i:hover {
+#layer-tabbar .active .controls i:hover {
     color: #777;
 }
 
-.nav-tabs > li > a > div.controls > i.icon-eye-close {
+#layer-tabbar .controls .icon-eye-close {
     color: #bbb;
 }
 
