@@ -42,8 +42,18 @@ function Main() {
             preferredFormat: 'name',
             showInput: true,
             showAlpha: true,
-            showButtons: false
+            showButtons: false,
+            change: function(color) {
+                log.info([color,this.id]);
+            }
         });
+        document.onkeydown = function(e) {
+            var key = e.keyCode - 48;
+            if (key >= 0 && key <= 9) {
+                log.info(key);
+                $('a[href=#tabcolor'+key+']').tab('show');
+            }
+        };
         var canvas = $('#layer1').get(0), context = canvas.getContext('2d');
         context.fillRect(0,0,100,100);
         canvas = $('#canvas').get(0), context = canvas.getContext('2d');
