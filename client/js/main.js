@@ -10,10 +10,6 @@ function Main() {
         update: function (e,ui) {
             $('#layer-tabbar li').each(function(e) {
                 log.info(this.id);
-                //log.info(e);
-                //var $this = $(this);
-                //log.info($this);
-                //log.info($this.attr('id'));
             });
             console.log([e,ui]);
         }
