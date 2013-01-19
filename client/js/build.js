@@ -1,8 +1,8 @@
 {
     baseUrl: '.',
     name: 'lib/almond.js',
-    include: ['home'],
-    insertRequire: ['home'],
+    include: ['home','main'],
+    insertRequire: ['main'],
     out: '../../clientbuild/js/main-built.js',
     wrap: true
 }

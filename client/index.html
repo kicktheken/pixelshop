@@ -5,8 +5,7 @@
 <title>Pixelshop</title>
 <link href="css/main-built.css" rel="stylesheet" type="text/css" />
 <script type="text/javascript">
-var c = document.getElementsByClassName("control-panel");
-if (!c || c.length < 1) { // for development
+if (document.styleSheets[0].cssRules.length === 0) { // for development
     document.write('<link href="css/main.css" rel="stylesheet" type="text/css" />');
 }
 </script>
@@ -108,7 +107,7 @@ if (!c || c.length < 1) { // for development
 <div class="row">
 <div class="tabbable tabs-right">
     <ul id="layer-tabbar" class="nav nav-tabs">
-        <li class="active">
+        <li id="li-layer1" class="active">
             <a href="#" data-toggle="tab">
                 <i class="icon-eye-open icon-large"></i>
                 <input id="inputlayer1" type="text" placeholder="Layer 1" />
@@ -120,7 +119,7 @@ if (!c || c.length < 1) { // for development
     </ul>
     <div class="tabs-left">
         <ul id="color-tabbar" class="nav nav-tabs pull-left">
-            <li class="active">
+            <li id="li-color1" class="active">
                 <a href="#tabcolor1" data-toggle="tab">
                     <input id="color1" type="text" class="colorpicker" />&nbsp;
                     <i class="icon-reorder"></i>

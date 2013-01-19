@@ -1,12 +1,11 @@
-require([
+define([
     "lib/class",
     "lib/util",
     "lib/log",
     "lib/modernizr",
-    "lib/jquery",
-    "main"
+    "lib/jquery"
 ],function() {
-    arguments[5]();
+    require(["main"]);
 });
 
 
