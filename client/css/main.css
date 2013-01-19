@@ -44,12 +44,42 @@
 
 /* left tabs colorpicker */
 #color-tabbar .colorpicker {
-    width: 38px;
+    width: 42px;
     margin-bottom:2px;
 }
 #color-tabbar .icon-reorder {
     cursor: move;
     color: #bbb;
+}
+
+.active .icon-reorder {
+    margin-left:2px;
+    vertical-align: middle;
+    position: relative;
+}
+.active .icon-reorder:before {
+    content:'';
+}
+.active .icon-reorder .after,
+.active .icon-reorder .before {
+    left: 100%;
+    border: solid transparent;
+    content: " ";
+    height: 0;
+    width: 0;
+    position: absolute;
+}
+.active .icon-reorder .after {
+    border-left-color: black;
+    border-width: 10px;
+    top: 50%;
+    margin-top: -10px;
+}
+.active .icon-reorder .before {
+    border-left-color: #333;
+    border-width: 12px;
+    top: 50%;
+    margin-top: -12px;
 }
 
 /* layer tab on right */

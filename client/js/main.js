@@ -1,9 +1,10 @@
 define([
     "lib/jqueryui",
     "lib/bootstrap",
-    "lib/spectrum"
+    "lib/spectrum",
+    "lib/keymaster"
 ],
-function Main() {
+function Main(Engine) {
     log.info("main start");
 
     var tabbar = $('#layer-tabbar').sortable({
@@ -46,17 +47,17 @@ function Main() {
         showAlpha: true,
         showButtons: false,
         change: function(color) {
-            log.info([color,this.id]);
+            $("#i"+this.id).css({
+                "border-left-color": color.toHexString()
+            });
+            log.info([color.toHexString(),this.id]);
         }
     });
-    document.onkeydown = function(e) {
-        var key = e.keyCode - 48;
-        if (key >= 0 && key <= 9) {
-            if (key === 0) key = 10;
-            log.info(key);
-            $('a[href=#tabcolor'+key+']').tab('show');
-        }
-    };
+    //key('⌘+r, ctrl+r', function(){ return false });
+    key('1,2,3,4,5,6,7,8,9,0', function(e,h) {
+        var key = (h.shortcut == 0) ? 10 : h.shortcut;
+        $('a[href=#tabcolor'+key+']').tab('show');
+    });
     var canvas = $('#layer1').get(0), context = canvas.getContext('2d');
     context.fillRect(0,0,100,100);
     canvas = $('#canvas').get(0), context = canvas.getContext('2d');

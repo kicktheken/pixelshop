@@ -122,7 +122,10 @@ if (document.styleSheets[0].cssRules.length === 0) { // for development
             <li id="li-color1" class="active">
                 <a href="#tabcolor1" data-toggle="tab">
                     <input id="color1" type="text" class="colorpicker" />&nbsp;
-                    <i class="icon-reorder"></i>
+                    <i class="icon-reorder">
+                        <i class="before"></i>
+                        <i id="icolor1" class="after"></i>
+                    </i>
                 </a>
             </li>
         </ul>
