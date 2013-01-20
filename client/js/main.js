@@ -4,15 +4,17 @@ define([
     "lib/spectrum",
     "lib/keymaster"
 ],
-function Main(Engine) {
+function Main() {
     log.info("main start");
 
+    var colororder = [0,1], layerorder = [0,1];
     var tabbar = $('#layer-tabbar').sortable({
         update: function (e,ui) {
+            var i = 1;
             $('#layer-tabbar li').each(function(e) {
-                log.info(this.id);
+                layerorder[i] = this.id[this.id.length-1];
+                i++;
             });
-            console.log([e,ui]);
         }
     });
     var html = tabbar.html(), ohtml = html.replace(' class="active"','');
@@ -20,17 +22,23 @@ function Main(Engine) {
         var tab = ohtml;
         if (i % 2 === 0) tab = tab.replace(/open/g,"close");
         html += tab.replace(/(ayer( )?)1/g,"$1"+i);
+        layerorder.push(i);
     }
     tabbar.html(html);
     
     tabbar = $('#color-tabbar').sortable({
         update: function (e,ui) {
-            console.log([e,ui]);
+            var i = 1;
+            $('#color-tabbar li').each(function(e) {
+                colororder[i] = this.id[this.id.length-1];
+                i = (i+1)%10;
+            });
         }
     });
     html = tabbar.html(), ohtml = html.replace(' class="active"','');
-    for (var i = 2; i <= 10; i++) {
+    for (var i = 2; i != 1; i = (i+1)%10) {
         html += ohtml.replace(/color1/g,"color"+i);
+        colororder.push(i);
     }
     tabbar.html(html);
 
@@ -55,8 +63,8 @@ function Main(Engine) {
     });
     //key('⌘+r, ctrl+r', function(){ return false });
     key('1,2,3,4,5,6,7,8,9,0', function(e,h) {
-        var key = (h.shortcut == 0) ? 10 : h.shortcut;
-        $('a[href=#tabcolor'+key+']').tab('show');
+        var i = colororder[h.shortcut];
+        $('a[href=#tabcolor'+i+']').tab('show');
     });
     var canvas = $('#layer1').get(0), context = canvas.getContext('2d');
     context.fillRect(0,0,100,100);
