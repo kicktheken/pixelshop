@@ -96,8 +96,9 @@ if (document.styleSheets[0].cssRules.length === 0) { // for development
             <button class="btn"><i class="icon-table"></i></button>
         </div>
         <div class="pull-left right-controls">
-            <button class="btn btn-mini"><i class="icon-plus"></i> Add new layer</button>
-            <!--a href="#"><i class="icon-plus"></i> Add new layer</a-->
+            <button id="addlayer" class="btn btn-mini">
+                <i class="icon-plus"></i> Add new layer
+            </button>
         </div>
     </div>
 </div>
@@ -112,7 +113,7 @@ if (document.styleSheets[0].cssRules.length === 0) { // for development
                 <i class="icon-eye-open icon-large"></i>
                 <input id="inputlayer1" type="text" placeholder="Layer 1" />
                 <span class="help-inline">
-                    <canvas id="layer1" width="32" height="32" class="img-polaroid"></canvas>
+                    <canvas id="layer1" width="30" height="30"></canvas>
                 </span>
             </a>
         </li>
