@@ -35,13 +35,8 @@ define(["layer"],function Canvas(Layer) {
 		defaultColors: function() {
 			return ['blue','red','green','yellow','orange','brown','black','white','purple','beige'];
 		},
-		setColor: function(i,c) {
-			i = (i+1)%10;
-            $('#color'+i).spectrum('set', c);
-            $("#icolor"+i).css({
-                "border-left-color": c
-            });
-
+		setColor: function(c) {
+            color = c;
 		}
 	});
 })

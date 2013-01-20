@@ -90,7 +90,7 @@ canvas {
     line-height:0px;
 }
 
-#layer-tabbar .active a:hover {
+#layer-tabbar .active a {
     cursor: move;
 }
 
