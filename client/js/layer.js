@@ -8,9 +8,8 @@ define(function Layer() {
 					update: function(e,ui) {
 						var order = [];
 						$('#layer-tabbar li').each(function(e) {
-							order.push(this.id[this.id.length-1]);
+							order.push(this.id[this.id.length-1]-1);
 						});
-						log.info(order);
 						g.Canvas.setLayerOrder(order);
 					}
 				});

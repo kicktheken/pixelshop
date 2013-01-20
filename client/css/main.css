@@ -4,7 +4,7 @@
 @import url('spectrum.css');
 
 canvas {
-    border: 1px solid black;
+    border: 1px solid #ddd;
 }
 .container {
     width: 1018px;
@@ -79,7 +79,7 @@ canvas {
     margin-top: -10px;
 }
 .active .icon-reorder .before {
-    border-left-color: #333;
+    border-left-color: #bbb;
     border-width: 12px;
     top: 50%;
     margin-top: -12px;

@@ -8,7 +8,9 @@ define([
 function Main(Canvas) {
     $(document).ready(function() {
         log.info("main start");
-        var canvas = new Canvas(), defaultColors = canvas.defaultColors();
+        var $canvas = $('#canvas');
+        var canvas = new Canvas($canvas);
+        var defaultColors = canvas.defaultColors();
         $('#addlayer').click(function() {
             if (canvas.addLayer() >= 8) {
                 $(this).attr('disabled', true);
@@ -52,12 +54,48 @@ function Main(Canvas) {
                 canvas.setColor($('#color'+i).spectrum('get'));
             });
         });
+        canvas.setColor($('#color1').spectrum('get'));
         //key('⌘+r, ctrl+r', function(){ return false });
         key('1,2,3,4,5,6,7,8,9,0', function(e,h) {
             var i = colororder[h.shortcut];
             $('#li-color'+i+' a').tab('show');
             canvas.setColor($('#color'+i).spectrum('get'));
         });
+
+        function canvasCoords(f,e,$this) {
+            var offset = $this.parent().offset();
+            var x = e.pageX - offset.left - 1;
+            var y = e.pageY - offset.top - 1;
+            if (withinBounds(x,y,0,0,$this.width(),$this.height())) {
+                f(x,y);
+            }
+        }
+        document.onselectstart = function() {return false;};
+        if ('ontouchstart' in window) {
+            $canvas.bind('touchmove', function(e) {
+                e.preventDefault();
+                e = e.orginalEvent.touches[0];
+                canvasCoords(canvas.cursorMove,e,$canvas);
+            });
+            $canvas.bind('touchstart', function(e) {
+                e.preventDefault();
+                e = e.orginalEvent.touches[0];
+                canvasCoords(canvas.cursorStart,e,$canvas);
+            });
+            $canvas.bind('touchend', function(e) {
+                canvas.cursorEnd();
+            });            
+        } else {
+            $canvas.mousemove(function(e) {
+                canvasCoords(canvas.cursorMove,e,$canvas);
+            });
+            $canvas.mousedown(function(e) {
+                canvasCoords(canvas.cursorStart,e,$canvas);
+            });
+            $canvas.mouseup(function(e) {
+                canvas.cursorEnd();
+            });
+        }
 
         $('#signin').popover({
             placement: 'bottom',

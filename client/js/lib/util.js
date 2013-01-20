@@ -48,6 +48,10 @@ function randomIndex(a) {
     return (a)[Math.floor(Math.random()*(a).length)];
 }
 
+function withinBounds(x,y,sx,sy,width,height) {
+    return x >= sx && y >= sy && x < width && y < height;
+}
+
 // code taken from https://developer.mozilla.org/en-US/docs/Mozilla_event_reference/wheel
 var initMouseScroll = function() {
     var prefix = "", _addEventListener, onwheel, support;
