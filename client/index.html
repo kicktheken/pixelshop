@@ -110,17 +110,17 @@ if (document.styleSheets[0].cssRules.length === 0) { // for development
     <ul id="layer-tabbar" class="nav nav-tabs">
         <li id="li-layer1" class="active">
             <a href="#" data-toggle="tab">
-                <i class="icon-eye-open icon-large"></i>
+                <i id="eyelayer1" class="icon-eye-open icon-large"></i>
                 <input id="inputlayer1" type="text" placeholder="Layer 1" />
                 <span class="help-inline">
-                    <canvas id="layer1" width="30" height="30"></canvas>
+                    <canvas id="layer1" width="30" height="30" class="preview"></canvas>
                 </span>
             </a>
         </li>
     </ul>
     <div class="tabs-left">
         <ul id="color-tabbar" class="nav nav-tabs pull-left">
-            <li id="li-color1" class="active">
+            <li id="li-color1">
                 <a href="#" data-toggle="tab">
                     <input id="color1" type="text" class="colorpicker" />&nbsp;
                     <i class="icon-reorder">

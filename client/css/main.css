@@ -4,6 +4,11 @@
 @import url('spectrum.css');
 
 canvas {
+    image-rendering: -moz-crisp-edges;
+    /* CHROME PLEASE FIX THIS SOON */
+    image-rendering: -webkit-optimize-contrast;
+}
+.preview {
     border: 1px solid #ddd;
 }
 .container {
@@ -76,6 +81,7 @@ canvas {
     border-left-color: black;
     border-width: 9px;
     top: 50%;
+    left: 0px;
     margin-top: -9px;
 }
 .active .icon-reorder .before {

@@ -7,12 +7,25 @@ define([
 ],
 function Main(Canvas) {
     $(document).ready(function() {
-        log.info("main start");
+        g.ts = function() { return new Date().getTime(); };
+        g.INITTIME = g.ts();
         var $canvas = $('#canvas');
+        g.width = $canvas.width();
+        g.height = $canvas.height();
+        g.offset = { x: g.width/8, y: g.height/8 };
+        g.createCanvas = function(width,height) {
+            var ret = {
+                canvas: document.createElement('canvas')
+            };
+            ret.canvas.width = width;
+            ret.canvas.height = height;
+            ret.context = ret.canvas.getContext('2d');
+            return ret;
+        };
         var canvas = new Canvas($canvas);
         var defaultColors = canvas.defaultColors();
         $('#addlayer').click(function() {
-            if (canvas.addLayer() >= 8) {
+            if (canvas.addLayer() >= 7) {
                 $(this).attr('disabled', true);
             }
         });
@@ -26,7 +39,7 @@ function Main(Canvas) {
             }
         });
         var colororder = [0,1];
-        var html = tabbar.html(), ohtml = html.replace(' class="active"','');
+        var html = tabbar.html(), ohtml = html;
         for (var i = 2; i != 1; i = (i+1)%10) {
             html += ohtml.replace(/color1/g,"color"+i);
             colororder.push(i);
@@ -55,6 +68,8 @@ function Main(Canvas) {
             });
         });
         canvas.setColor($('#color1').spectrum('get'));
+        $('#li-color1 a').tab('show');
+
         //key('⌘+r, ctrl+r', function(){ return false });
         key('1,2,3,4,5,6,7,8,9,0', function(e,h) {
             var i = colororder[h.shortcut];
@@ -64,9 +79,9 @@ function Main(Canvas) {
 
         function canvasCoords(f,e,$this) {
             var offset = $this.parent().offset();
-            var x = e.pageX - offset.left - 1;
-            var y = e.pageY - offset.top - 1;
-            if (withinBounds(x,y,0,0,$this.width(),$this.height())) {
+            var x = e.pageX - offset.left;
+            var y = e.pageY - offset.top;
+            if (withinBounds(x,y,0,0,g.width,g.height)) {
                 f(x,y);
             }
         }
@@ -76,25 +91,20 @@ function Main(Canvas) {
                 e.preventDefault();
                 e = e.orginalEvent.touches[0];
                 canvasCoords(canvas.cursorMove,e,$canvas);
-            });
-            $canvas.bind('touchstart', function(e) {
+            }).bind('touchstart', function(e) {
                 e.preventDefault();
                 e = e.orginalEvent.touches[0];
                 canvasCoords(canvas.cursorStart,e,$canvas);
-            });
-            $canvas.bind('touchend', function(e) {
+            }).bind('touchend', function(e) {
                 canvas.cursorEnd();
             });            
         } else {
             $canvas.mousemove(function(e) {
                 canvasCoords(canvas.cursorMove,e,$canvas);
-            });
-            $canvas.mousedown(function(e) {
+            }).mousedown(function(e) {
                 canvasCoords(canvas.cursorStart,e,$canvas);
             });
-            $canvas.mouseup(function(e) {
-                canvas.cursorEnd();
-            });
+            document.addEventListener('mouseup', canvas.cursorEnd);
         }
 
         $('#signin').popover({
@@ -104,5 +114,6 @@ function Main(Canvas) {
             content: $('.signinform').html(),
             trigger: 'click'
         });
+        log.info((g.ts() - g.INITTIME) + 'ms startup time');
     })
 });
