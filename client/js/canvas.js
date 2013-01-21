@@ -51,6 +51,15 @@ define(function Canvas() {
 		},
 		getViewData: function(width,height) {
 			return this.context.getImageData(this.offset.x,this.offset.y,width,height);
+		},
+		getViewDataFromBounds: function(width,height) {
+			if (!this.bounds) {
+				return;
+			}
+			var b = this.bounds;
+			var x = (b[0]+b[2]-width)/2, y = (b[1]+b[3]-height)/2;
+			return this.context.getImageData(x,y,width,height);
+
 		}
 	});
 });

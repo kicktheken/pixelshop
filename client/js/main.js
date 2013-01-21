@@ -7,18 +7,15 @@ define([
 ],
 function Main(Engine) {
     $(document).ready(function() {
-        g.ts = function() { return new Date().getTime(); };
-        g.INITTIME = g.ts();
-        var $canvas = $('#canvas'), disableClick = false;
+        var $canvas = $('#canvas');
 
         // default globals
+        g.ts = function() { return new Date().getTime(); };
+        g.INITTIME = g.ts();
         g.width = $canvas.width();
         g.height = $canvas.height();
-        g.defaultOffset = function(width,height) {
-            return {x: width/8, y: height/8 };
-        }
-
-        var engine = new Engine($canvas);
+        
+        var engine = new Engine($canvas), disableClick = false;
         var defaultColors = engine.defaultColors();
         $('#addlayer').click(function() {
             if (engine.addLayer() >= 8) {

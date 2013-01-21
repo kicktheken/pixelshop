@@ -72,9 +72,8 @@ define(["layer","canvas"],function Engine(Layer, Canvas) {
 			activeLayer = layers.length;
 			layers.push(new Layer(activeLayer));
 			order.unshift(activeLayer);
-			var d = _this.defaultColors();
 			for (var l in layers) {
-				layers[l].refresh(d[l]);
+				layers[l].refresh();
 			}
 			return layers.length;
 		},
@@ -91,7 +90,7 @@ define(["layer","canvas"],function Engine(Layer, Canvas) {
 			var size = sizes[s];
 			x = Math.floor(x/size);
 			y = Math.floor(y/size);
-			layers[activeLayer].buf.draw(color,x,y);
+			layers[activeLayer].draw(color,x,y);
 			_this.refresh(false);
 		},
 		cursorMove: function(x,y) {

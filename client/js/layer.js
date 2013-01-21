@@ -31,6 +31,8 @@ define(["canvas"], function Layer(Canvas) {
 			}
 			this.index = index;
 			this.preview = pcanvas.getContext('2d');
+			this.preview.width = pcanvas.width;
+			this.preview.height = pcanvas.height;
 			this.buf = new Canvas(g.width,g.height);
 			this.visible = true;
 			this.initEvents(i);
@@ -51,10 +53,18 @@ define(["canvas"], function Layer(Canvas) {
 				g.Canvas.setActiveLayer(i);
 			});
 		},
-		refresh: function(c) {
-			if (!c) c = 'black';
-			this.preview.fillStyle = c;
-			this.preview.fillRect(0,0,32,32);
+		draw: function(color,x,y) {
+			var ret = this.buf.draw(color,x,y);
+			this.refresh();
+			return ret;
+		},
+		refresh: function() {
+			var width = this.preview.width, height = this.preview.height;
+			var data = this.buf.getViewDataFromBounds(width,height);
+			if (data) {
+				this.preview.clearRect(0,0,width,height);
+				this.preview.putImageData(data,0,0);
+			}
 		}
 		
 	});
