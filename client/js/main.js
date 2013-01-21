@@ -9,7 +9,7 @@ function Main(Canvas) {
     $(document).ready(function() {
         g.ts = function() { return new Date().getTime(); };
         g.INITTIME = g.ts();
-        var $canvas = $('#canvas');
+        var $canvas = $('#canvas'), disableClick = false;
         g.width = $canvas.width();
         g.height = $canvas.height();
         g.offset = { x: g.width/8, y: g.height/8 };
@@ -55,6 +55,15 @@ function Main(Canvas) {
                 $("#i"+this.id).css({
                     "border-left-color": color.toHexString()
                 });
+                canvas.setColor(color);
+            },
+            show: function() {
+                $('#li-'+this.id+' a').tab('show');
+                canvas.setColor($('#color'+i).spectrum('get'));
+                disableClick = true;
+            },
+            hide: function() {
+                disableClick = false;
             }
         }).each(function(i) {
             var c = defaultColors[i];
@@ -102,7 +111,9 @@ function Main(Canvas) {
             $canvas.mousemove(function(e) {
                 canvasCoords(canvas.cursorMove,e,$canvas);
             }).mousedown(function(e) {
-                canvasCoords(canvas.cursorStart,e,$canvas);
+                if (!disableClick) {
+                    canvasCoords(canvas.cursorStart,e,$canvas);
+                }
             });
             document.addEventListener('mouseup', canvas.cursorEnd);
         }
