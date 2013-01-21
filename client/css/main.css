@@ -12,7 +12,7 @@ canvas {
     border: 1px solid #ddd;
 }
 .container {
-    width: 1018px;
+    width: 1003px;
 }
 .signinform {
     display:none;
@@ -38,7 +38,7 @@ canvas {
     width: 280px;
 }
 .canvas-controls {
-    margin-right: 24px;
+    margin-right: 20px;
 }
 .right-controls {
     width: 160px;
