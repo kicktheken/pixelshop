@@ -74,15 +74,16 @@ canvas {
 }
 .active .icon-reorder .after {
     border-left-color: black;
-    border-width: 10px;
+    border-width: 9px;
     top: 50%;
-    margin-top: -10px;
+    margin-top: -9px;
 }
 .active .icon-reorder .before {
     border-left-color: #bbb;
     border-width: 12px;
     top: 50%;
     margin-top: -12px;
+    left: -1px;
 }
 
 /* layer tab on right */
