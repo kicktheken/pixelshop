@@ -1,31 +1,27 @@
 define([
-    "canvas",
+    "engine",
     "lib/jqueryui",
     "lib/bootstrap",
     "lib/spectrum",
     "lib/keymaster"
 ],
-function Main(Canvas) {
+function Main(Engine) {
     $(document).ready(function() {
         g.ts = function() { return new Date().getTime(); };
         g.INITTIME = g.ts();
         var $canvas = $('#canvas'), disableClick = false;
+
+        // default globals
         g.width = $canvas.width();
         g.height = $canvas.height();
-        g.offset = { x: g.width/8, y: g.height/8 };
-        g.createCanvas = function(width,height) {
-            var ret = {
-                canvas: document.createElement('canvas')
-            };
-            ret.canvas.width = width;
-            ret.canvas.height = height;
-            ret.context = ret.canvas.getContext('2d');
-            return ret;
-        };
-        var canvas = new Canvas($canvas);
-        var defaultColors = canvas.defaultColors();
+        g.defaultOffset = function(width,height) {
+            return {x: width/8, y: height/8 };
+        }
+
+        var engine = new Engine($canvas);
+        var defaultColors = engine.defaultColors();
         $('#addlayer').click(function() {
-            if (canvas.addLayer() >= 7) {
+            if (engine.addLayer() >= 8) {
                 $(this).attr('disabled', true);
             }
         });
@@ -55,11 +51,11 @@ function Main(Canvas) {
                 $("#i"+this.id).css({
                     "border-left-color": color.toHexString()
                 });
-                canvas.setColor(color);
+                engine.setColor(color);
             },
             show: function() {
                 $('#li-'+this.id+' a').tab('show');
-                canvas.setColor($('#color'+i).spectrum('get'));
+                engine.setColor($('#color'+i).spectrum('get'));
                 disableClick = true;
             },
             hide: function() {
@@ -73,17 +69,17 @@ function Main(Canvas) {
                 "border-left-color": c
             });
             $('#li-color'+i+' a').click(function(e) {
-                canvas.setColor($('#color'+i).spectrum('get'));
+                engine.setColor($('#color'+i).spectrum('get'));
             });
         });
-        canvas.setColor($('#color1').spectrum('get'));
+        engine.setColor($('#color1').spectrum('get'));
         $('#li-color1 a').tab('show');
 
         //key('⌘+r, ctrl+r', function(){ return false });
         key('1,2,3,4,5,6,7,8,9,0', function(e,h) {
             var i = colororder[h.shortcut];
             $('#li-color'+i+' a').tab('show');
-            canvas.setColor($('#color'+i).spectrum('get'));
+            engine.setColor($('#color'+i).spectrum('get'));
         });
 
         function canvasCoords(f,e,$this) {
@@ -99,23 +95,23 @@ function Main(Canvas) {
             $canvas.bind('touchmove', function(e) {
                 e.preventDefault();
                 e = e.orginalEvent.touches[0];
-                canvasCoords(canvas.cursorMove,e,$canvas);
+                canvasCoords(engine.cursorMove,e,$canvas);
             }).bind('touchstart', function(e) {
                 e.preventDefault();
                 e = e.orginalEvent.touches[0];
-                canvasCoords(canvas.cursorStart,e,$canvas);
+                canvasCoords(engine.cursorStart,e,$canvas);
             }).bind('touchend', function(e) {
-                canvas.cursorEnd();
+                engine.cursorEnd();
             });            
         } else {
             $canvas.mousemove(function(e) {
-                canvasCoords(canvas.cursorMove,e,$canvas);
+                canvasCoords(engine.cursorMove,e,$canvas);
             }).mousedown(function(e) {
                 if (!disableClick) {
-                    canvasCoords(canvas.cursorStart,e,$canvas);
+                    canvasCoords(engine.cursorStart,e,$canvas);
                 }
             });
-            document.addEventListener('mouseup', canvas.cursorEnd);
+            document.addEventListener('mouseup', engine.cursorEnd);
         }
 
         $('#signin').popover({

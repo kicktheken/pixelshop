@@ -1,4 +1,4 @@
-define(function Layer() {
+define(["canvas"], function Layer(Canvas) {
 	var $tabbar = $('#layer-tabbar'), html = $tabbar.html();
 	var pwidth, pheight;
 	function initTabbar() {
@@ -31,10 +31,7 @@ define(function Layer() {
 			}
 			this.index = index;
 			this.preview = pcanvas.getContext('2d');
-			var buf = g.createCanvas(g.width,g.height);
-			this.canvas = buf.canvas;
-			this.context = buf.context;
-			this.offset = g.offset;
+			this.buf = new Canvas(g.width,g.height);
 			this.visible = true;
 			this.initEvents(i);
 		},
@@ -58,17 +55,7 @@ define(function Layer() {
 			if (!c) c = 'black';
 			this.preview.fillStyle = c;
 			this.preview.fillRect(0,0,32,32);
-		},
-		draw: function(color,x,y) {
-			x += this.offset.x;
-			y += this.offset.y;
-			var c = color.toRgb();
-			var d = this.context.createImageData(1,1);
-			d.data[0] = c.r;
-			d.data[1] = c.g;
-			d.data[2] = c.b;
-			d.data[3] = (c.a) ? c.a*255 : 255;
-			this.context.putImageData(d,x,y);
 		}
+		
 	});
 });
