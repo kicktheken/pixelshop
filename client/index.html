@@ -19,16 +19,12 @@ if (document.styleSheets[0].cssRules.length === 0) { // for development
                 <i class="icon-space-invaders"></i>Pixelshop
             </a>
             <ul class="nav pull-right">
+                <li><a href="#">Help <i class="icon-question-sign"></i></a></li>
                 <li class="dropdown">
                     <a href="#" role="button" id="signin">
                         Sign in <i class="icon-caret-down"></i>
                     </a>
                 </li>
-                <!--form class="navbar-form pull-right">
-                    <input type="text" placeholder="Email" class="span2" />
-                    <input type="password" placeholder="Password" class="span2" />
-                    <input type="submit" value="Login" class="btn btn-inverse" />
-                </form-->
             </ul>
         </div>
     </div>
@@ -36,40 +32,16 @@ if (document.styleSheets[0].cssRules.length === 0) { // for development
 <div class="control-panel">
     <div class="container">
         <div class="pull-left left-controls">&nbsp;
-            <!--div class="btn-group">
-                <button class="btn dropdown-toggle" data-toggle="dropdown">
-                    <i class="icon-palette"></i> <span class="caret"></span>
-                </button>
-                <ul class="dropdown-menu">
-                    <li><a href="#">Action</a></li>
-                    <li><a href="#">Another action</a></li>
-                    <li><a href="#">Something else here</a></li>
-                    <li class="divider"></li>
-                    <li><a href="#">Separated lin</a></li>
-                </ul>
-            </div-->
+            <!-- possibly some palette menus here -->
         </div>
         <div class="pull-left load-controls">
             <div class="input-prepend input-append">
-                <div class="btn-group">
-                    <button class="btn btn-warning dropdown-toggle" data-toggle="dropdown">
-                        <i class="icon-folder-open-alt"></i> <span class="caret"></span>
-                    </button>
-                    <ul class="dropdown-menu">
-                        <li><a href="#">Action</a></li>
-                        <li><a href="#">Another action</a></li>
-                        <li><a href="#">Something else here</a></li>
-                        <li class="divider"></li>
-                        <li><a href="#">Separated lin</a></li>
-                    </ul>
-                </div>
+                <button class="btn btn-warning"><i class="icon-folder-open-alt"></i></button>
                 <input type="text" class="searchbox" placeholder="Image Link or Search Library" />
                 <button class="btn btn-primary"><i class="icon-save"></i></button>
-                <!-- span class="add-on"><i class="icon-link"></i></span -->
             </div>
         </div>
         <div class="pull-left zoom-controls">
-            <!--button class="btn btn-primary"><i class="icon-save"></i></button-->
             <div class="btn-group">
                 <div class="btn-group">
                     <button class="btn"><i class="icon-zoom-in"></i></button>
@@ -78,22 +50,21 @@ if (document.styleSheets[0].cssRules.length === 0) { // for development
             </div>
         </div>
         <div class="pull-left paint-controls">
-            
-            <!--a class="btn btn-primary" href="#"><i class="icon-save"></i></a-->
             <div class="btn-group">
                 <div class="btn-group" data-toggle="buttons-radio">
-                    <button class="btn"><i class="icon-pencil"></i></button>
-                    <button class="btn"><i class="icon-paint-format"></i></button>
-                    <button class="btn"><i class="icon-eraser"></i></button>
-                    <button class="btn"><i class="icon-hand"></i></button>
-                    <button class="btn"><i class="icon-screenshot"></i></button>
-                    <button class="btn"><i class="icon-sun"></i></button>
-                    <button class="btn"><i class="icon-moon"></i></button>
+                    <button id="draw" class="btn paint-radio active"><i class="icon-pencil"></i></button>
+                    <button id="fill" class="btn paint-radio "><i class="icon-paint-format"></i></button>
+                    <button id="eraser" class="btn paint-radio"><i class="icon-eraser"></i></button>
+                    <button id="drag" class="btn paint-radio"><i class="icon-hand"></i></button>
+                    <button id="dropper" class="btn paint-radio"><i class="icon-eyedropper"></i></button>
+                    <button id="select" class="btn paint-radio"><i class="icon-screenshot"></i></button>
+                    <button id="brighten" class="btn paint-radio"><i class="icon-sun"></i></button>
+                    <button id="darken" class="btn paint-radio"><i class="icon-moon"></i></button>
                 </div>
             </div>
         </div>
         <div class="pull-left canvas-controls">
-            <button id="undo" class="btn"><i class="icon-undo"></i></button>
+            <button id="undo" class="btn disabled"><i class="icon-undo"></i></button>
         </div>
         <div class="pull-left right-controls">
             <button id="addlayer" class="btn btn-mini">
@@ -103,7 +74,6 @@ if (document.styleSheets[0].cssRules.length === 0) { // for development
     </div>
 </div>
 
-        <!--button class="btn btn-danger" id="signin">Sign in or Register <i class="icon-caret-down"></i></button-->
 <div class="container">
 <div class="row">
 <div class="tabbable tabs-right">

@@ -4,15 +4,16 @@
 @import url('spectrum.css');
 
 canvas {
+    border: 1px solid #ddd;
     image-rendering: -moz-crisp-edges;
     /* CHROME PLEASE FIX THIS SOON */
     image-rendering: -webkit-optimize-contrast;
 }
 .preview {
-    border: 1px solid #ddd;
+    background-color: #eee;
 }
 .container {
-    width: 1003px;
+    width: 1005px;
 }
 .signinform {
     display:none;
@@ -28,14 +29,14 @@ canvas {
     text-align: right;
 }
 .load-controls {
-    width: 312px;
+    width: 276px;
     margin-left: 20px;
 }
 .zoom-controls {
     width: 88px;
 }
 .paint-controls{
-    width: 280px;
+    width: 319px;
 }
 .canvas-controls {
     margin-right: 20px;
@@ -45,7 +46,7 @@ canvas {
     margin-top: 6px;
 }
 .searchbox {
-    width: 200px;
+    width: 180px;
 }
 
 /* workspace bootstrap overrides */
