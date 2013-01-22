@@ -53,16 +53,15 @@ define(["canvas"], function Layer(Canvas) {
 				g.Canvas.setActiveLayer(i);
 			});
 		},
-		draw: function(color,x,y) {
-			var ret = this.buf.draw(color,x,y);
+		draw: function(pixel) {
+			this.buf.draw(pixel);
 			this.refresh();
-			return ret;
 		},
 		refresh: function() {
 			var width = this.preview.width, height = this.preview.height;
 			var data = this.buf.getViewDataFromBounds(width,height);
+			this.preview.clearRect(0,0,width,height);
 			if (data) {
-				this.preview.clearRect(0,0,width,height);
 				this.preview.putImageData(data,0,0);
 			}
 		}

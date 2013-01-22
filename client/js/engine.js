@@ -1,5 +1,5 @@
-define(["layer","canvas"],function Engine(Layer, Canvas) {
-	var _this;
+define(["actions","layer","canvas"],function Engine(Actions, Layer, Canvas) {
+	var _this, actions;
 	var context, bg, buf, s, pressed, color, layers, order, activeLayer = -1;
 	var sizes = [10,15,20,24,30];
 	return Class.extend({
@@ -9,6 +9,7 @@ define(["layer","canvas"],function Engine(Layer, Canvas) {
             }
             _this = this;
             g['Canvas'] = this;
+            actions = new Actions();
             context = $canvas.get(0).getContext('2d');
             pressed = false;
             layers = [];
@@ -90,8 +91,28 @@ define(["layer","canvas"],function Engine(Layer, Canvas) {
 			var size = sizes[s];
 			x = Math.floor(x/size);
 			y = Math.floor(y/size);
-			layers[activeLayer].draw(color,x,y);
-			_this.refresh(false);
+			actions.draw(layers[activeLayer],color,x,y);
+			_this.refresh();
+			_this.updateUndo();
+		},
+		undo: function() {
+			if (actions.undo()) {
+				_this.refresh();
+				_this.updateUndo();
+			}
+		},
+		updateUndo: function() {
+			if (actions.canUndo()) {
+				$('#undo').removeClass('disabled');
+			} else {
+				$('#undo').addClass('disabled',true);
+			}
+		},
+		redo: function() {
+			if (actions.redo()) {
+				_this.refresh();
+				_this.updateUndo();
+			}
 		},
 		cursorMove: function(x,y) {
 			if (!pressed) {
@@ -105,6 +126,7 @@ define(["layer","canvas"],function Engine(Layer, Canvas) {
 		},
 		cursorEnd: function() {
 			pressed = false;
+			actions.endDraw();
 		}
 	});
 })

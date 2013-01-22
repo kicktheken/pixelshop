@@ -111,6 +111,10 @@ function Main(Engine) {
             document.addEventListener('mouseup', engine.cursorEnd);
         }
 
+        $('#undo').addClass('disabled', true).click(engine.undo);
+        key('⌘+z, ctrl+z', engine.undo);
+        key('⌘+shift+z, ctrl+shift+z', engine.redo);
+
         $('#signin').popover({
             placement: 'bottom',
             title: 'Sign in or Register',

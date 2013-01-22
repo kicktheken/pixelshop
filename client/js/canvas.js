@@ -1,4 +1,4 @@
-define(function Canvas() {
+define(["pixel"],function Canvas(Pixel) {
 	function defaultOffset(width,height) {
 		return {x: width/8, y: height/8 };
 	}
@@ -10,24 +10,13 @@ define(function Canvas() {
 			this.context = this.canvas.getContext('2d');
 			this.offset = defaultOffset(width,height);
 		},
-		draw: function(color,x,y) {
-			var c = color.toRgb();
-			if (c.a === 0) {
-				return;
-			}
-			var d = this.context.createImageData(1,1), old;
-			x += this.offset.x;
-			y += this.offset.y;
-			d.data[0] = c.r;
-			d.data[1] = c.g;
-			d.data[2] = c.b;
-			d.data[3] = (c.a) ? c.a*255 : 255;
-			this.context.putImageData(d,x,y);
+		draw: function(pixel) {
+			pixel.draw(this.context);
+			var x = pixel.x, y = pixel.y;
 			if (!this.bounds) {
-				old = this.bounds = [x,y,x,y];
+				this.bounds = [x,y,x,y];
 			} else {
 				var b = this.bounds;
-				old = [b[0],b[1],b[2],b[3]];
 				if (x < b[0]) {
 					b[0] = x;
 				} else if (x > b[2]) {
@@ -39,7 +28,14 @@ define(function Canvas() {
 					b[3] = y;
 				}
 			}
-			return old;
+		},
+		pixel: function(x,y,color) {
+			x += this.offset.x;
+			y += this.offset.y;
+			if (color) {
+				return new Pixel(color,x,y);
+			}
+			return new Pixel(this.context,x,y);
 		},
 		collapse: function(buf) {
 			var x = buf.offset.x - this.offset.x;
