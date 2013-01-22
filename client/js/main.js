@@ -29,6 +29,11 @@ function Main(Engine) {
                     colororder[i] = this.id[this.id.length-1];
                     i = (i+1)%10;
                 });
+            },
+            activate: function(e,ui) {
+                var id = ui.item[0].id;
+                $('#'+id+' a').tab('show');
+                engine.setColor($('#'+id.substr(3)).spectrum('get'));
             }
         });
         var colororder = [0,1];
