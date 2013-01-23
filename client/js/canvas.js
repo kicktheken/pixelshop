@@ -37,9 +37,25 @@ define(["pixel"],function Canvas(Pixel) {
 			}
 			return new Pixel(this.context,x,y);
 		},
+		move: function(x,y) {
+			this.offset.x += x;
+			this.offset.y += y;
+			if (this.offset.x < 0) {
+				this.offset.x = 0;
+			} else if (this.offset.x > this.canvas.width) {
+				this.offset.x = this.canvas.width;
+			}
+			if (this.offset.y < 0) {
+				this.offset.y = 0;
+			} else if (this.offset.x > this.canvas.height) {
+				this.offset.y = this.canvas.height;
+			}
+		},
+		constrainView: function() {
+		},
 		collapse: function(buf) {
-			var x = buf.offset.x - this.offset.x;
-			var y = buf.offset.y - this.offset.y;
+			var x = this.offset.x - buf.offset.x;
+			var y = this.offset.y - buf.offset.y;
 			this.context.drawImage(buf.canvas,x,y);
 		},
 		clear: function() {

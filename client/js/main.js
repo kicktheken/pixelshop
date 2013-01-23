@@ -83,6 +83,28 @@ function Main(Engine) {
             $('#li-color'+i+' a').tab('show');
             engine.setColor($('#color'+i).spectrum('get'));
         });
+        key('q,w,e,r,t,y,u,i', function(e,h) {
+            switch (h.shortcut) {
+                case 'q': return paintRadio('draw');
+                case 'w': return paintRadio('fill');
+                case 'e': return paintRadio('eraser');
+                case 'r': return paintRadio('drag');
+                case 't': return paintRadio('dropper');
+                case 'y': return paintRadio('select');
+                case 'u': return paintRadio('brighten');
+                case 'i': return paintRadio('darken');
+            }
+            var i = colororder[h.shortcut];
+            $('#li-color'+i+' a').tab('show');
+            engine.setColor($('#color'+i).spectrum('get'));
+        });
+        function paintRadio(id) {
+            $('#'+id).button('toggle');
+            engine.setMode(id);
+        }
+        $('.paint-radio').click(function(e) {
+            paintRadio(this.id);
+        });
 
         function canvasCoords(f,e,$this) {
             var offset = $this.parent().offset();

@@ -1,7 +1,8 @@
 define(["actions","layer","canvas"],function Engine(Actions, Layer, Canvas) {
 	var _this, actions;
-	var context, bg, buf, s, pressed, color, layers, order, activeLayer = -1;
+	var context, bg, buf, s, pressed, mode, color, layers, order, activeLayer = -1;
 	var sizes = [10,15,20,24,30];
+	var blankcolor = { toRgb: function() { return {r:0,g:0,b:0,a:0}; } };
 	return Class.extend({
 		init: function($canvas) {
 			if (typeof _this !== 'undefined') {
@@ -17,6 +18,7 @@ define(["actions","layer","canvas"],function Engine(Actions, Layer, Canvas) {
             s = 2;
             bg = new Canvas(g.width,g.height);
             buf = new Canvas(g.width,g.height);
+            mode = 'draw';
             _this.addLayer();
             _this.refreshBackground();
 		},
@@ -91,15 +93,44 @@ define(["actions","layer","canvas"],function Engine(Actions, Layer, Canvas) {
 			return ['blue','red','green','yellow','orange','brown','black','white','purple','beige'];
 		},
 		setColor: function(c) {
+			$('#draw').button('toggle');
+			_this.setMode('draw');
             color = c;
 		},
-		draw: function(x,y) {
+		setMode: function(m) {
+			mode = m;
+		},
+		perform: function(x,y) {
+			switch (mode) {
+			case 'draw': 	return _this.draw(color,x,y);
+			case 'fill': 	return;
+			case 'eraser': 	return _this.draw(blankcolor,x,y);
+			case 'drag': 	return _this.move(x,y);
+			case 'dropper': return;
+			case 'select': 	return;
+			case 'brighten':return;
+			case 'darken':	return;
+			}
+		},
+		draw: function(color,x,y) {
 			var size = sizes[s];
 			x = Math.floor(x/size);
 			y = Math.floor(y/size);
 			actions.draw(layers[activeLayer],color,x,y);
 			_this.refresh();
 			_this.updateUndo();
+		},
+		move: function(x,y) {
+			pressed.mx += (x-pressed.x)/sizes[s];
+			pressed.my += (y-pressed.y)/sizes[s];
+			x = (pressed.mx > 0) ? Math.floor(pressed.mx) : Math.ceil(pressed.mx);
+			y = (pressed.my > 0) ? Math.floor(pressed.my) : Math.ceil(pressed.my);
+			if (x !== 0 || y !== 0) {
+				pressed.mx -= x;
+				pressed.my -= y;
+				layers[activeLayer].buf.move(-x,-y);
+				_this.refresh();
+			}
 		},
 		undo: function() {
 			if (actions.undo()) {
@@ -124,11 +155,13 @@ define(["actions","layer","canvas"],function Engine(Actions, Layer, Canvas) {
 			if (!pressed) {
 				return;
 			}
-			_this.draw(x,y);
+			_this.perform(x,y);
+			pressed.x = x;
+			pressed.y = y;
 		},
 		cursorStart: function(x,y) {
-			pressed = true;
-			_this.draw(x,y);
+			pressed = {x:x,y:y,mx:0,my:0};
+			_this.perform(x,y);
 		},
 		cursorEnd: function() {
 			pressed = false;

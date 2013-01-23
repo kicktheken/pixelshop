@@ -5,14 +5,11 @@ define(function Pixel() {
 		init: function(c,x,y) {
 			if (typeof c.toRgb === 'function') {
 				var c = c.toRgb();
-				if (c.a === 0) {
-					return;
-				}
 				var d = context.createImageData(1,1);
 				d.data[0] = c.r;
 				d.data[1] = c.g;
 				d.data[2] = c.b;
-				d.data[3] = (c.a) ? c.a*255 : 255;
+				d.data[3] = (typeof c.a === 'undefined') ? 255: c.a*255;
 				this.d = d;
 				this.x = x;
 				this.y = y;
