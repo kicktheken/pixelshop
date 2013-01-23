@@ -138,12 +138,24 @@ define(["actions","layer","canvas"],function Engine(Actions, Layer, Canvas) {
 			if (s+1 < sizes.length) {
 				s++;
 				_this.refreshBackground();
+				_this.updateZoom();
 			}
 		},
 		zoomOut: function() {
 			if (s > 0) {
 				s--;
 				_this.refreshBackground();
+				_this.updateZoom();
+			}
+		},
+		updateZoom: function() {
+			if (s+1 === sizes.length) {
+				$('#zoomin').addClass('disabled');
+			} else if (s === 0) {
+				$('#zoomout').addClass('disabled');
+			} else {
+				$('#zoomin').removeClass('disabled');
+				$('#zoomout').removeClass('disabled');
 			}
 		}
 	});
