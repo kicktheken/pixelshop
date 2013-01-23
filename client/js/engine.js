@@ -5,10 +5,10 @@ define(["actions","layer","canvas"],function Engine(Actions, Layer, Canvas) {
 	return Class.extend({
 		init: function($canvas) {
 			if (typeof _this !== 'undefined') {
-                throw "Canvas is a singleton and cannot be initialized more than once";
+                throw "Engine is a singleton and cannot be initialized more than once";
             }
             _this = this;
-            g['Canvas'] = this;
+            g['Engine'] = this;
             actions = new Actions();
             context = $canvas.get(0).getContext('2d');
             pressed = false;
@@ -19,6 +19,12 @@ define(["actions","layer","canvas"],function Engine(Actions, Layer, Canvas) {
             buf = new Canvas(g.width,g.height);
             _this.addLayer();
             _this.refreshBackground();
+		},
+		viewWidth: function() {
+			return g.width/sizes[s];
+		},
+		viewHeight: function() {
+			return g.height/sizes[s];
 		},
 		refresh: function() {
 			context.drawImage(bg.canvas,0,0);
@@ -127,6 +133,18 @@ define(["actions","layer","canvas"],function Engine(Actions, Layer, Canvas) {
 		cursorEnd: function() {
 			pressed = false;
 			actions.endDraw();
+		},
+		zoomIn: function() {
+			if (s+1 < sizes.length) {
+				s++;
+				_this.refreshBackground();
+			}
+		},
+		zoomOut: function() {
+			if (s > 0) {
+				s--;
+				_this.refreshBackground();
+			}
 		}
 	});
 })

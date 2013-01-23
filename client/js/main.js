@@ -116,6 +116,8 @@ function Main(Engine) {
             document.addEventListener('mouseup', engine.cursorEnd);
         }
 
+        $('#zoomin').click(engine.zoomIn);
+        $('#zoomout').click(engine.zoomOut);
         key('⌘+z, ctrl+z', engine.undo);
         key('⌘+shift+z, ctrl+shift+z', engine.redo);
 

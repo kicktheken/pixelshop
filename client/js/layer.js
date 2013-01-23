@@ -9,12 +9,12 @@ define(["canvas"], function Layer(Canvas) {
 				$('#layer-tabbar li').each(function(e) {
 					order.push(this.id[this.id.length-1]-1);
 				});
-				g.Canvas.setLayerOrder(order);
+				g.Engine.setLayerOrder(order);
 			},
 			activate: function(e,ui) {
 				var id = ui.item[0].id;
 				$('#'+id+' a').tab('show');
-				g.Canvas.setActiveLayer(id[id.length-1]-1);
+				g.Engine.setActiveLayer(id[id.length-1]-1);
 			}
 		});
 	}

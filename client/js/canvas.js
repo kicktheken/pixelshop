@@ -1,6 +1,6 @@
 define(["pixel"],function Canvas(Pixel) {
 	function defaultOffset(width,height) {
-		return {x: width/8, y: height/8 };
+		return {x: width/6, y: height/6 };
 	}
 	return Class.extend({
 		init: function(width,height) {
@@ -30,8 +30,8 @@ define(["pixel"],function Canvas(Pixel) {
 			}
 		},
 		pixel: function(x,y,color) {
-			x += this.offset.x;
-			y += this.offset.y;
+			x += this.offset.x - g.Engine.viewWidth()/2;
+			y += this.offset.y - g.Engine.viewHeight()/2;
 			if (color) {
 				return new Pixel(color,x,y);
 			}
@@ -46,7 +46,9 @@ define(["pixel"],function Canvas(Pixel) {
 			this.context.clearRect(0,0,this.canvas.width,this.canvas.height);
 		},
 		getViewData: function(width,height) {
-			return this.context.getImageData(this.offset.x,this.offset.y,width,height);
+			var x = this.offset.x - g.Engine.viewWidth()/2;
+			var y = this.offset.y - g.Engine.viewHeight()/2;
+			return this.context.getImageData(x,y,width,height);
 		},
 		getViewDataFromBounds: function(width,height) {
 			if (!this.bounds) {
