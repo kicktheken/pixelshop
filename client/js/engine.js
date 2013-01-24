@@ -29,9 +29,14 @@ define(["actions","layer","canvas"],function Engine(Actions, Layer, Canvas) {
 			return g.height/sizes[s];
 		},
 		refresh: function() {
-			context.drawImage(bg.canvas,0,0);
 			var size = sizes[s], visible = 0;
 			var width = g.width/size, height = g.height/size;
+			context.fillStyle = '#bbb';
+			context.fillRect(0,0,g.width,g.height);
+			var v = layers[activeLayer].buf.viewable(width,height);
+			context.fillStyle = '#f4f4f4';
+			context.fillRect(v.x*size,v.y*size,v.width*size,v.height*size);
+			context.drawImage(bg.canvas,0,0);
 			buf.clear();
 			for (var i=layers.length-1; i>=0; i--) {
 				var layer = layers[order[i]];
@@ -56,8 +61,7 @@ define(["actions","layer","canvas"],function Engine(Actions, Layer, Canvas) {
 			}
 		},
 		refreshBackground: function() {
-			bg.context.fillStyle = '#f4f4f4';
-			bg.context.fillRect(0,0,g.width,g.height);
+			bg.clear();
 			bg.context.fillStyle = '#ddd';
             var size = sizes[s]/2;
             for (var y=0; y<g.height/size; y++) {
@@ -88,6 +92,7 @@ define(["actions","layer","canvas"],function Engine(Actions, Layer, Canvas) {
 		},
 		setActiveLayer: function(index) {
 			activeLayer = index;
+			_this.refresh();
 		},
 		defaultColors: function() {
 			return ['blue','red','green','yellow','orange','brown','black','white','purple','beige'];
@@ -121,13 +126,14 @@ define(["actions","layer","canvas"],function Engine(Actions, Layer, Canvas) {
 			_this.updateUndo();
 		},
 		move: function(x,y) {
-			pressed.mx += (x-pressed.x)/sizes[s];
-			pressed.my += (y-pressed.y)/sizes[s];
-			x = (pressed.mx > 0) ? Math.floor(pressed.mx) : Math.ceil(pressed.mx);
-			y = (pressed.my > 0) ? Math.floor(pressed.my) : Math.ceil(pressed.my);
+			var size = sizes[s];
+			pressed.mx += x-pressed.x;
+			pressed.my += y-pressed.y;
+			x = (pressed.mx > 0) ? Math.floor(pressed.mx/size) : Math.ceil(pressed.mx/size);
+			y = (pressed.my > 0) ? Math.floor(pressed.my/size) : Math.ceil(pressed.my/size);
 			if (x !== 0 || y !== 0) {
-				pressed.mx -= x;
-				pressed.my -= y;
+				pressed.mx -= x*size;
+				pressed.my -= y*size;
 				layers[activeLayer].buf.move(-x,-y);
 				_this.refresh();
 			}

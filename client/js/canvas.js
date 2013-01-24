@@ -51,7 +51,21 @@ define(["pixel"],function Canvas(Pixel) {
 				this.offset.y = this.canvas.height;
 			}
 		},
-		constrainView: function() {
+		viewable: function(vw,vh) {
+			vw /= 2;
+			vh /= 2;
+			var ret = {x:0, y:0, width:vw*2, height:vh*2};
+			if (this.offset.x < vw) {
+				ret.x = vw - this.offset.x;
+			} else if (this.offset.x > this.canvas.width - vw) {
+				ret.width = this.offset.x - this.canvas.width + vw*2;
+			}
+			if (this.offset.y < vh) {
+				ret.y = vh - this.offset.y;
+			} else if (this.offset.y > this.canvas.height - vh) {
+				ret.height = this.offset.y - this.canvas.height + vh*2;
+			}
+			return ret;
 		},
 		collapse: function(buf) {
 			var x = this.offset.x - buf.offset.x;
