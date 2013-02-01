@@ -117,6 +117,10 @@ define(["actions","layer","canvas"],function Engine(Actions, Layer, Canvas) {
 			case 'darken':	return;
 			}
 		},
+		load: function(image) {
+			layers[activeLayer].load(image);
+			_this.refresh();
+		},
 		draw: function(color,x,y) {
 			var size = sizes[s];
 			x = Math.floor(x/size);

@@ -52,11 +52,15 @@ define(["canvas"], function Layer(Canvas) {
 					_this.visible = true;
 					$(this).removeClass('icon-eye-close').addClass('icon-eye-open');
 				}
-				g.Canvas.refresh();
+				g.Engine.refresh();
 			});
 			$('#li-layer'+index+' a').click(function(e) {
-				g.Canvas.setActiveLayer(i);
+				g.Engine.setActiveLayer(i);
 			});
+		},
+		load: function(image) {
+			this.buf.load(image);
+			this.refresh();
 		},
 		draw: function(pixel) {
 			this.buf.draw(pixel);

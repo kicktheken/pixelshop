@@ -10,24 +10,27 @@ define(["pixel"],function Canvas(Pixel) {
 			this.context = this.canvas.getContext('2d');
 			this.offset = defaultOffset(width,height);
 		},
+		updateBounds: function(minx,miny,maxx,maxy) {
+			if (!this.bounds) {
+				this.bounds = [minx,miny,maxx,maxy];
+			} else {
+				var b = this.bounds;
+				if (minx < b[0]) {
+					b[0] = minx;
+				} else if (maxx > b[2]) {
+					b[2] = maxx;
+				}
+				if (miny < b[1]) {
+					b[1] = miny;
+				} else if (maxy > b[3]) {
+					b[3] = maxy;
+				}
+			}
+		},
 		draw: function(pixel) {
 			pixel.draw(this.context);
 			var x = pixel.x, y = pixel.y;
-			if (!this.bounds) {
-				this.bounds = [x,y,x,y];
-			} else {
-				var b = this.bounds;
-				if (x < b[0]) {
-					b[0] = x;
-				} else if (x > b[2]) {
-					b[2] = x;
-				}
-				if (y < b[1]) {
-					b[1] = y;
-				} else if (y > b[3]) {
-					b[3] = y;
-				}
-			}
+			this.updateBounds(x,y,x,y);
 		},
 		pixel: function(x,y,color) {
 			x += this.offset.x - g.Engine.viewWidth()/2;
@@ -36,6 +39,14 @@ define(["pixel"],function Canvas(Pixel) {
 				return new Pixel(color,x,y);
 			}
 			return new Pixel(this.context,x,y);
+		},
+		load: function(image) {
+			var x = this.offset.x-image.width/2;
+			var y = this.offset.y-image.height/2;
+			var maxx = this.offset.x+image.width/2;
+			var maxy = this.offset.y+image.height/2;
+			this.context.drawImage(image,x,y);
+			this.updateBounds(x,y,maxx,maxy);
 		},
 		move: function(x,y) {
 			this.offset.x += x;

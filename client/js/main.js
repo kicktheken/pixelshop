@@ -143,6 +143,27 @@ function Main(Engine) {
         key('⌘+z, ctrl+z', engine.undo);
         key('⌘+shift+z, ctrl+shift+z', engine.redo);
 
+        if (typeof FileReader !== 'undefined') {
+            log.info('file api available');
+            document.ondragover = function () { return false; };
+            document.ondragend = function () { return false; };
+            document.ondrop = function(e) {
+                e.preventDefault();
+                var file = e.dataTransfer.files[0], reader = new FileReader();
+                reader.onload = function(e) {
+                    reader.onload = null;
+                    var image = new Image();
+                    image.onload = function() {
+                        this.onload = null;
+                        engine.load(this);
+                    };
+                    image.src = e.target.result;
+                };
+                reader.readAsDataURL(file);
+                return false;
+            };
+        }
+
         key('enter', function() { $('.searchbox').focus(); });
         $('#signin').popover({
             placement: 'bottom',
