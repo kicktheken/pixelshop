@@ -17,20 +17,20 @@ define(function Action() {
 			var b = this.layer.buf.bounds;
 			this.redoBounds = [b[0],b[1],b[2],b[3]];
 		},
-		enqueue: function(undoPixel,redoPixel) {
-			this.undoQueue.unshift(undoPixel);
-			this.redoQueue.push(redoPixel);
+		enqueue: function(undo,redo) {
+			this.undoQueue.unshift(undo);
+			this.redoQueue.push(redo);
 		},
 		undo: function() {
 			for (var i in this.undoQueue) {
-				this.layer.buf.draw(this.undoQueue[i]);		
+				this.undoQueue[i]();		
 			}
 			this.layer.buf.bounds = this.undoBounds;
 			this.layer.refresh();
 		},
 		redo: function() {
 			for (var i in this.redoQueue) {
-				this.layer.buf.draw(this.redoQueue[i]);		
+				this.redoQueue[i]();		
 			}
 			this.layer.buf.bounds = this.redoBounds;
 			this.layer.refresh();

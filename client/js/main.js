@@ -140,6 +140,7 @@ function Main(Engine) {
 
         $('#zoomin').click(engine.zoomIn);
         $('#zoomout').click(engine.zoomOut);
+        $('#undo').click(engine.undo);
         key('⌘+z, ctrl+z', engine.undo);
         key('⌘+shift+z, ctrl+shift+z', engine.redo);
 

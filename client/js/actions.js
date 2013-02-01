@@ -21,9 +21,29 @@ define(["action"], function Actions(Action) {
 				action = actions[index] = new Action(layer);
 				actions = actions.slice(0,index+1);
 			}
-			action.enqueue(oldp,newp);
+			action.enqueue(
+				function() { layer.buf.draw(oldp); },
+				function() { layer.buf.draw(newp); }
+			);
 			layer.draw(newp);
 			return true;
+		},
+		load: function(layer,image) {
+			var olddata = layer.buf.getData(image.width,image.height);
+			var oldx = layer.buf.offset.x - image.width/2;
+			var oldy = layer.buf.offset.y - image.height/2;
+			var action = actions[index] = new Action(layer);
+			actions = actions.slice(0,index+1);
+			action.enqueue(
+				function() {
+					layer.buf.clear(oldx,oldy,image.width,image.height);
+					layer.buf.loadData(olddata,oldx,oldy);
+				},
+				function() { layer.load(image); }
+			);
+			layer.load(image);
+			action.complete();
+			index++;
 		},
 		endDraw: function() {
 			if (actions[index]) {

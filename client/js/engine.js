@@ -118,8 +118,9 @@ define(["actions","layer","canvas"],function Engine(Actions, Layer, Canvas) {
 			}
 		},
 		load: function(image) {
-			layers[activeLayer].load(image);
+			actions.load(layers[activeLayer],image);
 			_this.refresh();
+			_this.updateUndo();
 		},
 		draw: function(color,x,y) {
 			var size = sizes[s];

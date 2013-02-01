@@ -48,6 +48,9 @@ define(["pixel"],function Canvas(Pixel) {
 			this.context.drawImage(image,x,y);
 			this.updateBounds(x,y,maxx,maxy);
 		},
+		loadData: function(data,x,y) {
+			this.context.putImageData(data,x,y);
+		},
 		move: function(x,y) {
 			this.offset.x += x;
 			this.offset.y += y;
@@ -84,7 +87,17 @@ define(["pixel"],function Canvas(Pixel) {
 			this.context.drawImage(buf.canvas,x,y);
 		},
 		clear: function() {
-			this.context.clearRect(0,0,this.canvas.width,this.canvas.height);
+			if (arguments.length === 4) {
+				var a = arguments;
+				this.context.clearRect(a[0],a[1],a[2],a[3]);
+			} else {
+				this.context.clearRect(0,0,this.canvas.width,this.canvas.height);
+			}
+		},
+		getData: function(width,height) {
+			var x = this.offset.x - width/2;
+			var y = this.offset.y - height/2;
+			return this.context.getImageData(x,y,width,height);
 		},
 		getViewData: function(width,height) {
 			var x = this.offset.x - g.Engine.viewWidth()/2;
