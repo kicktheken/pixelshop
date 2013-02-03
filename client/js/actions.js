@@ -29,18 +29,23 @@ define(["action"], function Actions(Action) {
 			return true;
 		},
 		load: function(layer,image) {
-			var olddata = layer.buf.getData(image.width,image.height);
 			var oldx = layer.buf.offset.x - image.width/2;
 			var oldy = layer.buf.offset.y - image.height/2;
-			var action = actions[index] = new Action(layer);
-			actions = actions.slice(0,index+1);
-			action.enqueue(
-				function() {
+			var undo;
+			if (layer.buf.bounds) {
+				var olddata = layer.buf.getData(image.width,image.height);
+				undo = function() {
 					layer.buf.clear(oldx,oldy,image.width,image.height);
 					layer.buf.loadData(olddata,oldx,oldy);
-				},
-				function() { layer.load(image); }
-			);
+				};
+			} else {
+				undo = function() {
+					layer.buf.clear(oldx,oldy,image.width,image.height);
+				};
+			}
+			var action = actions[index] = new Action(layer);
+			actions = actions.slice(0,index+1);
+			action.enqueue(undo, function() { layer.load(image); });
 			layer.load(image);
 			action.complete();
 			index++;

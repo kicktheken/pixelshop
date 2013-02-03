@@ -38,7 +38,7 @@ if (document.styleSheets[0].cssRules.length === 0) { // for development
             <div class="input-prepend input-append">
                 <button class="btn btn-warning"><i class="icon-folder-open-alt"></i></button>
                 <input type="text" class="searchbox" placeholder="Image Link or Search Library" />
-                <button class="btn btn-primary"><i class="icon-save"></i></button>
+                <button id="save" class="btn btn-primary"><i class="icon-save"></i></button>
             </div>
         </div>
         <div class="pull-left zoom-controls">
@@ -127,7 +127,7 @@ if (document.styleSheets[0].cssRules.length === 0) { // for development
 <script type="text/javascript" src="js/main-built.js"></script>
 <script type="text/javascript">
 var _gaq = _gaq || [];
-_gaq.push(['_setAccount', 'UA-24723549-2']);
+_gaq.push(['_setAccount', window.googlekey]);
 _gaq.push(['_trackPageview']);
 
 (function() {

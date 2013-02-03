@@ -118,9 +118,17 @@ define(["actions","layer","canvas"],function Engine(Actions, Layer, Canvas) {
 			}
 		},
 		load: function(image) {
+			_this.addLayer();
 			actions.load(layers[activeLayer],image);
 			_this.refresh();
 			_this.updateUndo();
+		},
+		save: function() {
+            filepicker.store(buf.canvas.toDataURL(), function success(FPFile) {
+				log.info('file store success');
+			}, function error(FPError) {
+				log.info('file store error');
+			});
 		},
 		draw: function(color,x,y) {
 			var size = sizes[s];
