@@ -84,7 +84,11 @@ define(["pixel"],function Canvas(Pixel) {
 		collapse: function(buf) {
 			var x = this.offset.x - buf.offset.x;
 			var y = this.offset.y - buf.offset.y;
+			var b = buf.bounds;
 			this.context.drawImage(buf.canvas,x,y);
+			if (b) {
+				this.updateBounds(b[0],b[1],b[2],b[3]);
+			}
 		},
 		clear: function() {
 			if (arguments.length === 4) {
@@ -93,6 +97,26 @@ define(["pixel"],function Canvas(Pixel) {
 			} else {
 				this.context.clearRect(0,0,this.canvas.width,this.canvas.height);
 			}
+		},
+		toDataObject: function() {
+			var ret = {
+				x: this.offset.x,
+				y: this.offset.y
+			};
+			if (!this.bounds) {
+				return ret;
+			}
+			var b = this.bounds, width = b[2] - b[0], height = b[3]-b[1];
+			var data = this.context.getImageData(b[0],b[1],width,height);
+			var canvas = document.createElement('canvas');
+			canvas.width = width;
+			canvas.height = height;
+			var context = canvas.getContext('2d');
+			context.putImageData(data,0,0);
+			ret.w = width;
+			ret.h = height;
+			ret.data = canvas.toDataURL();
+			return ret;
 		},
 		getData: function(width,height) {
 			var x = this.offset.x - width/2;

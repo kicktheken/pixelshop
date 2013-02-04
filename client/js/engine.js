@@ -1,7 +1,7 @@
 define(["actions","layer","canvas"],function Engine(Actions, Layer, Canvas) {
 	var _this, actions;
 	var context, bg, buf, s, pressed, mode, color, layers, order, activeLayer = -1;
-	var sizes = [10,15,20,24,30];
+	var sizes = [10,15,20,24,30], host = 'http://'+g.host+'/a';
 	var blankcolor = { toRgb: function() { return {r:0,g:0,b:0,a:0}; } };
 	return Class.extend({
 		init: function($canvas) {
@@ -123,11 +123,41 @@ define(["actions","layer","canvas"],function Engine(Actions, Layer, Canvas) {
 			_this.refresh();
 			_this.updateUndo();
 		},
+		loadWorkspace: function() {
+			$.get(host+'/getworkspace', function(data) {
+				
+			}).fail(function(err) {
+				log.warn("unable to load workspace");
+			});
+		},
+		saveWorkspace: function() {
+			var workspace = { active: activeLayer, layers: layers.length };
+			for (var i=layers.length-1; i>=0; i--) {
+				workspace[i] = layers[order[i]].buf.toDataObject();
+			}
+			var data = JSON.stringify(workspace);
+			LZMA.compress(data,1,function(result) {
+				var binstring = String.fromCharCode.apply(null,result);
+				$.post(host+'/saveworkspace',binstring,function(data) {
+					log.info('data: '+data);
+				}).fail(function(err) {
+					log.warn("failed to save workspave");
+				});
+			});
+		},
 		save: function() {
-            filepicker.store(buf.canvas.toDataURL(), function success(FPFile) {
-				log.info('file store success');
-			}, function error(FPError) {
-				log.info('file store error');
+			var data = buf.canvas.toDataURL();
+			data = JSON.stringify(buf.toDataObject());
+			LZMA.compress(data,1, function(result) {
+				var binstring = String.fromCharCode.apply(null,result);
+				log.info(binstring.length);
+				var binarray = [];
+				for (var i=0; i<binstring.length; i++) {
+					binarray.push(binstring.charCodeAt(i));
+				}
+				LZMA.decompress(binarray, function(result) {
+					log.info(result);
+				});
 			});
 		},
 		draw: function(color,x,y) {

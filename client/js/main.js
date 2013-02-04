@@ -4,13 +4,12 @@ define([
     "lib/bootstrap",
     "lib/spectrum",
     "lib/keymaster",
-    "lib/filepicker",
     "lib/lzma",
-    "../config"
+    "config"
 ],
 function Main(Engine) {
     window.googlekey = g.analytics;
-    filepicker.setKey(g.fpkey);
+
     $(document).ready(function() {
         var $canvas = $('#canvas');
 
@@ -146,7 +145,8 @@ function Main(Engine) {
         $('#zoomin').click(engine.zoomIn);
         $('#zoomout').click(engine.zoomOut);
         $('#undo').click(engine.undo);
-        $('#save').click(engine.save);
+        $('#save').click(engine.saveWorkspace);
+        $('#load').click(engine.loadWorkspace);
         key('⌘+z, ctrl+z', engine.undo);
         key('⌘+shift+z, ctrl+shift+z', engine.redo);
 
