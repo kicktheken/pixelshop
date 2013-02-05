@@ -21,6 +21,11 @@ function Main(Engine) {
         
         var engine = new Engine($canvas), disableClick = false;
         var defaultColors = engine.defaultColors();
+        engine.loadWorkspace();
+        $(window).bind('beforeunload', function() {
+            engine.saveWorkspace();
+        });
+
         $('#addlayer').click(function() {
             if (engine.addLayer() >= 8) {
                 $(this).attr('disabled', true);

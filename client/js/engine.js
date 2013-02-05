@@ -125,6 +125,9 @@ define(["actions","layer","canvas"],function Engine(Actions, Layer, Canvas) {
 		},
 		loadWorkspace: function() {
 			$.get(host+'/getworkspace', function(bindata) {
+				if (bindata.length === 0) {
+					return;
+				}
 				var binarray = [];
 				for (var i=0; i<bindata.length; i++) {
 					binarray.push(bindata.charCodeAt(i));
@@ -192,11 +195,18 @@ define(["actions","layer","canvas"],function Engine(Actions, Layer, Canvas) {
 			var data = JSON.stringify(workspace);
 			LZMA.compress(data,1,function(result) {
 				var binstring = String.fromCharCode.apply(null,result);
-				$.post(host+'/saveworkspace',binstring,function(data) {
-					log.info("save successful (length: "+binstring.length+")");
-					//_this._loadWorkspace(workspace);
-				}).fail(function(err) {
-					log.error("failed to save workspave");
+				$.ajax({
+					type: "POST",
+					url: host+'/saveworkspace',
+					data: binstring,
+					success: function(data) {
+						log.info("save successful (length: "+binstring.length+")");
+						//_this._loadWorkspace(workspace);
+					},
+					error: function(err) {
+						//log.error("failed to save workspave");
+					},
+					async: false
 				});
 			});
 		},
