@@ -112,8 +112,8 @@ function Main(Engine) {
 
         function canvasCoords(f,e,$this) {
             var offset = $this.parent().offset();
-            var x = e.pageX - offset.left - 1;
-            var y = e.pageY - offset.top - 1;
+            var x = e.pageX - offset.left - 2;
+            var y = e.pageY - offset.top - 2;
             if (withinBounds(x,y,0,0,g.width,g.height)) {
                 f(x,y);
             }
