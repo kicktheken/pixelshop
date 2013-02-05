@@ -1,6 +1,6 @@
 define(["canvas"], function Layer(Canvas) {
 	var $tabbar = $('#layer-tabbar'), html = $tabbar.html();
-	var pwidth, pheight;
+	var pwidth, pheight, pool = [], numLayers = 0;
 	function initTabbar() {
 		$('#layer-tabbar a').removeAttr('style');
 		$tabbar.sortable({
@@ -24,9 +24,16 @@ define(["canvas"], function Layer(Canvas) {
 			if (i === 1) {
 				initTabbar();
 			}
-			if (i > 0) {
-				var ohtml = html.replace(/(ayer( )?)1/g,"$1"+index);
-				$tabbar.prepend(ohtml);
+			numLayers++;
+			if (numLayers > 1) {
+				if (pool[index] === undefined) {
+					var ohtml = html.replace(/(ayer( )?)1/g,"$1"+index);
+					$tabbar.prepend(ohtml);
+				} else {
+					pool[index].addClass('active');
+					$tabbar.prepend(pool[index]);
+					delete pool[index];
+				}
 				pcanvas = $('#layer'+index).get(0);
 			} else {
 				$('#layer-tabbar .active a').css({'cursor':'default'});
@@ -57,6 +64,19 @@ define(["canvas"], function Layer(Canvas) {
 			$('#li-layer'+index+' a').click(function(e) {
 				g.Engine.setActiveLayer(i);
 			});
+		},
+		remove: function() {
+			if (numLayers > 1) {
+				pool[this.index] = $("#li-layer"+this.index).detach();
+				numLayers--;
+			}
+		},
+		getWorkspace: function() {
+			return this.buf.toDataObject();
+		},
+		setWorkspace: function(obj) {
+			this.buf.setCanvas(obj);
+			this.refresh();
 		},
 		load: function(image) {
 			this.buf.load(image);

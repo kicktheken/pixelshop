@@ -124,24 +124,79 @@ define(["actions","layer","canvas"],function Engine(Actions, Layer, Canvas) {
 			_this.updateUndo();
 		},
 		loadWorkspace: function() {
-			$.get(host+'/getworkspace', function(data) {
-				
+			$.get(host+'/getworkspace', function(bindata) {
+				var binarray = [];
+				for (var i=0; i<bindata.length; i++) {
+					binarray.push(bindata.charCodeAt(i));
+				}
+				LZMA.decompress(binarray, function(json) {
+					var workspace = JSON.parse(json);
+					_this._loadWorkspace(workspace);
+				});
 			}).fail(function(err) {
-				log.warn("unable to load workspace");
+				log.error("unable to load workspace");
 			});
 		},
+		_loadWorkspace: function(workspace) {
+			var finished = 0;
+			function loadImage() {
+				workspace[this.i].img = this;
+				this.onload = null;
+				finished++;
+				if (finished < workspace.layers) {
+					return;
+				}
+				var diff = layers.length - workspace.layers;
+				if (diff > 0) {
+					var toRemove = layers.splice(layers.length - diff,diff);
+					for (var i=0; i<order.length; i++) {
+						if (layers[order[i]] === undefined) {
+							order.splice(i,1);
+							i--;
+						}
+					}
+					for (var i in toRemove) {
+						toRemove[i].remove();
+					}
+				} else if (diff < 0) {
+					diff *= -1;
+					for (var i=0; i<diff; i++) {
+						var l = layers.length;
+						layers.push(new Layer(l));
+						order.unshift(l);
+					}
+				}
+				for (var i=layers.length-1; i>=0; i--) {
+					layers[order[i]].setWorkspace(workspace[i]);
+				}
+				var i = order[workspace.active];
+				$('#li-layer'+(activeLayer+1)).removeClass('active');
+				$('#li-layer'+layers[i].index+' a').tab('show');
+				_this.setActiveLayer(i);
+			}
+			for (var i=0; i<workspace.layers; i++) {
+				var img = new Image();
+				img.onload = loadImage;
+				img.i = i;
+				img.src = workspace[i].data;
+			}
+		},
 		saveWorkspace: function() {
-			var workspace = { active: activeLayer, layers: layers.length };
+			var workspace = { layers: layers.length };
 			for (var i=layers.length-1; i>=0; i--) {
-				workspace[i] = layers[order[i]].buf.toDataObject();
+				if (activeLayer === order[i]) {
+					workspace.active = i;
+				}
+				workspace[i] = layers[order[i]].getWorkspace();
 			}
 			var data = JSON.stringify(workspace);
 			LZMA.compress(data,1,function(result) {
 				var binstring = String.fromCharCode.apply(null,result);
 				$.post(host+'/saveworkspace',binstring,function(data) {
-					log.info('data: '+data);
+					log.info("save successful (length: "+binstring.length+")");
+					//_this._loadWorkspace(workspace);
 				}).fail(function(err) {
-					log.warn("failed to save workspave");
+					log.error("failed to save workspave");
 				});
 			});
 		},
