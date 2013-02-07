@@ -11,20 +11,27 @@ function getCookies(req) {
     });
     return cookies;
 }
+function createUser(req,res) {
+    var idgen = req.connection.address().address;
+    idgen += req.headers['user-agent'];
+    idgen += Math.random().toString();
+    res.cookie('userid', sha1(idgen), {maxAge: 1000*3600*24*7, httpOnly: true });
+    res.send(204); // no content
+}
 
 module.exports.init = function(cb) {
     var routes = {
         '/a/getworkspace': function(req,res) {
             var cookies = getCookies(req);
             if (!cookies['userid'] || cookies['userid'].length !== 40) {
-                var idgen = req.connection.address().address;
-                idgen += req.headers['user-agent'];
-                idgen += Math.random().toString();
-                res.cookie('userid', sha1(idgen), {maxAge: 1000*3600*24*7, httpOnly: true });
-                res.send(204); // no content
+                createUser(req,res);
             } else {
                 cb.get(cookies['userid']+'.wks', function(err,data,meta) {
-                    res.send((err) ? 400 : data);
+                    if (err) {
+                        createUser(req,res);
+                    } else {
+                        res.send(data);
+                    }
                 });
             }
         },
