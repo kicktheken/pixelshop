@@ -143,8 +143,10 @@ define(["actions","layer","canvas"],function Engine(Actions, Layer, Canvas) {
 		_loadWorkspace: function(workspace) {
 			var finished = 0;
 			function loadImage() {
-				workspace[this.i].img = this;
-				this.onload = null;
+				if (this instanceof Image) {
+					workspace[this.i].img = this;
+					this.onload = null;
+				}
 				finished++;
 				if (finished < workspace.layers) {
 					return;
@@ -178,6 +180,10 @@ define(["actions","layer","canvas"],function Engine(Actions, Layer, Canvas) {
 				_this.setActiveLayer(i);
 			}
 			for (var i=0; i<workspace.layers; i++) {
+				if (!workspace[i].data) {
+					loadImage();
+					continue;
+				}
 				var img = new Image();
 				img.onload = loadImage;
 				img.i = i;
