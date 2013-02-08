@@ -1,4 +1,5 @@
 var crypto = require('crypto');
+var TIMEOUT = 1000;
 
 function sha1(s) {
     return crypto.createHash('sha1').update(s).digest('hex');
@@ -26,7 +27,9 @@ module.exports.init = function(cb) {
             if (!cookies['userid'] || cookies['userid'].length !== 40) {
                 createUser(req,res);
             } else {
+                var timeout = setTimeout(function() { createUser(req,res); }, TIMEOUT);
                 cb.get(cookies['userid']+'.wks', function(err,data,meta) {
+                    clearTimeout(timeout);
                     if (err) {
                         createUser(req,res);
                     } else {
@@ -46,7 +49,9 @@ module.exports.init = function(cb) {
                 data += chunk;
             });
             req.on('end',function() {
+                var timeout = setTimeout(function() { res.send(400); }, TIMEOUT);
                 cb.set(cookies['userid']+'.wks', data, function(err,meta) {
+                    clearTimeout(timeout);
                     res.send((err) ? 400 : 204);
                 });
             });

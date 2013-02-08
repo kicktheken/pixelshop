@@ -212,7 +212,8 @@ define(["actions","layer","canvas"],function Engine(Actions, Layer, Canvas) {
 					error: function(err) {
 						//log.error("failed to save workspave");
 					},
-					async: false
+					async: false,
+					timeout: 1000
 				});
 			});
 		},
