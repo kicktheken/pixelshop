@@ -3649,12 +3649,11 @@ var LZMA = (function () {
                 if ((new Date).getTime() - start > 200) {
                     if (on_progress) {
                         on_progress(percent);
-                        setTimeout(do_action, 0);
-                        return false;
                     } else if (typeof callback_num !== "undefined") {
                         update_progress(percent, callback_num);
-                        start = (new Date).getTime();
                     }
+                    setTimeout(do_action, 0);
+                    return false;
                 }
             }
             
@@ -3678,7 +3677,8 @@ var LZMA = (function () {
                 });
             }
         }
-        do_action();
+        
+        setTimeout(do_action, 1);
     }
     
     function decompress() {
@@ -3721,12 +3721,11 @@ var LZMA = (function () {
                 if ((new Date).getTime() - start > 200) {
                     if (on_progress) {
                         on_progress(percent);
-                        setTimeout(do_action, 0);
-                        return false;
                     } else if (typeof callback_num !== "undefined") {
                         update_progress(percent, callback_num);
-                        start = (new Date).getTime();
                     }
+                    setTimeout(do_action, 0);
+                    return false;
                 }
             }
             
@@ -3748,7 +3747,8 @@ var LZMA = (function () {
                 });
             }
         }
-        do_action();
+        
+        setTimeout(do_action, 0);
     }
     
     function $onModuleLoad(this$static) {

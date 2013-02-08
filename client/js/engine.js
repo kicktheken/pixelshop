@@ -2,6 +2,7 @@ define(["actions","layer","canvas"],function Engine(Actions, Layer, Canvas) {
 	var _this, actions;
 	var context, bg, buf, s, pressed, mode, color, layers, order, activeLayer = -1;
 	var sizes = [10,15,20,24,30], host = 'http://'+g.host+'/a';
+	var saveTimer, saved;
 	var blankcolor = { toRgb: function() { return {r:0,g:0,b:0,a:0}; } };
 	return Class.extend({
 		init: function($canvas) {
@@ -19,6 +20,7 @@ define(["actions","layer","canvas"],function Engine(Actions, Layer, Canvas) {
             bg = new Canvas(g.width,g.height);
             buf = new Canvas(g.width,g.height);
             mode = 'draw';
+            saved = true;
             _this.addLayer();
             _this.refreshBackground();
 		},
@@ -106,20 +108,34 @@ define(["actions","layer","canvas"],function Engine(Actions, Layer, Canvas) {
 			mode = m;
 		},
 		perform: function(x,y) {
+			var changed = false;
 			switch (mode) {
-			case 'draw': 	return _this.draw(color,x,y);
+			case 'draw': 	changed = _this.draw(color,x,y); break;
 			case 'fill': 	return;
-			case 'eraser': 	return _this.draw(blankcolor,x,y);
+			case 'eraser': 	changed = _this.draw(blankcolor,x,y); break;
 			case 'drag': 	return _this.move(x,y);
 			case 'dropper': return;
 			case 'select': 	return;
 			case 'brighten':return;
 			case 'darken':	return;
 			}
+			if (changed) {
+				_this.queueSave();
+			}
+		},
+		queueSave: function() {
+			saved = false;
+			clearTimeout(saveTimer);
+			saveTimer = setTimeout(_this.saveWorkspace, g.timeout*2);
+			
+		},
+		isSaved: function() {
+			return saved;
 		},
 		load: function(image) {
 			_this.addLayer();
 			actions.load(layers[activeLayer],image);
+			_this.queueSave();
 			_this.refresh();
 			_this.updateUndo();
 		},
@@ -207,6 +223,7 @@ define(["actions","layer","canvas"],function Engine(Actions, Layer, Canvas) {
 					data: binstring,
 					success: function(data) {
 						log.info("save successful (length: "+binstring.length+")");
+						saved = true;
 						//_this._loadWorkspace(workspace);
 					},
 					error: function(err) {
@@ -235,9 +252,10 @@ define(["actions","layer","canvas"],function Engine(Actions, Layer, Canvas) {
 			var size = sizes[s];
 			x = Math.floor(x/size);
 			y = Math.floor(y/size);
-			actions.draw(layers[activeLayer],color,x,y);
+			var ret = actions.draw(layers[activeLayer],color,x,y);
 			_this.refresh();
 			_this.updateUndo();
+			return ret;
 		},
 		move: function(x,y) {
 			var size = sizes[s];

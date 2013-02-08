@@ -23,10 +23,9 @@ function Main(Engine) {
         var defaultColors = engine.defaultColors();
         engine.loadWorkspace();
         $(window).bind('beforeunload', function() {
-            engine.saveWorkspace();
-            // yes, busy wait to make sure asynchronous post goes thru
-            var ts = g.ts();
-            while (ts+g.timeout > g.ts()) {}
+            if (!engine.isSaved()) {
+                return "You have unsaved changes.";
+            }
         });
 
         $('#addlayer').click(function() {

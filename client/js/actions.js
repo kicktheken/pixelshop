@@ -80,7 +80,7 @@ define(["action"], function Actions(Action) {
 			return true;
 		},
 		canUndo: function() {
-			return index > 0 || !actions[index].isComplete();
+			return index > 0 || actions[index] && !actions[index].isComplete();
 		},
 		canRedo: function() {
 			return index < actions.length && actions[index].isComplete();
