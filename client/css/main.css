@@ -2,6 +2,7 @@
 @import url('jqueryui-bootstrap.css');
 @import url('font-custom.css');
 @import url('spectrum.css');
+@import url('keys.css');
 
 canvas {
     border: 1px solid #ddd;
@@ -13,7 +14,7 @@ canvas {
     background-color: #eee;
 }
 .container {
-    width: 1006px;
+    width: 1012px;
 }
 .signinform {
     display:none;
@@ -25,7 +26,7 @@ canvas {
     padding-bottom: 6px;
 }
 .left-controls {
-    width: 80px;
+    width: 86px;
     text-align: right;
 }
 .load-controls {
@@ -56,41 +57,14 @@ canvas {
     width: 42px;
     margin-bottom:2px;
 }
-#color-tabbar .icon-reorder {
+#color-tabbar li {
+    min-width:105px;
+}
+#color-tabbar .key {
     cursor: move;
-    color: #bbb;
-}
-
-.active .icon-reorder {
-    margin-left:2px;
-    vertical-align: middle;
-    position: relative;
-}
-.active .icon-reorder:before {
-    content:'';
-}
-.active .icon-reorder .after,
-.active .icon-reorder .before {
-    left: 100%;
-    border: solid transparent;
-    content: " ";
-    height: 0;
-    width: 0;
-    position: absolute;
-}
-.active .icon-reorder .after {
-    border-left-color: black;
-    border-width: 9px;
-    top: 50%;
-    left: 0px;
-    margin-top: -9px;
-}
-.active .icon-reorder .before {
-    border-left-color: #bbb;
-    border-width: 12px;
-    top: 50%;
-    margin-top: -12px;
-    left: -1px;
+    margin-left:8px;
+    padding-top:3px;
+    padding-bottom:2px;
 }
 
 /* layer tab on right */

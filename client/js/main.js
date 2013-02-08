@@ -24,6 +24,9 @@ function Main(Engine) {
         engine.loadWorkspace();
         $(window).bind('beforeunload', function() {
             engine.saveWorkspace();
+            // yes, busy wait to make sure asynchronous post goes thru
+            var ts = g.ts();
+            while (ts+g.timeout > g.ts()) {}
         });
 
         $('#addlayer').click(function() {
@@ -35,7 +38,9 @@ function Main(Engine) {
             update: function (e,ui) {
                 var i = 1;
                 $('#color-tabbar li').each(function(e) {
-                    colororder[i] = this.id[this.id.length-1];
+                    var index = this.id[this.id.length-1];
+                    $('#key-color'+index).html(i);
+                    colororder[i] = index;
                     i = (i+1)%10;
                 });
             },
@@ -48,7 +53,7 @@ function Main(Engine) {
         var colororder = [0,1];
         var html = tabbar.html(), ohtml = html;
         for (var i = 2; i != 1; i = (i+1)%10) {
-            html += ohtml.replace(/color1/g,"color"+i);
+            html += ohtml.replace(/color1/g,"color"+i).replace(/>1/g,">"+i);
             colororder.push(i);
         }
         tabbar.html(html);
@@ -59,9 +64,14 @@ function Main(Engine) {
             showAlpha: true,
             showButtons: false,
             change: function(color) {
-                $("#i"+this.id).css({
-                    "border-left-color": color.toHexString()
-                });
+                var rgb = color.toRgb(), css = {};
+                if ((rgb.r+rgb.g+rgb.b)/3 < 128) {
+                    css["color"] = "#eee";
+                } else {
+                    css["color"] = "";
+                }
+                css["background"] = color.toHexString();
+                $("#key-"+this.id).css(css);
                 engine.setColor(color);
             },
             show: function() {
@@ -76,11 +86,20 @@ function Main(Engine) {
             var c = defaultColors[i];
             i = (i+1)%10;
             $('#color'+i).spectrum('set', c);
-            $("#icolor"+i).css({
-                "border-left-color": c
-            });
-            $('#li-color'+i+' a').click(function(e) {
-                engine.setColor($('#color'+i).spectrum('get'));
+
+            $('#li-color'+i+' a').on('show', function(e) {
+                var children = e.currentTarget.children;
+                $("#color-tabbar .key").each(function(i,e) {
+                    $(e).css({ "background" : "", "color" : "" });
+                });
+                var color = $(children[0]).spectrum('get');
+                var rgb = color.toRgb(), css = {};
+                if ((rgb.r+rgb.g+rgb.b)/3 < 128) {
+                    css["color"] = "#eee";
+                }
+                css["background"] = color.toHexString();
+                $(children[2]).css(css);
+                engine.setColor(color);
             });
         });
         engine.setColor($('#color1').spectrum('get'));
@@ -113,6 +132,9 @@ function Main(Engine) {
         }
         $('.paint-radio').click(function(e) {
             paintRadio(this.id);
+        }).each(function(i,e) {
+            // TODO: add tooltips
+            //$(e).tooltip({ title: this.id, placement:'top' });
         });
 
         function canvasCoords(f,e,$this) {
