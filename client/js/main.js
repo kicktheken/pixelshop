@@ -110,7 +110,8 @@ function Main(Engine) {
             $('#li-color'+i+' a').tab('show');
             engine.setColor($('#color'+i).spectrum('get'));
         });
-        key('q,w,e,r,t,y,u,i', function(e,h) {
+        var paintKeys = ['q','w','e','r','t','y','u','i'];
+        key(paintKeys.join(','), function(e,h) {
             switch (h.shortcut) {
                 case 'q': return paintRadio('draw');
                 case 'w': return paintRadio('fill');
@@ -133,7 +134,13 @@ function Main(Engine) {
             paintRadio(this.id);
         }).each(function(i,e) {
             // TODO: add tooltips
-            //$(e).tooltip({ title: this.id, placement:'top' });
+            $(e).tooltip({
+                title: this.id+"<div class='light key'>"+paintKeys[i]+"</div>",
+                html: true,
+                placement:'top',
+                container: 'body',
+                delay: 500
+            });
         });
 
         function canvasCoords(f,e,$this) {

@@ -23,7 +23,7 @@ canvas {
 /* control bar */
 .control-panel {
     padding-top: 12px;
-    padding-bottom: 6px;
+    padding-bottom: 2px;
 }
 .left-controls {
     width: 86px;
@@ -50,7 +50,11 @@ canvas {
     width: 180px;
 }
 
-/* workspace bootstrap overrides */
+.tooltip .key {
+    margin-left:6px;
+    padding-top:2px;
+    padding-bottom:3px;
+}
 
 /* left tabs colorpicker */
 #color-tabbar .colorpicker {
