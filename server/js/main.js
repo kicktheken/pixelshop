@@ -26,7 +26,8 @@ cb.connect(config, function(err,cb) {
     }
     var routes = router.init(cb);
     for (var method in routes) {
-        app.all(method,routes[method]);
+        var path = config.proxyPrefix + method;
+        app.all(path,routes[method]);
     }
     app.listen(9008);
 });

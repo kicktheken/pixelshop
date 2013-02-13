@@ -1,6 +1,6 @@
 var config = {
     analytics: "", // google analytics
-    host: "localhost", // client host
+    proxyPrefix: "/a", // subdirectory name to proxy to nodejs server
     hosts: ["localhost:8091"], // couchbase hosts
     bucket: "default", // couchbase bucket
     timeout: 1000 // request timeout (in ms)

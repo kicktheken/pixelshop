@@ -1,7 +1,8 @@
 define(["actions","layer","canvas"],function Engine(Actions, Layer, Canvas) {
 	var _this, actions;
 	var context, bg, buf, s, pressed, mode, color, layers, order, activeLayer = -1;
-	var sizes = [10,15,20,24,30], host = 'http://'+g.host+'/a';
+	var host = /[^\/]+\/\/[^\/]+/g.exec(window.location.href) + g.proxyPrefix;
+	var sizes = [10,15,20,24,30];
 	var saveTimer, saved;
 	var blankcolor = { toRgb: function() { return {r:0,g:0,b:0,a:0}; } };
 	return Class.extend({

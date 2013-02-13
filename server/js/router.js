@@ -22,7 +22,7 @@ function createUser(req,res) {
 
 module.exports.init = function(cb) {
     var routes = {
-        '/a/getworkspace': function(req,res) {
+        '/getworkspace': function(req,res) {
             var cookies = getCookies(req);
             if (!cookies['userid'] || cookies['userid'].length !== 40) {
                 createUser(req,res);
@@ -38,7 +38,7 @@ module.exports.init = function(cb) {
                 });
             }
         },
-        '/a/saveworkspace': function(req,res) {
+        '/saveworkspace': function(req,res) {
             var cookies = getCookies(req);
             if (!cookies['userid'] || cookies['userid'].length !== 40) {
                 res.send(400); // bad request
