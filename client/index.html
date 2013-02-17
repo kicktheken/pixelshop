@@ -21,10 +21,8 @@ if (document.styleSheets[0].cssRules.length === 0) { // for development
             </a>
             <ul class="nav pull-right">
                 <li><a href="#">Help <i class="icon-question-sign"></i></a></li>
-                <li class="dropdown">
-                    <a href="#" role="button" id="signin">
-                        Sign in <i class="icon-caret-down"></i>
-                    </a>
+                <li>
+                    <a id="signin" class="btn btn-danger" href="#">Sign in</a>
                 </li>
             </ul>
         </div>
@@ -104,21 +102,6 @@ if (document.styleSheets[0].cssRules.length === 0) { // for development
 </div> <!-- tabbable -->
 </div> <!-- row -->
 </div> <!-- container -->
-
-<div class="signinform">
-    <form>
-        <div class="input-prepend">
-            <span class="add-on"><i class="icon-envelope"></i></span>
-            <input class="span2" type="text" placeholder="Email address">
-        </div>
-        <div class="input-prepend">
-            <span class="add-on"><i class="icon-key"></i></span>
-            <input class="span2" type="password" placeholder="Password">
-        </div>
-        <label class="checkbox"><input type="checkbox" /> Remember me</label>
-        <input class="btn btn-danger" type="submit" value="Login" />
-    </form>
-</div>
 
 <!-- load scripts at end -->
 <script type="text/javascript" src="js/main-built.js"></script>

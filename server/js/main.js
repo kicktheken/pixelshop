@@ -29,7 +29,7 @@ cb.connect(config, function(err,cb) {
         var path = config.proxyPrefix + method;
         app.all(path,routes[method]);
     }
-    app.listen(9008);
+    app.listen(config.proxyPort);
 });
 
 

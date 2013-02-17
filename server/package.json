@@ -4,8 +4,7 @@
     "author":"Kenneth Chan <kicktheken@gmail.com>",
     "dependencies": {
         "couchbase": "0.0.10",
-        "express": "3.1.0",
-        "aws-sdk": "0.9.2-pre.3"
+        "express": "3.1.0"
     },
     "engines" : { "node" : ">=0.8.8" }
 }

@@ -16,8 +16,13 @@ canvas {
 .container {
     width: 1012px;
 }
-.signinform {
-    display:none;
+#signin {
+    padding:4px 12px;
+    text-shadow: none;
+    color:white;
+}
+#signin:hover {
+    background-color: #bd362f;
 }
 
 /* control bar */
