@@ -178,8 +178,8 @@ function Main(Engine) {
         $('#zoomin').click(engine.zoomIn);
         $('#zoomout').click(engine.zoomOut);
         $('#undo').click(engine.undo);
-        $('#save').click(engine.saveWorkspace);
-        $('#load').click(engine.loadWorkspace);
+        $('#save').click(engine.export);
+        //$('#load').click(engine.loadWorkspace);
         key('⌘+z, ctrl+z', engine.undo);
         key('⌘+shift+z, ctrl+shift+z', engine.redo);
 

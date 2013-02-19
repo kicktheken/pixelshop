@@ -166,7 +166,8 @@ define(["actions","layer","canvas"],function Engine(Actions, Layer, Canvas) {
 			var qs = window.location.hash, query = "";
 			if (qs.length && /#access_token=\w+/.test(qs)) {
 				query = "?" + qs.substr(1);
-				//window.location.hash = "";
+				log.info(query);
+				window.location.hash = "";
 			}
 			$.get(host+'/getworkspace'+query, function(data) {
 				if (data.length === 0) {
@@ -308,6 +309,16 @@ define(["actions","layer","canvas"],function Engine(Actions, Layer, Canvas) {
 					log.info(result);
 				});
 			});
+		},
+		export: function() {
+			var obj = buf.toDataObject();
+			if (!obj.data) {
+				return;
+			}
+			var dataURL = obj.data;
+			var base64img = dataURL.substr(dataURL.indexOf(',')+1).toString();
+			$('#hidden').val(base64img);
+			$('form').attr("action",host+'/exportpng').submit();
 		},
 		draw: function(color,x,y) {
 			var size = sizes[s];

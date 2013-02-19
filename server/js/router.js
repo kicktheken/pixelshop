@@ -22,10 +22,10 @@ function createUser(req,res) {
     return userid;
 }
 
-function user(req,res) {
+function user(req,res,getonly) {
     var cookies = getCookies(req);
     if (!cookies['userid'] || cookies['userid'].length !== 40) {
-        return createUser(req,res);
+        return (getonly) ? "" : createUser(req,res);
     }
     return cookies['userid'];
 }
@@ -78,6 +78,36 @@ module.exports.init = function(cb) {
             }
         });
     }
+    function saveWorkspace(req,res,callback) {
+        try {
+            var data = '';
+            req.on('data',function(chunk) {
+                data += chunk;
+            });
+            req.on('end',function() {
+                var key = user(req,res) + ".wks";
+                if (data.length === 0) {
+                    if (typeof callback === 'function') {
+                        callback();
+                    }
+                    res.send(204);
+                    return;
+                }
+                cbSet(key, data, function() {
+                    if (typeof callback === 'function') {
+                        callback();
+                    }
+                    res.send(204);
+                }, function(err) {
+                    console.log(err);
+                    res.send(400);
+                });
+            });
+        } catch(err) {
+            console.log(err);
+            res.send(400);
+        }
+    }
     var routes = {
         '/getworkspace': function(req,res) {
             try {
@@ -87,6 +117,12 @@ module.exports.init = function(cb) {
                             var profile = JSON.parse(body);
                             if (profile.id && profile.email && profile.verified_email) {
                                 cbGet(config.oauthPrefix+profile.id, function(wksKey) {
+                                    var userid = wksKey.substr(0,40);
+                                    var prevuserid = user(req,res,true);
+                                    if (prevuserid.length > 0 && userid !== prevuserid) {
+                                        cb.remove(prevuserid+".wks", function (err, meta) {});
+                                        res.cookie('userid', userid, {maxAge: 1000*3600*24*30, httpOnly: true });
+                                    }
                                     sendWorkspace(req,res,wksKey,profile.email);
                                 }, function(err) {
                                     var userid = user(req,res);
@@ -112,39 +148,26 @@ module.exports.init = function(cb) {
             }
             
         },
-        '/saveworkspace': function(req,res,callback) {
-            try {
-                var data = '';
-                req.on('data',function(chunk) {
-                    data += chunk;
-                });
-                req.on('end',function() {
-                    var key = user(req,res) + ".wks";
-                    if (data.length === 0) {
-                        if (typeof callback === 'function') {
-                            callback();
-                        }
-                        res.send(204);
-                        return;
-                    }
-                    cbSet(key, data, function() {
-                        if (typeof callback === 'function') {
-                            callback();
-                        }
-                        res.send(204);
-                    }, function(err) {
-                        console.log(err);
-                        res.send(400);
-                    });
-                });
-            } catch(err) {
-                console.log(err);
-                res.send(400);
-            }
+        '/saveworkspace': function(req,res) {
+            saveWorkspace(req,res);
         },
         '/newworkspace': function(req,res) {
-            routes['/saveworkspace'](req,res,function() {
+            saveWorkspace(req,res,function() {
                 createUser(req,res);
+            });
+        },
+        '/exportpng': function(req,res) {
+            var data = '';
+            req.on('data',function(chunk) {
+                data += chunk;
+            });
+            req.on('end',function() {
+                data = decodeURIComponent(data.substr(5));
+                var bin = new Buffer(data,"base64");
+                res.setHeader('Content-Type', 'image/png');
+                res.setHeader('Content-Disposition','attachment; filename="export.png"');
+                res.setHeader('Content-Length', bin.length);
+                res.end(bin);
             });
         }
     }
