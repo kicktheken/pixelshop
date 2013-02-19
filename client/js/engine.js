@@ -3,7 +3,7 @@ define(["actions","layer","canvas"],function Engine(Actions, Layer, Canvas) {
 	var context, bg, buf, s, pressed, mode, color, layers, order, activeLayer = -1;
 	var host = /[^\/]+\/\/[^\/]+/g.exec(window.location.href) + g.proxyPrefix;
 	var sizes = [10,15,20,24,30];
-	var saveTimer, saved;
+	var saveTimer, saved, email;
 	var blankcolor = { toRgb: function() { return {r:0,g:0,b:0,a:0}; } };
 	return Class.extend({
 		init: function($canvas) {
@@ -22,6 +22,7 @@ define(["actions","layer","canvas"],function Engine(Actions, Layer, Canvas) {
             buf = new Canvas(g.width,g.height);
             mode = 'draw';
             saved = true;
+            email = "";
             _this.addLayer();
             _this.refreshBackground();
 		},
@@ -141,16 +142,31 @@ define(["actions","layer","canvas"],function Engine(Actions, Layer, Canvas) {
 			_this.updateUndo();
 		},
 		loadWorkspace: function() {
-			$.get(host+'/getworkspace', function(bindata) {
-				if (bindata.length === 0) {
+			var qs = window.location.hash, query = "";
+			if (qs.length && /#access_token=\w+/.test(qs)) {
+				query = "?" + qs.substr(1);
+				//window.location.hash = "";
+			}
+			$.get(host+'/getworkspace'+query, function(data) {
+				if (data.length === 0) {
+					return;
+				}
+				var workspace = typeof data === 'object' ? data : JSON.parse(data);
+				if (workspace.email) {
+					email = workspace.email;
+					$('#email').text(email);
+					$('#signin').removeClass('btn-danger')
+						.attr("href","").text("Sign out");
+				}
+				if (!workspace.layers) {
 					return;
 				}
 				var binarray = [];
-				for (var i=0; i<bindata.length; i++) {
-					binarray.push(bindata.charCodeAt(i));
+				for (var i=0; i<workspace.layers.length; i++) {
+					binarray.push(workspace.layers.charCodeAt(i));
 				}
 				LZMA.decompress(binarray, function(json) {
-					var workspace = JSON.parse(json);
+					workspace.layers = JSON.parse(json);
 					_this._loadWorkspace(workspace);
 				});
 			}).fail(function(err) {
@@ -161,14 +177,14 @@ define(["actions","layer","canvas"],function Engine(Actions, Layer, Canvas) {
 			var finished = 0;
 			function loadImage() {
 				if (this instanceof Image) {
-					workspace[this.i].img = this;
+					workspace.layers[this.i].img = this;
 					this.onload = null;
 				}
 				finished++;
-				if (finished < workspace.layers) {
+				if (finished < workspace.numLayers) {
 					return;
 				}
-				var diff = layers.length - workspace.layers;
+				var diff = layers.length - workspace.numLayers;
 				if (diff > 0) {
 					var toRemove = layers.splice(layers.length - diff,diff);
 					for (var i=0; i<order.length; i++) {
@@ -189,39 +205,44 @@ define(["actions","layer","canvas"],function Engine(Actions, Layer, Canvas) {
 					}
 				}
 				for (var i=layers.length-1; i>=0; i--) {
-					layers[order[i]].setWorkspace(workspace[i]);
+					layers[order[i]].setWorkspace(workspace.layers[i]);
 				}
 				var i = order[workspace.active];
 				$('#li-layer'+(activeLayer+1)).removeClass('active');
 				$('#li-layer'+layers[i].index+' a').tab('show');
 				_this.setActiveLayer(i);
 			}
-			for (var i=0; i<workspace.layers; i++) {
-				if (!workspace[i].data) {
+			for (var i=0; i<workspace.numLayers; i++) {
+				if (!workspace.layers[i].data) {
 					loadImage();
 					continue;
 				}
 				var img = new Image();
 				img.onload = loadImage;
 				img.i = i;
-				img.src = workspace[i].data;
+				img.src = workspace.layers[i].data;
 			}
 		},
 		saveWorkspace: function() {
-			var workspace = { layers: layers.length };
+			var workspace = { numLayers: layers.length, layers: [] };
 			for (var i=layers.length-1; i>=0; i--) {
 				if (activeLayer === order[i]) {
 					workspace.active = i;
 				}
-				workspace[i] = layers[order[i]].getWorkspace();
+				workspace.layers[i] = layers[order[i]].getWorkspace();
 			}
-			var data = JSON.stringify(workspace);
-			LZMA.compress(data,1,function(result) {
+			var layersData = JSON.stringify(workspace.layers);
+			LZMA.compress(layersData,1,function(result) {
 				var binstring = String.fromCharCode.apply(null,result);
+				if (email.length) {
+					workspace.email = email;
+				}
+				workspace.layers = binstring;
+				var data = JSON.stringify(workspace);
 				$.ajax({
 					type: "POST",
 					url: host+'/saveworkspace',
-					data: binstring,
+					data: data,
 					success: function(data) {
 						log.info("save successful (length: "+binstring.length+")");
 						saved = true;

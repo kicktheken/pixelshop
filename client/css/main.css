@@ -16,12 +16,20 @@ canvas {
 .container {
     width: 1012px;
 }
+#email {
+    cursor:default;
+}
 #signin {
     padding:4px 12px;
+}
+#signin.btn-danger {
     text-shadow: none;
     color:white;
 }
-#signin:hover {
+#signin.btn:hover {
+    background-color:#e6e6e6;
+}
+#signin.btn.btn-danger:hover {
     background-color: #bd362f;
 }
 
