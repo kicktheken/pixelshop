@@ -78,6 +78,10 @@ define(["canvas"], function Layer(Canvas) {
 			this.buf.setCanvas(obj);
 			this.refresh();
 		},
+		resetWorkspace: function() {
+			this.buf.reset();
+			this.refresh();
+		},
 		load: function(image) {
 			this.buf.load(image);
 			this.refresh();

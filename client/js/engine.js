@@ -94,8 +94,11 @@ define(["actions","layer","canvas"],function Engine(Actions, Layer, Canvas) {
 			}
 			return layers.length;
 		},
-		setActiveLayer: function(index) {
+		setActiveLayer: function(index,local) {
 			activeLayer = index;
+			if (local) {
+				$('#li-layer'+layers[index].index+' a').tab('show');
+			}
 			_this.refresh();
 		},
 		defaultColors: function() {
@@ -141,6 +144,15 @@ define(["actions","layer","canvas"],function Engine(Actions, Layer, Canvas) {
 			_this.refresh();
 			_this.updateUndo();
 		},
+		resetWorkspace: function() {
+			var toRemove = layers.splice(1,layers.length-1);
+			for (var i in toRemove) {
+				toRemove[i].remove();
+			}
+			layers[0].resetWorkspace();
+			order = [0];
+			_this.setActiveLayer(0,true);
+		},
 		loadWorkspace: function() {
 			var qs = window.location.hash, query = "";
 			if (qs.length && /#access_token=\w+/.test(qs)) {
@@ -156,7 +168,11 @@ define(["actions","layer","canvas"],function Engine(Actions, Layer, Canvas) {
 					email = workspace.email;
 					$('#email').text(email);
 					$('#signin').removeClass('btn-danger')
-						.attr("href","").text("Sign out");
+					.attr("href","#").text("Sign out")
+					.click(function(e) {
+						e.preventDefault();
+						_this.resetWorkspace();
+					});
 				}
 				if (!workspace.layers) {
 					return;
@@ -209,8 +225,7 @@ define(["actions","layer","canvas"],function Engine(Actions, Layer, Canvas) {
 				}
 				var i = order[workspace.active];
 				$('#li-layer'+(activeLayer+1)).removeClass('active');
-				$('#li-layer'+layers[i].index+' a').tab('show');
-				_this.setActiveLayer(i);
+				_this.setActiveLayer(i,true);
 			}
 			for (var i=0; i<workspace.numLayers; i++) {
 				if (!workspace.layers[i].data) {

@@ -98,6 +98,10 @@ define(["pixel"],function Canvas(Pixel) {
 				this.context.clearRect(0,0,this.canvas.width,this.canvas.height);
 			}
 		},
+		reset: function() {
+			this.clear();
+			this.offset = defaultOffset(this.canvas.width,this.canvas.height);
+		},
 		setCanvas: function(obj) {
 			this.offset.x = obj.ox;
 			this.offset.y = obj.oy;
