@@ -112,7 +112,7 @@ module.exports.init = function(cb) {
             }
             
         },
-        '/saveworkspace': function(req,res) {
+        '/saveworkspace': function(req,res,callback) {
             try {
                 var data = '';
                 req.on('data',function(chunk) {
@@ -120,7 +120,17 @@ module.exports.init = function(cb) {
                 });
                 req.on('end',function() {
                     var key = user(req,res) + ".wks";
+                    if (data.length === 0) {
+                        if (typeof callback === 'function') {
+                            callback();
+                        }
+                        res.send(204);
+                        return;
+                    }
                     cbSet(key, data, function() {
+                        if (typeof callback === 'function') {
+                            callback();
+                        }
                         res.send(204);
                     }, function(err) {
                         console.log(err);
@@ -131,6 +141,11 @@ module.exports.init = function(cb) {
                 console.log(err);
                 res.send(400);
             }
+        },
+        '/newworkspace': function(req,res) {
+            routes['/saveworkspace'](req,res,function() {
+                createUser(req,res);
+            });
         }
     }
     return routes;

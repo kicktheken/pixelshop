@@ -4,6 +4,7 @@ define(["actions","layer","canvas"],function Engine(Actions, Layer, Canvas) {
 	var host = /[^\/]+\/\/[^\/]+/g.exec(window.location.href) + g.proxyPrefix;
 	var sizes = [10,15,20,24,30];
 	var saveTimer, saved, email;
+	var authURL = "https://accounts.google.com/o/oauth2/auth";
 	var blankcolor = { toRgb: function() { return {r:0,g:0,b:0,a:0}; } };
 	return Class.extend({
 		init: function($canvas) {
@@ -25,6 +26,14 @@ define(["actions","layer","canvas"],function Engine(Actions, Layer, Canvas) {
             email = "";
             _this.addLayer();
             _this.refreshBackground();
+            _this.initSignin();
+		},
+		initSignin: function() {
+			var oauth2 = config.oauth2, query = [];
+	        for (var param in oauth2) {
+	            query.push(param+"="+oauth2[param]);
+	        }
+	        $('#signin').attr("href", authURL+"?"+query.join("&"));
 		},
 		viewWidth: function() {
 			return g.width/sizes[s];
@@ -171,7 +180,13 @@ define(["actions","layer","canvas"],function Engine(Actions, Layer, Canvas) {
 					.attr("href","#").text("Sign out")
 					.click(function(e) {
 						e.preventDefault();
-						_this.resetWorkspace();
+						$(this).addClass('btn-danger').text("Sign in");
+						email = "";
+						$('#email').text(email);
+						log.info("commencing signoff");
+						$(this).unbind('click');
+
+						_this.saveWorkspace(true);
 					});
 				}
 				if (!workspace.layers) {
@@ -238,7 +253,7 @@ define(["actions","layer","canvas"],function Engine(Actions, Layer, Canvas) {
 				img.src = workspace.layers[i].data;
 			}
 		},
-		saveWorkspace: function() {
+		saveWorkspace: function(logoff) {
 			var workspace = { numLayers: layers.length, layers: [] };
 			for (var i=layers.length-1; i>=0; i--) {
 				if (activeLayer === order[i]) {
@@ -254,17 +269,26 @@ define(["actions","layer","canvas"],function Engine(Actions, Layer, Canvas) {
 				}
 				workspace.layers = binstring;
 				var data = JSON.stringify(workspace);
+				var action = (logoff) ? '/newworkspace' : '/saveworkspace';
 				$.ajax({
 					type: "POST",
-					url: host+'/saveworkspace',
+					url: host+action,
 					data: data,
 					success: function(data) {
 						log.info("save successful (length: "+binstring.length+")");
 						saved = true;
+						if (logoff) {
+							_this.resetWorkspace();
+							_this.initSignin();
+						}
 						//_this._loadWorkspace(workspace);
 					},
 					error: function(err) {
 						//log.error("failed to save workspave");
+						if (logoff) {
+							_this.resetWorkspace();
+							_this.initSignin();
+						}
 					},
 					timeout: g.timeout
 				});

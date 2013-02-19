@@ -205,12 +205,6 @@ function Main(Engine) {
         }
 
         key('enter', function() { $('.searchbox').focus(); });
-        var oauth2 = config.oauth2, data = [];
-        for (var param in oauth2) {
-            data.push(param+"="+oauth2[param]);
-        }
-        var authURL = "https://accounts.google.com/o/oauth2/auth";
-        $('#signin').attr("href", authURL+"?"+data.join("&"));
         log.info((g.ts() - g.INITTIME) + 'ms startup time');
     })
 });

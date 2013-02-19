@@ -8,6 +8,8 @@ var config = {
     },
     oauthURL: "https://www.googleapis.com/oauth2/v1/userinfo?access_token=",
     oauthPrefix: "goog_user_",
+    sslkey: "/path/to/ssl/key",
+    sslcert: "/path/to/ssl/cert",
     proxyPrefix: "/a", // subdirectory name to proxy to nodejs server
     proxyPort: 9008,
     hosts: ["localhost:8091"], // couchbase hosts

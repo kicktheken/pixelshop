@@ -32,8 +32,8 @@ cb.connect(config, function(err,cb) {
     }
     try {
         var options = {
-            key: fs.readFileSync('/etc/ssl/private/server.key'),
-            cert: fs.readFileSync('/etc/ssl/certs/server.crt')
+            key: fs.readFileSync(config.sslkey),
+            cert: fs.readFileSync(config.sslcert)
         };
         var https = require('https');
         console.log("ssl listening on "+config.proxyPort);
