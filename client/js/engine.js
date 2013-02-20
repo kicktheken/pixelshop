@@ -79,7 +79,7 @@ define(["actions","layer","canvas"],function Engine(Actions, Layer, Canvas) {
             var size = sizes[s]/2;
             for (var y=0; y<g.height/size; y++) {
             	for (var x=(y%2); x<g.width/size; x+=2) {
-            		bg.context.fillRect(x*size,y*size,size,size);
+            		bg.context.fillRect(x*size,y*size,size+(x%2),size+(y%2));
             	}
             }
             _this.refresh();
