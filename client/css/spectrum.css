@@ -1,5 +1,5 @@
 /***
-Spectrum Colorpicker v1.0.1
+Spectrum Colorpicker v1.0.9
 https://github.com/bgrins/spectrum
 Author: Brian Grinstead
 License: MIT
@@ -458,6 +458,12 @@ License: MIT
     display:block;
     position:absolute;
     top:0;left:0;bottom:0;right:0;
+}
+
+.sp-palette .sp-thumb-inner
+{
+    background-position: 50% 50%;
+    background-repeat: no-repeat;
 }
 
 .sp-palette .sp-thumb-light.sp-thumb-active .sp-thumb-inner

@@ -61,6 +61,7 @@ function Main(Engine) {
             preferredFormat: 'name',
             showInput: true,
             showAlpha: true,
+            showInitial: true,
             showButtons: false,
             change: function(color) {
                 var rgb = color.toRgb(), css = {};

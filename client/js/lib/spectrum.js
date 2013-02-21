@@ -1,4 +1,4 @@
-// Spectrum Colorpicker v1.0.2
+// Spectrum Colorpicker v1.0.9
 // https://github.com/bgrins/spectrum
 // Author: Brian Grinstead
 // License: MIT
@@ -108,7 +108,7 @@
             c += (tinycolor.equals(color, p[i])) ? " sp-thumb-active" : "";
 
             var swatchStyle = rgbaSupport ? ("background-color:" + tiny.toRgbString()) : "filter:" + tiny.toFilter();
-            html.push('<span title="' + tiny.toHexString() + '" data-color="' + tiny.toRgbString() + '" class="' + c + '"><span class="sp-thumb-inner" style="' + swatchStyle + ';" /></span>');
+            html.push('<span title="' + tiny.toRgbString() + '" data-color="' + tiny.toRgbString() + '" class="' + c + '"><span class="sp-thumb-inner" style="' + swatchStyle + ';" /></span>');
         }
         return "<div class='sp-cf " + className + "'>" + html.join('') + "</div>";
     }
@@ -138,11 +138,6 @@
 
         var opts = instanceOptions(o, element),
             flat = opts.flat,
-            showPaletteOnly = opts.showPaletteOnly,
-            showPalette = opts.showPalette || showPaletteOnly,
-            showInitial = opts.showInitial && !flat,
-            showInput = opts.showInput,
-            showAlpha = opts.showAlpha,
             showSelectionPalette = opts.showSelectionPalette,
             localStorageKey = opts.localStorageKey,
             theme = opts.theme,
@@ -169,7 +164,7 @@
         var doc = element.ownerDocument,
             body = doc.body,
             boundElement = $(element),
-            disabled = boundElement.is(":disabled") || (opts.disabled === true),
+            disabled = false,
             container = $(markup, doc).addClass(theme),
             dragger = container.find(".sp-color"),
             dragHelper = container.find(".sp-dragger"),
@@ -194,9 +189,20 @@
             currentPreferredFormat = preferredFormat,
             clickoutFiresChange = !opts.showButtons || opts.clickoutFiresChange;
 
-        chooseButton.text(opts.chooseText);
-        cancelButton.text(opts.cancelText);
-        if(opts.disabled) disable();
+
+        function applyOptions() {
+
+            container.toggleClass("sp-flat", flat);
+            container.toggleClass("sp-input-disabled", !opts.showInput);
+            container.toggleClass("sp-alpha-enabled", opts.showAlpha);
+            container.toggleClass("sp-buttons-disabled", !opts.showButtons || flat);
+            container.toggleClass("sp-palette-disabled", !opts.showPalette);
+            container.toggleClass("sp-palette-only", opts.showPaletteOnly);
+            container.toggleClass("sp-initial-disabled", !opts.showInitial);
+            container.addClass(opts.className);
+
+            reflow();
+        }
 
         function initialize() {
 
@@ -204,14 +210,7 @@
                 container.find("*:not(input)").attr("unselectable", "on");
             }
 
-            container.toggleClass("sp-flat", flat);
-            container.toggleClass("sp-input-disabled", !showInput);
-            container.toggleClass("sp-alpha-enabled", showAlpha);
-            container.toggleClass("sp-buttons-disabled", !opts.showButtons || flat);
-            container.toggleClass("sp-palette-disabled", !showPalette);
-            container.toggleClass("sp-palette-only", showPaletteOnly);
-            container.toggleClass("sp-initial-disabled", !showInitial);
-            container.addClass(opts.className);
+            applyOptions();
 
             if (shouldReplace) {
                 boundElement.hide().after(replacer);
@@ -223,13 +222,25 @@
             else {
                 $(body).append(container.hide());
             }
-            if (localStorageKey && window.localStorage) {
-                try {
-                    selectionPalette = window.localStorage[localStorageKey].split(",");
-                }
-                catch (e) {
 
+            if (localStorageKey && window.localStorage) {
+
+                // Migrate old palettes over to new format.  May want to remove this eventually.
+                try {
+                    var oldPalette = window.localStorage[localStorageKey].split(",#");
+                    if (oldPalette.length > 1) {
+                        delete window.localStorage[localStorageKey];
+                        $.each(oldPalette, function(i, c) {
+                             addColorToSelectionPalette(c);
+                        });
+                    }
                 }
+                catch(e) { }
+
+                try {
+                    selectionPalette = window.localStorage[localStorageKey].split(";");
+                }
+                catch (e) { }
             }
 
             offsetElement.bind("click.spectrum touchstart.spectrum", function (e) {
@@ -244,8 +255,8 @@
                 }
             });
 
-            if (disabled) {
-                offsetElement.addClass("sp-disabled");
+            if(boundElement.is(":disabled") || (opts.disabled === true)) {
+                disable();
             }
 
             // Prevent clicks from bubbling up to document.  This would cause it to be hidden.
@@ -258,12 +269,14 @@
             });
             textInput.keydown(function (e) { if (e.keyCode == 13) { setFromTextInput(); } });
 
+            cancelButton.text(opts.cancelText);
             cancelButton.bind("click.spectrum", function (e) {
                 e.stopPropagation();
                 e.preventDefault();
                 hide("cancel");
             });
 
+            chooseButton.text(opts.chooseText);
             chooseButton.bind("click.spectrum", function (e) {
                 e.stopPropagation();
                 e.preventDefault();
@@ -284,13 +297,13 @@
             });
 
             draggable(slider, function (dragX, dragY) {
-                currentHue = (dragY / slideHeight);
+                currentHue = parseFloat(dragY / slideHeight);
                 move();
             }, dragStart, dragStop);
 
             draggable(dragger, function (dragX, dragY) {
-                currentSaturation = dragX / dragWidth;
-                currentValue = (dragHeight - dragY) / dragHeight;
+                currentSaturation = parseFloat(dragX / dragWidth);
+                currentValue = parseFloat((dragHeight - dragY) / dragHeight);
                 move();
             }, dragStart, dragStop);
 
@@ -329,13 +342,21 @@
 
             var paletteEvent = IE ? "mousedown.spectrum" : "click.spectrum touchstart.spectrum";
             paletteContainer.delegate(".sp-thumb-el", paletteEvent, palletElementClick);
-            initialColorContainer.delegate(".sp-thumb-el::nth-child(1)", paletteEvent, { ignore: true }, palletElementClick);
+            initialColorContainer.delegate(".sp-thumb-el:nth-child(1)", paletteEvent, { ignore: true }, palletElementClick);
         }
+
         function addColorToSelectionPalette(color) {
             if (showSelectionPalette) {
-                selectionPalette.push(tinycolor(color).toHexString());
+                var colorRgb = tinycolor(color).toRgbString();
+                if ($.inArray(colorRgb, selectionPalette) === -1) {
+                    selectionPalette.push(colorRgb);
+                }
+
                 if (localStorageKey && window.localStorage) {
-                    window.localStorage[localStorageKey] = selectionPalette.join(",");
+                    try {
+                        window.localStorage[localStorageKey] = selectionPalette.join(";");
+                    }
+                    catch(e) { }
                 }
             }
         }
@@ -344,30 +365,30 @@
             var unique = [];
             var p = selectionPalette;
             var paletteLookup = {};
-            var hex;
+            var rgb;
 
-            if (showPalette) {
+            if (opts.showPalette) {
 
                 for (var i = 0; i < paletteArray.length; i++) {
                     for (var j = 0; j < paletteArray[i].length; j++) {
-                        hex = tinycolor(paletteArray[i][j]).toHexString();
-                        paletteLookup[hex] = true;
+                        rgb = tinycolor(paletteArray[i][j]).toRgbString();
+                        paletteLookup[rgb] = true;
                     }
                 }
 
                 for (i = 0; i < p.length; i++) {
-                    var color = tinycolor(p[i]);
-                    hex = color.toHexString();
+                    rgb = tinycolor(p[i]).toRgbString();
 
-                    if (!paletteLookup.hasOwnProperty(hex)) {
+                    if (!paletteLookup.hasOwnProperty(rgb)) {
                         unique.push(p[i]);
-                        paletteLookup[hex] = true;
+                        paletteLookup[rgb] = true;
                     }
                 }
             }
 
             return unique.reverse().slice(0, opts.maxSelectionSize);
         }
+
         function drawPalette() {
 
             var currentColor = get();
@@ -382,22 +403,26 @@
 
             paletteContainer.html(html.join(""));
         }
+
         function drawInitial() {
-            if (showInitial) {
+            if (opts.showInitial) {
                 var initial = colorOnShow;
                 var current = get();
                 initialColorContainer.html(paletteTemplate([initial, current], current, "sp-palette-row-initial"));
             }
         }
+
         function dragStart() {
             if (dragHeight === 0 || dragWidth === 0 || slideHeight === 0) {
                 reflow();
             }
             container.addClass(draggingClass);
         }
+
         function dragStop() {
             container.removeClass(draggingClass);
         }
+
         function setFromTextInput() {
             var tiny = tinycolor(textInput.val());
             if (tiny.ok) {
@@ -432,7 +457,7 @@
             replacer.addClass("sp-active");
             container.show();
 
-            if (showPalette) {
+            if (opts.showPalette) {
                 drawPalette();
             }
             reflow();
@@ -543,7 +568,7 @@
                 previewElement.css("filter", realColor.toFilter());
             }
 
-            if (showAlpha) {
+            if (opts.showAlpha) {
                 var rgb = realColor.toRgb();
                 rgb.a = 0;
                 var realAlpha = tinycolor(rgb).toRgbString();
@@ -562,7 +587,7 @@
 
 
             // Update the text entry input as it changes happen
-            if (showInput) {
+            if (opts.showInput) {
                 if (currentAlpha < 1) {
                     if (format === "hex" || format === "name") {
                         format = "rgb";
@@ -571,7 +596,7 @@
                 textInput.val(realColor.toString(format));
             }
 
-            if (showPalette) {
+            if (opts.showPalette) {
                 drawPalette();
             }
 
@@ -652,6 +677,18 @@
             spectrums[spect.id] = null;
         }
 
+        function option(optionName, optionValue) {
+            if (optionName === undefined) {
+                return $.extend({}, opts);
+            }
+            if (optionValue === undefined) {
+                return opts[optionName];
+            }
+
+            opts[optionName] = optionValue;
+            applyOptions();
+        }
+
         function enable() {
             disabled = false;
             boundElement.attr("disabled", false);
@@ -659,6 +696,7 @@
         }
 
         function disable() {
+            hide();
             disabled = true;
             boundElement.attr("disabled", true);
             offsetElement.addClass("sp-disabled");
@@ -671,6 +709,7 @@
             hide: hide,
             toggle: toggle,
             reflow: reflow,
+            option: option,
             enable: enable,
             disable: disable,
             set: function (c) {
@@ -846,32 +885,44 @@
     */
     var dataID = "spectrum.id";
     $.fn.spectrum = function (opts, extra) {
-        if (typeof opts == "string") {
-            if (opts == "get") {
-                return spectrums[this.eq(0).data(dataID)].get();
-            } else if (opts == "container") {
-                return spectrums[$(this).data(dataID)].container;
-            }
 
-            return this.each(function () {
+        if (typeof opts == "string") {
+
+            var returnValue = this;
+            var args = Array.prototype.slice.call( arguments, 1 );
+
+            this.each(function () {
                 var spect = spectrums[$(this).data(dataID)];
                 if (spect) {
-                    if (opts == "show") { spect.show(); }
-                    if (opts == "hide") { spect.hide(); }
-                    if (opts == "toggle") { spect.toggle(); }
-                    if (opts == "reflow") { spect.reflow(); }
-                    if (opts == "set") { spect.set(extra); }
-                    if (opts == 'enable') { spect.enable(); }
-                    if (opts == 'disable') { spect.disable(); }
-                    if (opts == "destroy") {
+
+                    var method = spect[opts];
+                    if (!method) {
+                        throw new Error( "Spectrum: no such method: '" + opts + "'" );
+                    }
+
+                    if (opts == "get") {
+                        returnValue = spect.get();
+                    }
+                    else if (opts == "container") {
+                        returnValue = spect.container;
+                    }
+                    else if (opts == "option") {
+                        returnValue = spect.option.apply(spect, args);
+                    }
+                    else if (opts == "destroy") {
                         spect.destroy();
                         $(this).removeData(dataID);
                     }
+                    else {
+                        method.apply(spect, args);
+                    }
                 }
             });
+
+            return returnValue;
         }
 
-        // Initializing a new one
+        // Initializing a new instance of spectrum
         return this.spectrum("destroy").each(function () {
             var spect = spectrum(this, opts);
             $(this).data(dataID, spect.id);
@@ -882,6 +933,10 @@
     $.fn.spectrum.loadOpts = {};
     $.fn.spectrum.draggable = draggable;
     $.fn.spectrum.defaults = defaultOpts;
+
+    $.spectrum = { };
+    $.spectrum.localization = { };
+    $.spectrum.palettes = { };
 
     $.fn.spectrum.processNativeColorInputs = function () {
         var colorInput = $("<input type='color' value='!' />")[0];
@@ -1691,4 +1746,3 @@
     });
 
 })(window, jQuery);
-
