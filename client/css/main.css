@@ -4,18 +4,69 @@
 @import url('spectrum.css');
 @import url('keys.css');
 
+body {
+    overflow:hidden;
+}
+
 canvas {
     border: 1px solid #ddd;
     image-rendering: -moz-crisp-edges;
     /* CHROME PLEASE FIX THIS SOON */
     image-rendering: -webkit-optimize-contrast;
 }
+
+.tabs-left {
+    position:relative;
+    left:30px;
+    top:11px;
+}
+
+.navbar .container .brand {
+    padding: 10px 15px 10px 8px;
+}
+
+#hruler {
+    position:absolute;
+    left:21px;
+}
+#vruler {
+    position:relative;
+    left:10px;
+    top:11px;
+}
+#canvas {
+    position:relative;
+    right:-5px;
+    top:11px;
+}
+#vscroll {
+    right:0px;
+    top:11px;
+    position:relative;
+}
+#hscroll {
+    top:2px;
+    left:21px;
+    position:relative;
+}
+
 .preview {
     background-color: #eee;
 }
 .container {
-    width: 1012px;
+    width: 1043px;
 }
+.container .nav.pull-right {
+    margin-right:96px;
+}
+.navbar .navbar-inner .container {
+    width:1006px;
+}
+.container .input-prepend {
+    position:relative;
+    top:5px;
+}
+
 #email {
     cursor:default;
 }
@@ -35,38 +86,35 @@ canvas {
 
 /* control bar */
 .control-panel {
-    padding-top: 12px;
-    padding-bottom: 2px;
+    padding-top: 10px;
+    padding-bottom: 10px;
 }
 .left-controls {
-    width: 86px;
+    margin-left:10px;
+    margin-right:10px;
+    width: 106px;
     text-align: right;
 }
-.load-controls {
-    width: 276px;
-    margin-left: 20px;
-}
-.zoom-controls {
-    width: 88px;
-}
-.paint-controls{
-    width: 319px;
-}
-.canvas-controls {
-    margin-right: 20px;
+.controls {
+    width:720px;
 }
 .right-controls {
+    margin-left:13px;
     width: 160px;
-    margin-top: 6px;
+    margin-top: 7px;
 }
 .searchbox {
-    width: 180px;
+    width: 400px;
 }
 
 .tooltip .key {
     margin-left:6px;
     padding-top:2px;
     padding-bottom:3px;
+}
+
+.tab-content {
+    position:relative;
 }
 
 /* left tabs colorpicker */
@@ -85,6 +133,12 @@ canvas {
 }
 
 /* layer tab on right */
+#layer-tabbar {
+    position:relative;
+    left:-20px;
+    top:11px;
+}
+
 #layer-tabbar a {
     line-height:0px;
 }

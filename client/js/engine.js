@@ -2,7 +2,7 @@ define(["actions","layer","canvas"],function Engine(Actions, Layer, Canvas) {
 	var _this, actions;
 	var context, bg, buf, s, pressed, mode, color, layers, order, activeLayer = -1;
 	var host = /[^\/]+\/\/[^\/]+/g.exec(window.location.href) + g.proxyPrefix;
-	var sizes = [10,15,20,24,30];
+	var sizes = [6,8,10,15,20,24,30];
 	var saveTimer, saved, email;
 	var authURL = "https://accounts.google.com/o/oauth2/auth";
 	var blankcolor = { toRgb: function() { return {r:0,g:0,b:0,a:0}; } };
@@ -18,7 +18,7 @@ define(["actions","layer","canvas"],function Engine(Actions, Layer, Canvas) {
             pressed = false;
             layers = [];
             order = [];
-            s = 2;
+            s = 4;
             bg = new Canvas(g.width,g.height);
             buf = new Canvas(g.width,g.height);
             mode = 'draw';
@@ -203,6 +203,7 @@ define(["actions","layer","canvas"],function Engine(Actions, Layer, Canvas) {
 				});
 			}).fail(function(err) {
 				log.error("unable to load workspace");
+				$(window).unbind('beforeunload');
 			});
 		},
 		_loadWorkspace: function(workspace) {

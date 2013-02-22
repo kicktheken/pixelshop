@@ -17,9 +17,13 @@ if (document.styleSheets[0].cssRules.length === 0) { // for development
     <div class="navbar-inner">
         <div class="container">
             <a class="brand" href="#"><i class="icon-space-invaders"></i>Pixelshop</a>
+            <div class="input-prepend input-append">
+                <button id="load" class="btn btn-warning"><i class="icon-folder-open-alt"></i></button>
+                <input type="text" class="searchbox" placeholder="Image Link or Search Library" />
+                <button id="save" class="btn btn-primary"><i class="icon-save"></i></button>
+            </div>
             <ul class="nav pull-right">
-                <li><a href="#">Help <i class="icon-question-sign"></i></a></li>
-                <li><a id="email"></a></li>
+                <li><a id="email" class="pull-right"></a></li>
                 <li><a id="signin" class="btn btn-danger" href="#">Sign in</a></li>
             </ul>
         </div>
@@ -30,22 +34,13 @@ if (document.styleSheets[0].cssRules.length === 0) { // for development
         <div class="pull-left left-controls">&nbsp;
             <!-- possibly some palette menus here -->
         </div>
-        <div class="pull-left load-controls">
-            <div class="input-prepend input-append">
-                <button id="load" class="btn btn-warning"><i class="icon-folder-open-alt"></i></button>
-                <input type="text" class="searchbox" placeholder="Image Link or Search Library" />
-                <button id="save" class="btn btn-primary"><i class="icon-save"></i></button>
-            </div>
-        </div>
-        <div class="pull-left zoom-controls">
+        <div class="pull-left controls">
             <div class="btn-group">
                 <div class="btn-group">
                     <button id="zoomin" class="btn"><i class="icon-zoom-in"></i></button>
                     <button id="zoomout" class="btn"><i class="icon-zoom-out"></i></button>
                 </div>
             </div>
-        </div>
-        <div class="pull-left paint-controls">
             <div class="btn-group">
                 <div class="btn-group" data-toggle="buttons-radio">
                     <button id="draw" class="btn paint-radio active"><i class="icon-pencil"></i></button>
@@ -58,9 +53,6 @@ if (document.styleSheets[0].cssRules.length === 0) { // for development
                     <button id="darken" class="btn paint-radio"><i class="icon-moon"></i></button>
                 </div>
             </div>
-        </div>
-        <div class="pull-left canvas-controls">
-            <button id="undo" class="btn disabled"><i class="icon-undo"></i></button>
         </div>
         <div class="pull-left right-controls">
             <button id="addlayer" class="btn btn-mini">
@@ -94,7 +86,11 @@ if (document.styleSheets[0].cssRules.length === 0) { // for development
         </ul>
     </div>
     <div class="tab-content">
+        <canvas width="720px" height="10px" id="hruler"></canvas>
+        <canvas width="10px" height="600px" id="vruler"></canvas>
         <canvas width="720px" height="600px" id="canvas"></canvas>
+        <canvas width="10px" height="600px" id="vscroll"></canvas>
+        <canvas width="720px" height="10px" id="hscroll"></canvas>
     </div>
 </div> <!-- tabbable -->
 </div> <!-- row -->
