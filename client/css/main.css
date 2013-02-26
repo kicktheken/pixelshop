@@ -15,6 +15,22 @@ canvas {
     image-rendering: -webkit-optimize-contrast;
 }
 
+.numeric {
+    margin-top:4px;
+    vertical-align:bottom;
+}
+.numeric input {
+    height:15px;
+    width:30px;
+    -webkit-border-radius: 3px;
+    -moz-border-radius:3px;
+    border-radius: 3px;
+    border: 1px solid #ccc;
+    font-size:12px;
+    line-height:12px;
+    margin-left:2px;
+    margin-right:2px;
+}
 .tabs-left {
     position:relative;
     left:30px;
@@ -57,7 +73,7 @@ canvas {
     width: 1043px;
 }
 .container .nav.pull-right {
-    margin-right:96px;
+    margin-right:94px;
 }
 .navbar .navbar-inner .container {
     width:1006px;
@@ -96,12 +112,15 @@ canvas {
     text-align: right;
 }
 .controls {
-    width:720px;
+    width:722px;
 }
 .right-controls {
-    margin-left:13px;
+    margin-left:15px;
     width: 160px;
-    margin-top: 7px;
+    margin-top: 3px;
+}
+.right-controls .btn-group {
+    margin-top: 1px;
 }
 .searchbox {
     width: 400px;
@@ -115,6 +134,10 @@ canvas {
 
 .tab-content {
     position:relative;
+}
+
+.clonemerge {
+    margin-top: 4px;
 }
 
 /* left tabs colorpicker */
