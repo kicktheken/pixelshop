@@ -13,7 +13,7 @@ if (document.styleSheets[0].cssRules.length === 0) { // for development
 </head>
 
 <body>
-<div class="navbar navbar-static-top">
+<!--div class="navbar navbar-static-top">
     <div class="navbar-inner">
         <div class="container">
             <a class="brand" href="#"><i class="icon-space-invaders"></i>Pixelshop</a>
@@ -32,7 +32,6 @@ if (document.styleSheets[0].cssRules.length === 0) { // for development
 <div class="control-panel">
     <div class="container">
         <div class="pull-left left-controls">&nbsp;
-            <!-- possibly some palette menus here -->
         </div>
         <div class="pull-left controls">
             
@@ -47,8 +46,6 @@ if (document.styleSheets[0].cssRules.length === 0) { // for development
                 <button id="drag" class="btn paint-radio"><i class="icon-hand"></i></button>
                 <button id="dropper" class="btn paint-radio"><i class="icon-eyedropper"></i></button>
                 <button id="select" class="btn paint-radio"><i class="icon-screenshot"></i></button>
-                <!--button id="brighten" class="btn paint-radio"><i class="icon-sun"></i></button>
-                <button id="darken" class="btn paint-radio"><i class="icon-moon"></i></button-->
             </div>
             <div class="pull-right">
                 <label class="numeric">x<input type="input" maxlength="4" /></label>
@@ -116,9 +113,67 @@ if (document.styleSheets[0].cssRules.length === 0) { // for development
         <canvas width="10px" height="600px" id="vscroll"></canvas>
         <canvas width="720px" height="10px" id="hscroll"></canvas>
     </div>
-</div> <!-- tabbable -->
-</div> <!-- row -->
-</div> <!-- container -->
+</div>
+</div>
+</div!-->
+<div class="navbar navbar-static-top">
+    <div class="navbar-inner">
+        <div class="container">
+            <a class="brand" href="#"><i class="icon-space-invaders"></i>Pixelshop</a>
+            <div class="input-prepend input-append">
+                <button id="load" class="btn btn-warning"><i class="icon-folder-open-alt"></i></button>
+                <input type="text" class="searchbox" placeholder="Image Link or Search Library" />
+                <button id="save" class="btn btn-primary"><i class="icon-save"></i></button>
+            </div>
+            <ul class="nav pull-right">
+                <li><a id="email" class="pull-right"></a></li>
+                <li><a id="signin" class="btn btn-danger" href="#">Sign in</a></li>
+            </ul>
+        </div>
+    </div>
+</div>
+<canvas id="canvas"></canvas>
+<div id="toolbar" style="display:none;">
+    <div class="buttonset pull-left">
+        <input type="radio" id="draw" name="radio" checked/><label for="draw"><i class="icon-pencil icon-large"></i></label>
+        <input type="radio" id="fill" name="radio"/><label for="fill"><i class="icon-paint-format icon-large"></i></label>
+        <input type="radio" id="eraser" name="radio" /><label for="eraser"><i class="icon-eraser icon-large"></i></label>
+        <input type="radio" id="drag" name="radio" /><label for="drag"><i class="icon-hand icon-large"></i></label>
+        <input type="radio" id="dropper" name="radio" /><label for="dropper"><i class="icon-eyedropper icon-large"></i></label>
+        <input type="radio" id="select" name="radio" /><label for="select"><i class="icon-screenshot icon-large"></i></label>
+    </div>
+    <div class="buttonset pull-left">
+        <button id="zoomin"><i class="icon-zoom-in icon-large"></i></button>
+        <button id="zoomout"><i class="icon-zoom-out icon-large"></i></button>
+    </div>
+    <div class="buttonset pull-left">
+        <button id="undo" class="disabled"><i class="icon-undo icon-large"></i></button>
+        <button id="redo" class="disabled"><i class="icon-repeat icon-large"></i></button>
+    </div>
+</div>
+<div id="colors" style="display:none;">
+    <ul class="sortable">
+        <li class="ui-state-default">
+            <input id="color1" type="text" class="colorpicker" /><i id="key-color1" class="light key">1</i>
+        </li>
+    </ul>
+</div>
+<div id="layers" style="display:none;">
+    <ul class="sortable">
+        <li class="ui-state-default">
+            <span>
+            <i class="icon-eye-open icon-large"></i>
+            Layer 1</span>
+            <canvas id="layer1" width="30" height="30" class="preview pull-right"></canvas>
+        </li>
+        <li class="ui-state-default">
+            <span>
+            <i class="icon-eye-open icon-large"></i>
+            Layer 2</span>
+            <canvas id="layer2" width="30" height="30" class="preview pull-right"></canvas>
+        </li>
+    </ul>
+</div>
 
 <form method="POST"><input type="hidden" id="hidden" name="data" value="" /></form>
 

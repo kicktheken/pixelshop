@@ -4,6 +4,109 @@
 @import url('spectrum.css');
 @import url('keys.css');
 
+body
+{
+    width:100%;
+    height: 100%;
+    margin: 0;
+    padding: 0;
+    overflow:hidden;
+}
+canvas
+{
+    display:block;
+}
+form {
+    display:none;
+}
+.navbar-static-top .container {
+    width:100%;
+}
+.container .input-prepend {
+    position:relative;
+    top:5px;
+}
+.no-close .ui-dialog-titlebar-close {
+    display: none;
+}
+
+.ui-dialog-title {
+    display:none;
+}
+.ui-draggable .ui-dialog-titlebar {
+    border:1px solid #aaa;
+    background-color: #aaa;
+    background-image: -moz-linear-gradient(top, #eee, #aaa);
+    background-image: -webkit-gradient(linear, 0 0, 0 100%, from(#eee), to(#aaa));
+    background-image: -webkit-linear-gradient(top, #eee, #aaa);
+    background-image: -o-linear-gradient(top, #eee, #aaa);
+    background-image: linear-gradient(to bottom, #eee, #aaa);
+    background-repeat: repeat-x;
+    border-radius:3px;
+}
+
+.sortable {
+    list-style-type: none;
+    margin: 0;
+    padding: 0;
+}
+.sortable .ui-state-highlight {
+    margin-bottom:0;
+}
+.ui-dialog .ui-dialog-content {
+    padding: 3px 0;
+}
+#colors li {
+    height:32px;
+    
+}
+#colors .key {
+    cursor: move;
+    margin-left:8px;
+    /*padding-top:3px;
+    padding-bottom:2px;*/
+}
+#layers li {
+    height:30px;
+}
+.sortable li {
+    cursor: default;
+    border-radius:3px;
+    padding:3px;
+}
+.sortable .ui-selecting { background: #FECA40; }
+.sortable .ui-selected { background: #F39814; color: white; }
+.sortable span {
+    position:relative;
+    top:5px;
+    left:5px;
+}
+.searchbox {
+    width: 400px;
+}
+
+/*.ui-state-highlight { height:1.2em; line-height: 1em; }
+*/
+.colorpicker {
+    width: 42px;
+    margin-bottom:2px;
+}
+
+#signin {
+    padding:4px 12px;
+}
+#signin.btn-danger {
+    text-shadow: none;
+    color:white;
+}
+#signin.btn:hover {
+    background-color:#e6e6e6;
+}
+#signin.btn.btn-danger:hover {
+    background-color: #bd362f;
+}
+
+/*
 body {
     overflow:hidden;
 }
@@ -11,7 +114,6 @@ body {
 canvas {
     border: 1px solid #ddd;
     image-rendering: -moz-crisp-edges;
-    /* CHROME PLEASE FIX THIS SOON */
     image-rendering: -webkit-optimize-contrast;
 }
 
@@ -86,21 +188,8 @@ canvas {
 #email {
     cursor:default;
 }
-#signin {
-    padding:4px 12px;
-}
-#signin.btn-danger {
-    text-shadow: none;
-    color:white;
-}
-#signin.btn:hover {
-    background-color:#e6e6e6;
-}
-#signin.btn.btn-danger:hover {
-    background-color: #bd362f;
-}
 
-/* control bar */
+
 .control-panel {
     padding-top: 10px;
     padding-bottom: 10px;
@@ -140,7 +229,6 @@ canvas {
     margin-top: 4px;
 }
 
-/* left tabs colorpicker */
 #color-tabbar .colorpicker {
     width: 42px;
     margin-bottom:2px;
@@ -155,7 +243,6 @@ canvas {
     padding-bottom:2px;
 }
 
-/* layer tab on right */
 #layer-tabbar {
     position:relative;
     left:-20px;
@@ -190,5 +277,5 @@ canvas {
 
 #layer-tabbar .icon-eye-close {
     color: #bbb;
-}
+}*/
 

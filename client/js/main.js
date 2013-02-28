@@ -1,7 +1,6 @@
 define([
     "engine",
     "lib/jqueryui",
-    "lib/bootstrap",
     "lib/spectrum",
     "lib/keymaster",
     "lib/lzma",
@@ -9,8 +8,79 @@ define([
 ],
 function Main(Engine) {
     window.googlekey = g.analytics;
+    document.onselectstart = function() {return false;};
+    $('.buttonset').buttonset();
+    $('#undo').button('disable');
+    $('#redo').button('disable');
+    function initDivs() {
+        $("#toolbar").dialog({
+            dialogClass: "no-close",
+            title:"",
+            position: [200,41],
+            resizable: false,
+            width:456,
+            height:55
+        });
+        $("#colors").dialog({
+            dialogClass: "no-close",
+            position: [10,100],
+            resizable: false,
+            width:90,
+            minWidth:90,
+            height:400
+        });
+        $("#layers").dialog({
+            dialogClass: "no-close",
+            containment:".mew",
+            position: [800,100],
+            resizable: false,
+            width:50,
+            height:400
+        })
+        $(".ui-dialog").draggable("option", "containment", "#canvas");
+    }
+    function initNew() {
+        g.ts = function() { return new Date().getTime(); };
+        g.INITTIME = g.ts();
+        initDivs();
+        var canvas = $('#canvas').get(0), context = canvas.getContext('2d');
+        function resize() {
+            var c = document.createElement("canvas"), ct = c.getContext('2d');
+            c.width = 20;
+            c.height = 20;
+            ct.fillStyle = "#bbb";
+            ct.fillRect(0,0,20,20);
+            ct.fillStyle = "#ddd";
+            ct.fillRect(10,1,9,9);
+            ct.fillRect(1,10,9,9);
+            
+            var pat = context.createPattern(c,"repeat");
+            var width = $(window).width(), height = $(window).height();
+            canvas.width = width;
+            canvas.height = height-41;//Math.max(600,height - 41);
 
-    $(document).ready(function() {
+            context.fillStyle = pat;
+            context.fillRect(0,0,width,height);
+        }
+        resize();
+        $(window).resize(resize);
+        $(".sortable").sortable({
+            /*containment: "#layers",*/
+            placeholder: "ui-state-highlight",
+            axis: "y"
+        });
+        var $sortable_li = $(".sortable li");
+        $sortable_li.mousedown(function(e) {
+            $sortable_li.removeClass("ui-selected");
+            $(this).addClass("ui-selected");
+        });
+        var c = $('.preview').get(0), ct = c.getContext('2d');
+        ct.fillStyle='black';
+        ct.fillRect(0,0,30,30);
+        $("#color1").spectrum();
+    }
+
+    function init() {
         var $canvas = $('#canvas');
 
         // default globals
@@ -207,5 +277,6 @@ function Main(Engine) {
 
         key('enter', function() { $('.searchbox').focus(); });
         log.info((g.ts() - g.INITTIME) + 'ms startup time');
-    })
+    }
+    $(document).ready(initNew);
 });

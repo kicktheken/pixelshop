@@ -1,5 +1,5 @@
 /***
-Spectrum Colorpicker v1.0.9
+Spectrum Colorpicker v1.0.9 (modified)
 https://github.com/bgrins/spectrum
 Author: Brian Grinstead
 License: MIT
@@ -216,9 +216,9 @@ License: MIT
 
 /* Basic display options (colors, fonts, global widths) */
 .sp-container {
-    border-radius: 0;
+    border-radius: 3px;
     background-color: #ECECEC;
-    border: solid 1px #f0c49B;
+    border: solid 1px #aaa;
     padding: 0;
 }
 .sp-container, .sp-container button, .sp-container input, .sp-color, .sp-hue
@@ -307,7 +307,7 @@ License: MIT
 .sp-initial
 {
     float: left;
-    border: solid 1px #333;
+    border: solid 1px #888;
 }
 .sp-initial span {
     width: 30px;
@@ -332,13 +332,14 @@ License: MIT
     display:inline-block;
     *zoom: 1;
     *display: inline;
-    border: solid 1px #91765d;
+    border: solid 1px #888;
     background: #eee;
     color: #333;
     vertical-align: middle;
+    border-radius:3px;
 }
 .sp-replacer:hover, .sp-replacer.sp-active {
-    border-color: #F0C49B;
+    border-color: #aaa;
     color: #111;
 }
 .sp-replacer.sp-disabled {
