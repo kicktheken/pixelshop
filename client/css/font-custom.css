@@ -373,3 +373,9 @@ ul.icons li [class*=" icon-"] {
 .icon-flow-line:before {
   content: "\e014";
 }
+.icon-fullscreen:before {
+  content: "\f0b2";
+}
+.icon-resize:before {
+  content: "\e015";
+}
