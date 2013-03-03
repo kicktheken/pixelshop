@@ -1,39 +1,53 @@
 define(["actions","layer","canvas"],function Engine(Actions, Layer, Canvas) {
-	var _this, actions;
-	var context, bg, buf, s, pressed, mode, color, layers, order, activeLayer = -1;
+	var _this, actions, canvas, context;
+	var buf, s, pressed, mode, color, layers, order, activeLayer = -1;
 	var host = /[^\/]+\/\/[^\/]+/g.exec(window.location.href) + g.proxyPrefix;
 	var sizes = [6,8,10,15,20,24,30];
 	var saveTimer, saved, email;
+	var darkPattern, lightPattern;
 	var authURL = "https://accounts.google.com/o/oauth2/auth";
 	var blankcolor = { toRgb: function() { return {r:0,g:0,b:0,a:0}; } };
 	return Class.extend({
 		init: function($canvas) {
 			if (typeof _this !== 'undefined') {
-                throw "Engine is a singleton and cannot be initialized more than once";
-            }
-            _this = this;
-            g['Engine'] = this;
-            actions = new Actions();
-            context = $canvas.get(0).getContext('2d');
-            pressed = false;
-            layers = [];
-            order = [];
-            s = 4;
-            bg = new Canvas(g.width,g.height);
-            buf = new Canvas(g.width,g.height);
-            mode = 'draw';
-            saved = true;
-            email = "";
-            _this.addLayer();
-            _this.refreshBackground();
-            _this.initSignin();
+				throw "Engine is a singleton and cannot be initialized more than once";
+			}
+			_this = this;
+			g['Engine'] = this;
+			actions = new Actions();
+			canvas = $canvas.get(0);
+			context = canvas.getContext('2d');
+			pressed = false;
+			layers = [];
+			order = [];
+			s = 4;
+			buf = new Canvas(g.width,g.height);
+			mode = 'draw';
+			saved = true;
+			email = "";
+			_this.addLayer();
+			_this.refreshBackground();
+			_this.initSignin();
+			_this.resize();
 		},
 		initSignin: function() {
 			var oauth2 = config.oauth2, query = [];
-	        for (var param in oauth2) {
-	            query.push(param+"="+oauth2[param]);
-	        }
-	        $('#signin').attr("href", authURL+"?"+query.join("&"));
+			for (var param in oauth2) {
+				query.push(param+"="+oauth2[param]);
+			}
+			$('#signin').attr("href", authURL+"?"+query.join("&"));
+		},
+		initPattern: function() {
+			
+		},
+		resize: function() {
+			var width = $(window).width(), height = $(window).height();
+			canvas.width = width;
+			canvas.height = height - $(".container").height() - 1;
+
+			context.fillStyle = lightPattern;
+			context.fillRect(0,0,width,height);
+			_this.refresh();
 		},
 		viewWidth: function() {
 			return g.width/sizes[s];
@@ -43,13 +57,13 @@ define(["actions","layer","canvas"],function Engine(Actions, Layer, Canvas) {
 		},
 		refresh: function() {
 			var size = sizes[s], visible = 0;
-			var width = g.width/size, height = g.height/size;
-			context.fillStyle = '#bbb';
-			context.fillRect(0,0,g.width,g.height);
+			var width = Math.ceil(canvas.width/size);
+			var height = Math.ceil(canvas.height/size);
+			context.fillStyle = lightPattern;
+			context.fillRect(0,0,canvas.width,canvas.height);
 			var v = layers[activeLayer].buf.viewable(width,height);
-			context.fillStyle = '#f4f4f4';
+			context.fillStyle = lightPattern;
 			context.fillRect(v.x*size,v.y*size,v.width*size,v.height*size);
-			context.drawImage(bg.canvas,0,0);
 			buf.clear();
 			for (var i=layers.length-1; i>=0; i--) {
 				var layer = layers[order[i]];
@@ -74,15 +88,22 @@ define(["actions","layer","canvas"],function Engine(Actions, Layer, Canvas) {
 			}
 		},
 		refreshBackground: function() {
-			bg.clear();
-			bg.context.fillStyle = '#ddd';
-            var size = sizes[s]/2;
-            for (var y=0; y<g.height/size; y++) {
-            	for (var x=(y%2); x<g.width/size; x+=2) {
-            		bg.context.fillRect(x*size,y*size,size+(x%2),size+(y%2));
-            	}
-            }
-            _this.refresh();
+			var c = document.createElement("canvas"), ct = c.getContext('2d');
+			var d = sizes[s], h = d/2, m = h-1;
+			c.width = d;
+			c.height = d;
+			ct.fillStyle = "#bbb";
+			ct.fillRect(0,0,d,d);
+			ct.fillStyle = "#ddd";
+			ct.fillRect(h,1,m,m);
+			ct.fillRect(1,h,m,m);
+			darkPattern = ct.createPattern(c,"repeat");
+			ct.fillRect(0,0,d,d);
+			ct.fillStyle = "#f4f4f4";
+			ct.fillRect(h,1,m,m);
+			ct.fillRect(1,h,m,m);
+			lightPattern = ct.createPattern(c,"repeat");
+			_this.refresh();
 		},
 		setLayerOrder: function(o) {
 			order = o;
@@ -106,7 +127,8 @@ define(["actions","layer","canvas"],function Engine(Actions, Layer, Canvas) {
 		setActiveLayer: function(index,local) {
 			activeLayer = index;
 			if (local) {
-				$('#li-layer'+layers[index].index+' a').tab('show');
+				$("#layers .sortable li").removeClass("active");
+				$("#li-layer"+(index+1)).addClass("active");
 			}
 			_this.refresh();
 		},
@@ -114,7 +136,8 @@ define(["actions","layer","canvas"],function Engine(Actions, Layer, Canvas) {
 			return ['blue','red','green','yellow','orange','brown','black','white','purple','beige'];
 		},
 		setColor: function(c) {
-			$('#draw').button('toggle');
+			$('[name="radio"]').removeAttr("checked").button('refresh');
+			$('label[for="draw"]').addClass("ui-state-active");
 			_this.setMode('draw');
             color = c;
 		},

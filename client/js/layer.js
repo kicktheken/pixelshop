@@ -1,20 +1,16 @@
 define(["canvas"], function Layer(Canvas) {
-	var $tabbar = $('#layer-tabbar'), html = $tabbar.html();
+	var $tabbar = $('#layers .sortable'), html = $tabbar.html();
 	var pwidth, pheight, pool = [], numLayers = 0;
 	function initTabbar() {
-		$('#layer-tabbar a').removeAttr('style');
 		$tabbar.sortable({
+			placeholder: "ui-state-highlight",
+			axis: "y",
 			update: function(e,ui) {
 				var order = [];
-				$('#layer-tabbar li').each(function(e) {
+				$('#layers .sortable li').each(function(e) {
 					order.push(this.id[this.id.length-1]-1);
 				});
 				g.Engine.setLayerOrder(order);
-			},
-			activate: function(e,ui) {
-				var id = ui.item[0].id;
-				$('#'+id+' a').tab('show');
-				g.Engine.setActiveLayer(id[id.length-1]-1);
 			}
 		});
 	}
@@ -36,11 +32,16 @@ define(["canvas"], function Layer(Canvas) {
 				}
 				pcanvas = $('#layer'+index).get(0);
 			} else {
-				$('#layer-tabbar .active a').css({'cursor':'default'});
+				//$('#layer-tabbar .active a').css({'cursor':'default'});
 				pcanvas = $('#layer'+index).get(0);
 				pwidth = pcanvas.width;
 				pheight = pcanvas.height;
 			}
+			$("#li-layer"+index).mousedown(function() {
+				$("#layers .sortable li").removeClass("active");
+				var id = $(this).addClass("active").attr('id');
+				g.Engine.setActiveLayer(id[id.length-1]-1);
+			});
 			this.index = index;
 			this.preview = pcanvas.getContext('2d');
 			this.preview.width = pcanvas.width;

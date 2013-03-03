@@ -3,10 +3,10 @@ define(["action"], function Actions(Action) {
 	return Class.extend({
 		init: function() {
 			if (typeof _this !== 'undefined') {
-                throw "Actions is a singleton and cannot be initialized more than once";
-            }
-            _this = this;
-            g['Actions'] = this;
+				throw "Actions is a singleton and cannot be initialized more than once";
+			}
+			_this = this;
+			g['Actions'] = this;
 			actions = [];
 			index = 0;
 		},
