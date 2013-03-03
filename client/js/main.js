@@ -10,40 +10,6 @@ define([
 function Main(Engine) {
 	window.googlekey = g.analytics;
 	document.onselectstart = function() {return false;};
-	function initDivs() {
-		$('.buttonset').buttonset();
-		$("#toolbar").dialog({
-			dialogClass: "no-close",
-			title:"",
-			position: [200,41],
-			resizable: false,
-			width:503,
-			height:55
-		});
-		$("#colors").dialog({
-			dialogClass: "no-close",
-			position: [10,100],
-			resizable: false,
-			width:90,
-			minWidth:90,
-			height:426
-		});
-		$("#layers").dialog({
-			dialogClass: "no-close",
-			containment:".mew",
-			position: [800,100],
-			resizable: false,
-			width:129,
-			minWidth:129,
-			height:400
-		});
-		// fix jqueryui bug
-		$('#addlayer').focus(function(e) {
-			$(this).blur();
-		}).blur();
-
-		$(".ui-dialog").draggable("option", "containment", "#canvas");
-	}
 
 	function init() {
 		var $canvas = $('#canvas');
@@ -53,7 +19,6 @@ function Main(Engine) {
 		g.width = 720;
 		g.height = 600;
 		g.INITTIME = g.ts();
-		initDivs();
 
 		var engine = new Engine($canvas), disableClick = false;
 		$(window).resize(engine.resize);
@@ -64,6 +29,12 @@ function Main(Engine) {
 				return "You have unsaved changes.";
 			}
 		});
+
+		$('.buttonset').buttonset();
+		// fix jqueryui bug
+		$('#addlayer').focus(function(e) {
+			$(this).blur();
+		}).blur();
 
 		$('#addlayer').click(function() {
 			if (engine.addLayer() >= 8) {
@@ -192,7 +163,7 @@ function Main(Engine) {
 				canvasCoords(engine.cursorStart,e,$canvas);
 			}).bind('touchend', function(e) {
 				engine.cursorEnd();
-			});            
+			});
 		} else {
 			$canvas.mousemove(function(e) {
 				canvasCoords(engine.cursorMove,e,$canvas);

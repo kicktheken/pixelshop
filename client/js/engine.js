@@ -4,7 +4,7 @@ define(["actions","layer","canvas"],function Engine(Actions, Layer, Canvas) {
 	var host = /[^\/]+\/\/[^\/]+/g.exec(window.location.href) + g.proxyPrefix;
 	var sizes = [6,8,10,15,20,24,30];
 	var saveTimer, saved, email;
-	var darkPattern, lightPattern;
+	var darkPattern, lightPattern, cheight = $(".container").height() + 1;
 	var authURL = "https://accounts.google.com/o/oauth2/auth";
 	var blankcolor = { toRgb: function() { return {r:0,g:0,b:0,a:0}; } };
 	return Class.extend({
@@ -29,6 +29,7 @@ define(["actions","layer","canvas"],function Engine(Actions, Layer, Canvas) {
 			_this.refreshBackground();
 			_this.initSignin();
 			_this.resize();
+			_this.initDialogs();
 		},
 		initSignin: function() {
 			var oauth2 = config.oauth2, query = [];
@@ -37,13 +38,54 @@ define(["actions","layer","canvas"],function Engine(Actions, Layer, Canvas) {
 			}
 			$('#signin').attr("href", authURL+"?"+query.join("&"));
 		},
-		initPattern: function() {
-			
+		initDialogs: function() {
+			$("#toolbar").dialog({
+				dialogClass: "no-close",
+				title:"",
+				position: [canvas.width/2-251,41],
+				resizable: false,
+				width:503,
+				height:55
+			});
+			$("#colors").dialog({
+				dialogClass: "no-close",
+				position: [0,100],
+				resizable: false,
+				width:90,
+				minWidth:90,
+				height:426
+			});
+			$("#layers").dialog({
+				dialogClass: "no-close",
+				position: [canvas.width-129,100],
+				resizable: false,
+				width:129,
+				minWidth:129,
+				height:400
+			});
+			$(".ui-dialog").draggable("option", "containment", "#canvas");
+		},
+		reposition: function(selector,newwidth,newheight) {
+			try { //disable for initial setup
+				var pos = $(selector).dialog("option","position");
+				pos[0] = Math.floor(pos[0]/canvas.width*newwidth);
+				pos[1] = Math.floor(pos[1]/canvas.height*newheight);
+				pos[1] = Math.max(cheight, pos[1]);
+				$(selector).dialog("option", {position:pos});
+			} catch(err) {
+				return false;
+			}
+			return true;
 		},
 		resize: function() {
 			var width = $(window).width(), height = $(window).height();
+			height -= cheight;
+			if (_this.reposition("#toolbar",width,height)) {
+				_this.reposition("#colors",width,height)
+				_this.reposition("#layers",width,height)
+			}
 			canvas.width = width;
-			canvas.height = height - $(".container").height() - 1;
+			canvas.height = height;
 
 			context.fillStyle = lightPattern;
 			context.fillRect(0,0,width,height);
