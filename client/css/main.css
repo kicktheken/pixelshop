@@ -91,7 +91,6 @@ form {
 	height:32px;
 }
 #colors .key {
-	cursor: move;
 	margin-left:8px;
 	margin-right:0;
 }
@@ -99,7 +98,7 @@ form {
 	height:30px;
 }
 .sortable li {
-	cursor: default;
+	cursor: move;
 	border-radius:3px;
 	padding:3px;
 }
