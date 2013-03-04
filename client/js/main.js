@@ -106,17 +106,16 @@ function Main(Engine) {
 		key('1,2,3,4,5,6,7,8,9,0', function(e,h) {
 			setColor(colororder[h.shortcut]);
 		});
-		var paintKeys = ['q','w','e','r','t','y','u','i'];
+		var paintKeys = ['q','w','e','r','t','y','u'];
 		key(paintKeys.join(','), function(e,h) {
 			switch (h.shortcut) {
 				case 'q': return paintRadio('draw');
 				case 'w': return paintRadio('fill');
 				case 'e': return paintRadio('eraser');
-				case 'r': return paintRadio('drag');
+				case 'r': return paintRadio('pan');
 				case 't': return paintRadio('dropper');
 				case 'y': return paintRadio('select');
-				case 'u': return paintRadio('brighten');
-				case 'i': return paintRadio('darken');
+				case 'u': return paintRadio('move');
 			}
 		});
 		function paintRadio(id) {

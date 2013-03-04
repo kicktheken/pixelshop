@@ -4,7 +4,7 @@ define(["actions","layer","canvas"],function Engine(Actions, Layer, Canvas) {
 	var host = /[^\/]+\/\/[^\/]+/g.exec(window.location.href) + g.proxyPrefix;
 	var sizes = [6,8,10,15,20,24,30];
 	var saveTimer, saved, email, cheight = $(".container").height() + 1;
-	var darkPattern, lightPattern, medPattern;
+	var darkPattern, lightPattern, medPattern, pan;
 	var authURL = "https://accounts.google.com/o/oauth2/auth";
 	var blankcolor = { toRgb: function() { return {r:0,g:0,b:0,a:0}; } };
 	return Class.extend({
@@ -23,6 +23,7 @@ define(["actions","layer","canvas"],function Engine(Actions, Layer, Canvas) {
 			s = 3;
 			buf = new Canvas(g.width,g.height);
 			bg = new Canvas(g.width,g.height);
+			pan = {x:0,y:0};
 			mode = 'draw';
 			saved = true;
 			email = "";
@@ -43,9 +44,9 @@ define(["actions","layer","canvas"],function Engine(Actions, Layer, Canvas) {
 			$("#toolbar").dialog({
 				dialogClass: "no-close",
 				title:"",
-				position: [canvas.width/2-251,41],
+				position: [canvas.width/2-274,41],
 				resizable: false,
-				width:503,
+				width:548,
 				height:55
 			});
 			$("#colors").dialog({
@@ -102,23 +103,31 @@ define(["actions","layer","canvas"],function Engine(Actions, Layer, Canvas) {
 			var size = sizes[s], visible = 0;
 			var width = Math.ceil(canvas.width/size);
 			var height = Math.ceil(canvas.height/size);
-			var xrem = Math.ceil(canvas.width/2)+buf.offset.x;
+			var xrem = Math.ceil(canvas.width/2)+buf.offset.x + pan.x;
 			xrem = xrem%size - ((xrem%size > 0) ? size : 0);
-			var yrem = Math.ceil(canvas.height/2)+buf.offset.y;
+			var yrem = Math.ceil(canvas.height/2)+buf.offset.y + pan.y;
 			yrem = yrem%size - ((yrem%size > 0) ? size : 0);
 
 			bg.context.fillStyle = darkPattern;
 			bg.context.fillRect(0,0,bg.canvas.width,bg.canvas.height);
 			var v = layers[activeLayer].buf.viewable(width,height);
+
+			var remx = Math.ceil(canvas.width/2)+buf.offset.x;
+			remx = remx%size - ((remx%size > 0) ? size : 0);
+			var remy = Math.ceil(canvas.height/2)+buf.offset.y;
+			remy = remy%size - ((remy%size > 0) ? size : 0);
+
+			var dx = pan.x-xrem+remx, dy = pan.y-yrem+remy;
 			bg.context.fillStyle = medPattern;
-			bg.context.fillRect(v.x*size, v.y*size, v.width*size, v.height*size);
+			bg.context.fillRect(v.x*size+dx, v.y*size+dy, v.width*size, v.height*size);
 			var l = buf.viewable(width,height);
-			bg.context.fillRect(l.x*size, l.y*size, l.width*size, l.height*size);
+			bg.context.fillRect(l.x*size+dx, l.y*size+dy, l.width*size, l.height*size);
 			var minx = Math.min(v.x,l.x), maxx = Math.max(v.x,l.x);
 			var miny = Math.min(v.y,l.y), maxy = Math.max(v.y,l.y);
 			bg.context.fillStyle = lightPattern;
-			bg.context.fillRect(maxx*size, maxy*size, (v.width-maxx+minx)*size, (v.height-maxy+miny)*size);
+			bg.context.fillRect(maxx*size+dx, maxy*size+dy, (v.width-maxx+minx)*size, (v.height-maxy+miny)*size);
 			context.drawImage(bg.canvas,xrem,yrem);
+
 			buf.clear();
 			for (var i=layers.length-1; i>=0; i--) {
 				var layer = layers[order[i]];
@@ -138,7 +147,7 @@ define(["actions","layer","canvas"],function Engine(Actions, Layer, Canvas) {
 					var i = (x+y*width)*4;
 					if (d.data[i+3] > 0) {
 						context.fillStyle = 'rgba('+d.data[i]+','+d.data[i+1]+','+d.data[i+2]+','+d.data[i+3]+')';
-						context.fillRect(x*size+xrem, y*size+yrem, size, size);
+						context.fillRect(x*size+remx+pan.x, y*size+remy+pan.y, size, size);
 					}
 				}
 			}
@@ -212,11 +221,10 @@ define(["actions","layer","canvas"],function Engine(Actions, Layer, Canvas) {
 			case 'draw': 	changed = _this.draw(color,x,y); break;
 			case 'fill': 	return;
 			case 'eraser': 	changed = _this.draw(blankcolor,x,y); break;
-			case 'drag': 	return _this.move(x,y);
+			case 'pan': 	return _this.pan(x,y);
 			case 'dropper': return;
 			case 'select': 	return;
-			case 'brighten':return;
-			case 'darken':	return;
+			case 'move':	return _this.move(x,y);
 			}
 			if (changed) {
 				_this.queueSave();
@@ -408,12 +416,32 @@ define(["actions","layer","canvas"],function Engine(Actions, Layer, Canvas) {
 		},
 		draw: function(color,x,y) {
 			var size = sizes[s];
-			x = Math.floor((x-canvas.width/2)/size);
-			y = Math.floor((y-canvas.height/2)/size);
+			x = Math.floor((x-canvas.width/2-pan.x)/size);
+			y = Math.floor((y-canvas.height/2-pan.y)/size);
 			var ret = actions.draw(layers[activeLayer],color,x,y);
 			_this.refresh();
 			_this.updateUndo();
 			return ret;
+		},
+		pan: function(x,y) {
+			var size = sizes[s];
+			var px = pan.x + x-pressed.x, py = pan.y + y-pressed.y;
+			var xlim = buf.canvas.width/2*size, ylim = buf.canvas.height/2*size;
+			if (px > xlim) {
+				pan.x = xlim;
+			} else if (px < -xlim) {
+				pan.x = -xlim;
+			} else {
+				pan.x = px;
+			}
+			if (py > ylim) {
+				pan.y = ylim;
+			} else if (py < -ylim) {
+				pan.y = -ylim;
+			} else {
+				pan.y = py;
+			}
+			_this.refresh();
 		},
 		move: function(x,y) {
 			var size = sizes[s];
