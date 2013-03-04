@@ -1,10 +1,10 @@
 define(["actions","layer","canvas"],function Engine(Actions, Layer, Canvas) {
 	var _this, actions, canvas, context;
-	var buf, s, pressed, mode, color, layers, order, activeLayer = -1;
+	var bg, buf, s, pressed, mode, color, layers, order, activeLayer = -1;
 	var host = /[^\/]+\/\/[^\/]+/g.exec(window.location.href) + g.proxyPrefix;
 	var sizes = [6,8,10,15,20,24,30];
-	var saveTimer, saved, email;
-	var darkPattern, lightPattern, cheight = $(".container").height() + 1;
+	var saveTimer, saved, email, cheight = $(".container").height() + 1;
+	var darkPattern, lightPattern, medPattern;
 	var authURL = "https://accounts.google.com/o/oauth2/auth";
 	var blankcolor = { toRgb: function() { return {r:0,g:0,b:0,a:0}; } };
 	return Class.extend({
@@ -20,8 +20,9 @@ define(["actions","layer","canvas"],function Engine(Actions, Layer, Canvas) {
 			pressed = false;
 			layers = [];
 			order = [];
-			s = 4;
+			s = 3;
 			buf = new Canvas(g.width,g.height);
+			bg = new Canvas(g.width,g.height);
 			mode = 'draw';
 			saved = true;
 			email = "";
@@ -86,26 +87,38 @@ define(["actions","layer","canvas"],function Engine(Actions, Layer, Canvas) {
 			}
 			canvas.width = width;
 			canvas.height = height;
-
-			context.fillStyle = lightPattern;
-			context.fillRect(0,0,width,height);
+			var edge = sizes[sizes.length-1];
+			bg.canvas.width = width+edge;
+			bg.canvas.height = height+edge;
 			_this.refresh();
 		},
 		viewWidth: function() {
-			return g.width/sizes[s];
+			return canvas.width/sizes[s];
 		},
 		viewHeight: function() {
-			return g.height/sizes[s];
+			return canvas.height/sizes[s];
 		},
 		refresh: function() {
 			var size = sizes[s], visible = 0;
 			var width = Math.ceil(canvas.width/size);
 			var height = Math.ceil(canvas.height/size);
-			context.fillStyle = lightPattern;
-			context.fillRect(0,0,canvas.width,canvas.height);
+			var xrem = Math.ceil(canvas.width/2)+buf.offset.x;
+			xrem = xrem%size - ((xrem%size > 0) ? size : 0);
+			var yrem = Math.ceil(canvas.height/2)+buf.offset.y;
+			yrem = yrem%size - ((yrem%size > 0) ? size : 0);
+
+			bg.context.fillStyle = darkPattern;
+			bg.context.fillRect(0,0,bg.canvas.width,bg.canvas.height);
 			var v = layers[activeLayer].buf.viewable(width,height);
-			context.fillStyle = lightPattern;
-			context.fillRect(v.x*size,v.y*size,v.width*size,v.height*size);
+			bg.context.fillStyle = medPattern;
+			bg.context.fillRect(v.x*size, v.y*size, v.width*size, v.height*size);
+			var l = buf.viewable(width,height);
+			bg.context.fillRect(l.x*size, l.y*size, l.width*size, l.height*size);
+			var minx = Math.min(v.x,l.x), maxx = Math.max(v.x,l.x);
+			var miny = Math.min(v.y,l.y), maxy = Math.max(v.y,l.y);
+			bg.context.fillStyle = lightPattern;
+			bg.context.fillRect(maxx*size, maxy*size, (v.width-maxx+minx)*size, (v.height-maxy+miny)*size);
+			context.drawImage(bg.canvas,xrem,yrem);
 			buf.clear();
 			for (var i=layers.length-1; i>=0; i--) {
 				var layer = layers[order[i]];
@@ -118,13 +131,14 @@ define(["actions","layer","canvas"],function Engine(Actions, Layer, Canvas) {
 			if (!visible) {
 				return;
 			}
+
 			var d = buf.getViewData(width,height);
 			for (var y=0; y<height; y++) {
 				for (var x=0; x<width; x++) {
 					var i = (x+y*width)*4;
 					if (d.data[i+3] > 0) {
 						context.fillStyle = 'rgba('+d.data[i]+','+d.data[i+1]+','+d.data[i+2]+','+d.data[i+3]+')';
-						context.fillRect(x*size, y*size, size, size);
+						context.fillRect(x*size+xrem, y*size+yrem, size, size);
 					}
 				}
 			}
@@ -145,6 +159,12 @@ define(["actions","layer","canvas"],function Engine(Actions, Layer, Canvas) {
 			ct.fillRect(h,1,m,m);
 			ct.fillRect(1,h,m,m);
 			lightPattern = ct.createPattern(c,"repeat");
+			ct.fillStyle = "#ccc";
+			ct.fillRect(0,0,d,d);
+			ct.fillStyle = "#e0e0e0";
+			ct.fillRect(h,1,m,m);
+			ct.fillRect(1,h,m,m);
+			medPattern = ct.createPattern(c,"repeat");
 			_this.refresh();
 		},
 		setLayerOrder: function(o) {
@@ -388,8 +408,8 @@ define(["actions","layer","canvas"],function Engine(Actions, Layer, Canvas) {
 		},
 		draw: function(color,x,y) {
 			var size = sizes[s];
-			x = Math.floor(x/size);
-			y = Math.floor(y/size);
+			x = Math.floor((x-canvas.width/2)/size);
+			y = Math.floor((y-canvas.height/2)/size);
 			var ret = actions.draw(layers[activeLayer],color,x,y);
 			_this.refresh();
 			_this.updateUndo();

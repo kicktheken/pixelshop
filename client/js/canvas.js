@@ -1,14 +1,11 @@
 define(["pixel"],function Canvas(Pixel) {
-	function defaultOffset(width,height) {
-		return {x: width/6, y: height/6 };
-	}
 	return Class.extend({
 		init: function(width,height) {
 			this.canvas = document.createElement('canvas');
 			this.canvas.width = width;
 			this.canvas.height = height;
 			this.context = this.canvas.getContext('2d');
-			this.offset = defaultOffset(width,height);
+			this.offset = {x:0,y:0};
 		},
 		updateBounds: function(minx,miny,maxx,maxy) {
 			if (!this.bounds) {
@@ -33,8 +30,8 @@ define(["pixel"],function Canvas(Pixel) {
 			this.updateBounds(x,y,x,y);
 		},
 		pixel: function(x,y,color) {
-			x += this.offset.x - g.Engine.viewWidth()/2;
-			y += this.offset.y - g.Engine.viewHeight()/2;
+			x += this.offset.x + Math.ceil(this.canvas.width/2);
+			y += this.offset.y + Math.ceil(this.canvas.height/2);
 			if (color) {
 				return new Pixel(color,x,y);
 			}
@@ -54,31 +51,21 @@ define(["pixel"],function Canvas(Pixel) {
 		move: function(x,y) {
 			this.offset.x += x;
 			this.offset.y += y;
-			if (this.offset.x < 0) {
-				this.offset.x = 0;
-			} else if (this.offset.x > this.canvas.width) {
-				this.offset.x = this.canvas.width;
+			if (this.offset.x < -this.canvas.width+1) {
+				this.offset.x = -this.canvas.width+1;
+			} else if (this.offset.x > this.canvas.width-1) {
+				this.offset.x = this.canvas.width-1;
 			}
-			if (this.offset.y < 0) {
-				this.offset.y = 0;
-			} else if (this.offset.x > this.canvas.height) {
-				this.offset.y = this.canvas.height;
+			if (this.offset.y < -this.canvas.height+1) {
+				this.offset.y = -this.canvas.height+1;
+			} else if (this.offset.y > this.canvas.height-1) {
+				this.offset.y = this.canvas.height-1;
 			}
 		},
-		viewable: function(vw,vh) {
-			vw /= 2;
-			vh /= 2;
-			var ret = {x:0, y:0, width:vw*2, height:vh*2};
-			if (this.offset.x < vw) {
-				ret.x = vw - this.offset.x;
-			} else if (this.offset.x > this.canvas.width - vw) {
-				ret.width = this.offset.x - this.canvas.width + vw*2;
-			}
-			if (this.offset.y < vh) {
-				ret.y = vh - this.offset.y;
-			} else if (this.offset.y > this.canvas.height - vh) {
-				ret.height = this.offset.y - this.canvas.height + vh*2;
-			}
+		viewable: function(width,height) {
+			var x = Math.ceil(width/2) - Math.ceil(this.canvas.width/2) - this.offset.x;
+			var y = Math.ceil(height/2) - Math.ceil(this.canvas.height/2) - this.offset.y;
+			var ret = {x:x, y:y, width:this.canvas.width, height:this.canvas.height};
 			return ret;
 		},
 		collapse: function(buf) {
@@ -140,8 +127,8 @@ define(["pixel"],function Canvas(Pixel) {
 			return this.context.getImageData(x,y,width,height);
 		},
 		getViewData: function(width,height) {
-			var x = this.offset.x - g.Engine.viewWidth()/2;
-			var y = this.offset.y - g.Engine.viewHeight()/2;
+			var x = Math.ceil(this.canvas.width/2) - Math.ceil(width/2);
+			var y = Math.ceil(this.canvas.height/2) - Math.ceil(height/2);
 			return this.context.getImageData(x,y,width,height);
 		},
 		getViewDataFromBounds: function(width,height) {

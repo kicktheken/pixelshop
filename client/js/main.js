@@ -16,8 +16,8 @@ function Main(Engine) {
 
 		// default globals
 		g.ts = function() { return new Date().getTime(); };
-		g.width = 720;
-		g.height = 600;
+		g.width = 30;
+		g.height = 30;
 		g.INITTIME = g.ts();
 
 		var engine = new Engine($canvas), disableClick = false;
