@@ -263,7 +263,7 @@ define(["actions","layer","canvas"],function Engine(Actions, Layer, Canvas) {
 				window.location.hash = "";
 			}
 			$.get(host+'/getworkspace'+query, function(data) {
-				if (data.length === 0) {
+				if (!data || data.length === 0) {
 					return;
 				}
 				var workspace = typeof data === 'object' ? data : JSON.parse(data);
@@ -336,6 +336,8 @@ define(["actions","layer","canvas"],function Engine(Actions, Layer, Canvas) {
 				var i = order[workspace.active];
 				$('#li-layer'+(activeLayer+1)).removeClass('active');
 				_this.setActiveLayer(i,true);
+				pan = workspace.pan;
+				_this.refresh();
 			}
 			for (var i=0; i<workspace.numLayers; i++) {
 				if (!workspace.layers[i].data) {
@@ -349,7 +351,7 @@ define(["actions","layer","canvas"],function Engine(Actions, Layer, Canvas) {
 			}
 		},
 		saveWorkspace: function(logoff) {
-			var workspace = { numLayers: layers.length, layers: [] };
+			var workspace = { numLayers: layers.length, layers: [], pan: pan };
 			for (var i=layers.length-1; i>=0; i--) {
 				if (activeLayer === order[i]) {
 					workspace.active = i;
