@@ -272,7 +272,7 @@ define(["actions","layer","canvas"],function Engine(Actions, Layer, Canvas) {
 			actions.load(layers[activeLayer],image);
 			_this.queueSave();
 			_this.refresh();
-			_this.updateUndo();
+			_this.updateDo();
 		},
 		resetWorkspace: function() {
 			var toRemove = layers.splice(1,layers.length-1);
@@ -450,7 +450,7 @@ define(["actions","layer","canvas"],function Engine(Actions, Layer, Canvas) {
 			var y = Math.floor((cy-canvas.height/2-pan.y)/size);
 			var ret = actions.draw(layers[activeLayer],color,x,y);
 			_this.refresh(cx,cy);
-			_this.updateUndo();
+			_this.updateDo();
 			return ret;
 		},
 		pan: function(x,y) {
