@@ -62,7 +62,7 @@ function Main(Engine) {
 			colororder.push(i);
 		}
 		tabbar.html(html);
- 
+
 		$('.colorpicker').spectrum({
 			preferredFormat: 'name',
 			showInput: true,
@@ -180,6 +180,7 @@ function Main(Engine) {
 		$('#undo').click(engine.undo);
 		$('#redo').click(engine.redo);
 		$('#save').click(engine.export);
+		$('#resize').click(engine.resizeCanvas);
 		//$('#load').click(engine.loadWorkspace);
 		key('⌘+z, ctrl+z', engine.undo);
 		key('⌘+shift+z, ctrl+shift+z', engine.redo);

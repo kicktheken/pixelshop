@@ -47,11 +47,10 @@ define(["actions","layer","canvas"],function Engine(Actions, Layer, Canvas) {
 		initDialogs: function() {
 			$("#toolbar").dialog({
 				dialogClass: "no-close",
-				title:"",
 				position: [canvas.width/2-274,41],
 				resizable: false,
 				width:548,
-				height:55
+				height:56
 			});
 			$("#colors").dialog({
 				dialogClass: "no-close",
@@ -487,6 +486,51 @@ define(["actions","layer","canvas"],function Engine(Actions, Layer, Canvas) {
 				layers[activeLayer].buf.move(-x,-y);
 				_this.refresh();
 			}
+		},
+		setDimensions: function() {
+			var $input = $('#dimensions');
+			var s = $input.val();
+			s = s.split(/[^0-9]+/);
+			if (s.length > 1 && isInt(s[0]) && isInt(s[1])) {
+				g.width = s[0];
+				g.height = s[1];
+				buf.setDimensions(g.width,g.height);
+				for (var i in layers) {
+					layers[i].buf.setDimensions(g.width,g.height);
+				}
+				_this.refresh();
+			}
+			$('#resize-dialog').dialog('close');
+			$input.val("");
+		},
+		resizeCanvas: function() {
+			$('#dimensions').attr('placeholder',g.width+'x'+g.height);
+			$('#frame').attr('placeholder',g.width+'x'+g.height);
+			function apply() {
+				
+			}
+			$(".numeric input").keyup(function (e) {
+				if (e.keyCode == 13) {
+					_this.setDimensions();
+				}
+			});
+			$('#resize-dialog').dialog({
+				dialogClass: "no-close",
+				modal:true,
+				draggable:false,
+				resizable:false,
+				width:190,
+				height:150,
+				title: "Dimensions",
+				buttons: {
+					Apply: _this.setDimensions,
+					Cancel: function() {
+						$(this).dialog('close');
+					}
+				}
+			});
+		},
+		changeDimensions: function(width,height) {
 		},
 		undo: function() {
 			if (actions.undo()) {

@@ -24,6 +24,15 @@ define(["pixel"],function Canvas(Pixel) {
 				}
 			}
 		},
+		setDimensions: function(width,height) {
+			var canvas = document.createElement('canvas');
+			canvas.width = width;
+			canvas.height = height;
+			var context = canvas.getContext('2d');
+			context.drawImage(this.canvas,0,0);
+			this.canvas = canvas;
+			this.context = context;
+		},
 		draw: function(pixel) {
 			pixel.draw(this.context);
 			var x = pixel.x, y = pixel.y;

@@ -74,6 +74,17 @@ if (document.styleSheets[0].cssRules.length === 0) { // for development
 	</ul>
 </div>
 
+<div id="resize-dialog" style="display:none;">
+	<fieldset>
+		<label class="numeric">
+			Dimensions:
+			<input id="dimensions" type="text" placeholder="300x200" maxlength="9">
+		</label>
+		<label class="numeric">
+			Frame:
+			<input id="frame" type="text" placeholder="300x200" maxlength="9"></label>
+	</fieldset>
+</div>
 <form method="POST"><input type="hidden" id="hidden" name="data" value="" /></form>
 
 <!-- load scripts at end -->

@@ -153,3 +153,14 @@ form {
 	background-color: #bd362f;
 }
 
+.numeric {
+	margin: 10px;
+}
+.numeric input {
+	height:14px;
+	margin-bottom: 0;
+	margin-left: 5px;
+	width:68px;
+	float: right;
+}
+
