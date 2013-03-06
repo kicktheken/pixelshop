@@ -2,7 +2,7 @@ define(["actions","layer","canvas"],function Engine(Actions, Layer, Canvas) {
 	var _this, actions, canvas, context;
 	var bg, buf, s, pressed, mode, color, layers, order, activeLayer = -1;
 	var host = /[^\/]+\/\/[^\/]+/g.exec(window.location.href) + g.proxyPrefix;
-	var sizes = [6,8,10,15,20,24,30], cursor, dotted;
+	var sizes = [6,8,10,15,20,24,30], cursor, dotted, drawing;
 	var saveTimer, saved, email, cheight = $(".container").height() + 1;
 	var darkPattern, lightPattern, medPattern, pan;
 	var authURL = "https://accounts.google.com/o/oauth2/auth";
@@ -27,6 +27,7 @@ define(["actions","layer","canvas"],function Engine(Actions, Layer, Canvas) {
 			pan = {x:0,y:0};
 			mode = 'draw';
 			saved = true;
+			drawing = false;
 			email = "";
 			_this.initDotted();
 			_this.addLayer();
@@ -445,6 +446,7 @@ define(["actions","layer","canvas"],function Engine(Actions, Layer, Canvas) {
 			$('form').attr("action",host+'/exportpng').submit();
 		},
 		draw: function(color,cx,cy) {
+			drawing = true;
 			var size = sizes[s];
 			var x = Math.floor((cx-canvas.width/2-pan.x)/size);
 			var y = Math.floor((cy-canvas.height/2-pan.y)/size);
@@ -525,7 +527,10 @@ define(["actions","layer","canvas"],function Engine(Actions, Layer, Canvas) {
 		},
 		cursorEnd: function() {
 			pressed = false;
-			actions.endDraw();
+			if (drawing) {
+				actions.endDraw();
+				drawing = false;
+			}
 		},
 		cursorOut: function() {
 			_this.refresh();
