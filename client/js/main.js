@@ -139,8 +139,8 @@ function Main(Engine) {
 			});
 		});
 
+		var cheight = $(".container").height()+1;
 		function canvasCoords(f,e,$this) {
-			var cheight = $(".container").height()+1;
 			var offset = $this.parent().offset();
 			var width = $(window).width();
 			var height = $(window).height() - cheight;
@@ -172,6 +172,7 @@ function Main(Engine) {
 				}
 			});
 			document.addEventListener('mouseup', engine.cursorEnd);
+			$canvas.mouseleave(engine.cursorOut);
 		}
 
 		$('#zoomin').click(engine.zoomIn);

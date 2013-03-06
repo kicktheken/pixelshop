@@ -2,7 +2,7 @@ define(["actions","layer","canvas"],function Engine(Actions, Layer, Canvas) {
 	var _this, actions, canvas, context;
 	var bg, buf, s, pressed, mode, color, layers, order, activeLayer = -1;
 	var host = /[^\/]+\/\/[^\/]+/g.exec(window.location.href) + g.proxyPrefix;
-	var sizes = [6,8,10,15,20,24,30];
+	var sizes = [6,8,10,15,20,24,30], cursor, dotted;
 	var saveTimer, saved, email, cheight = $(".container").height() + 1;
 	var darkPattern, lightPattern, medPattern, pan;
 	var authURL = "https://accounts.google.com/o/oauth2/auth";
@@ -23,10 +23,12 @@ define(["actions","layer","canvas"],function Engine(Actions, Layer, Canvas) {
 			s = 3;
 			buf = new Canvas(g.width,g.height);
 			bg = new Canvas(g.width,g.height);
+			cursor = new Canvas(sizes[s],sizes[s]);
 			pan = {x:0,y:0};
 			mode = 'draw';
 			saved = true;
 			email = "";
+			_this.initDotted();
 			_this.addLayer();
 			_this.refreshBackground();
 			_this.initSignin();
@@ -67,6 +69,18 @@ define(["actions","layer","canvas"],function Engine(Actions, Layer, Canvas) {
 			});
 			$(".ui-dialog").draggable("option", "containment", "#canvas");
 		},
+		initDotted: function() {
+			dotted = document.createElement("canvas");
+			var d = 2, h = d/2;
+			dotted.width = d;
+			dotted.height = d;
+			var ct = dotted.getContext('2d');
+			ct.fillStyle = 'white';
+			ct.fillRect(0,0,d,d);
+			ct.fillStyle = 'black';
+			ct.fillRect(0,0,h,h);
+			ct.fillRect(h,h,h,h);
+		},
 		reposition: function(selector,newwidth,newheight) {
 			try { //disable for initial setup
 				var pos = $(selector).dialog("option","position");
@@ -99,7 +113,7 @@ define(["actions","layer","canvas"],function Engine(Actions, Layer, Canvas) {
 		viewHeight: function() {
 			return canvas.height/sizes[s];
 		},
-		refresh: function() {
+		refresh: function(cx,cy) {
 			var size = sizes[s], visible = 0;
 			var width = Math.ceil(canvas.width/size);
 			var height = Math.ceil(canvas.height/size);
@@ -151,6 +165,12 @@ define(["actions","layer","canvas"],function Engine(Actions, Layer, Canvas) {
 					}
 				}
 			}
+
+			if (typeof cx !== 'undefined' && typeof cy !== 'undefined') {
+				cx = Math.floor((cx-remx)/size)*size;
+				cy = Math.floor((cy-remy)/size)*size;
+				context.drawImage(cursor.canvas,cx+remx-1,cy+remy-1);
+			}
 		},
 		refreshBackground: function() {
 			var c = document.createElement("canvas"), ct = c.getContext('2d');
@@ -174,6 +194,13 @@ define(["actions","layer","canvas"],function Engine(Actions, Layer, Canvas) {
 			ct.fillRect(h,1,m,m);
 			ct.fillRect(1,h,m,m);
 			medPattern = ct.createPattern(c,"repeat");
+			
+			cursor.canvas.width = d+2;
+			cursor.canvas.height = d+2;
+			cursor.clear();
+			cursor.context.strokeStyle = ct.createPattern(dotted,"repeat");
+			cursor.context.lineWidth = 2;
+			cursor.context.strokeRect(1,1,d,d);
 			_this.refresh();
 		},
 		setLayerOrder: function(o) {
@@ -416,12 +443,12 @@ define(["actions","layer","canvas"],function Engine(Actions, Layer, Canvas) {
 			$('#hidden').val(base64img);
 			$('form').attr("action",host+'/exportpng').submit();
 		},
-		draw: function(color,x,y) {
+		draw: function(color,cx,cy) {
 			var size = sizes[s];
-			x = Math.floor((x-canvas.width/2-pan.x)/size);
-			y = Math.floor((y-canvas.height/2-pan.y)/size);
+			var x = Math.floor((cx-canvas.width/2-pan.x)/size);
+			var y = Math.floor((cy-canvas.height/2-pan.y)/size);
 			var ret = actions.draw(layers[activeLayer],color,x,y);
-			_this.refresh();
+			_this.refresh(cx,cy);
 			_this.updateUndo();
 			return ret;
 		},
@@ -479,11 +506,12 @@ define(["actions","layer","canvas"],function Engine(Actions, Layer, Canvas) {
 		},
 		cursorMove: function(x,y) {
 			if (!pressed) {
-				return;
+				_this.refresh(x,y);
+			} else {
+				_this.perform(x,y);
+				pressed.x = x;
+				pressed.y = y;
 			}
-			_this.perform(x,y);
-			pressed.x = x;
-			pressed.y = y;
 		},
 		cursorStart: function(x,y) {
 			pressed = {x:x,y:y,mx:0,my:0};
@@ -492,6 +520,9 @@ define(["actions","layer","canvas"],function Engine(Actions, Layer, Canvas) {
 		cursorEnd: function() {
 			pressed = false;
 			actions.endDraw();
+		},
+		cursorOut: function() {
+			_this.refresh();
 		},
 		zoomIn: function() {
 			if (s+1 < sizes.length) {
