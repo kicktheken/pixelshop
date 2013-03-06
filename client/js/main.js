@@ -20,6 +20,7 @@ function Main(Engine) {
 		g.height = 30;
 		g.INITTIME = g.ts();
 
+		$('.buttonset').buttonset();
 		var engine = new Engine($canvas), disableClick = false;
 		$(window).resize(engine.resize);
 		var defaultColors = engine.defaultColors();
@@ -30,7 +31,6 @@ function Main(Engine) {
 			}
 		});
 
-		$('.buttonset').buttonset();
 		// fix jqueryui bug
 		$('#addlayer').focus(function(e) {
 			$(this).blur();

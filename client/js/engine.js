@@ -34,6 +34,7 @@ define(["actions","layer","canvas"],function Engine(Actions, Layer, Canvas) {
 			_this.initSignin();
 			_this.resize();
 			_this.initDialogs();
+			_this.updateDo();
 		},
 		initSignin: function() {
 			var oauth2 = config.oauth2, query = [];
@@ -488,20 +489,25 @@ define(["actions","layer","canvas"],function Engine(Actions, Layer, Canvas) {
 		undo: function() {
 			if (actions.undo()) {
 				_this.refresh();
-				_this.updateUndo();
+				_this.updateDo();
 			}
 		},
-		updateUndo: function() {
+		updateDo: function() {
 			if (actions.canUndo()) {
-				$('#undo').removeClass('disabled');
+				$('#undo').button('enable');
 			} else {
-				$('#undo').addClass('disabled',true);
+				$('#undo').button('disable');
+			}
+			if (actions.canRedo()) {
+				$('#redo').button('enable');
+			} else {
+				$('#redo').button('disable');
 			}
 		},
 		redo: function() {
 			if (actions.redo()) {
 				_this.refresh();
-				_this.updateUndo();
+				_this.updateDo();
 			}
 		},
 		cursorMove: function(x,y) {
@@ -540,12 +546,12 @@ define(["actions","layer","canvas"],function Engine(Actions, Layer, Canvas) {
 		},
 		updateZoom: function() {
 			if (s+1 === sizes.length) {
-				$('#zoomin').addClass('disabled');
+				$('#zoomin').button('disable');
 			} else if (s === 0) {
-				$('#zoomout').addClass('disabled');
+				$('#zoomout').button('disable');
 			} else {
-				$('#zoomin').removeClass('disabled');
-				$('#zoomout').removeClass('disabled');
+				$('#zoomin').button('enable');
+				$('#zoomout').button('enable');
 			}
 		}
 	});
