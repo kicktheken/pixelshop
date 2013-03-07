@@ -168,9 +168,16 @@ define(["actions","layer","canvas"],function Engine(Actions, Layer, Canvas) {
 			}
 
 			if (typeof cx !== 'undefined' && typeof cy !== 'undefined') {
-				cx = Math.floor((cx-remx)/size)*size;
-				cy = Math.floor((cy-remy)/size)*size;
-				context.drawImage(cursor.canvas,cx+remx-1,cy+remy-1);
+				cx = Math.floor((cx-remx)/size)*size + remx - 1;
+				cy = Math.floor((cy-remy)/size)*size + remy - 1;
+				context.drawImage(cursor.canvas,cx,cy);
+				context.font="bold 16px Verdana";
+				context.textAlign="right";
+				context.textBaseline="top";
+				context.fillStyle = context.createPattern(dotted,"repeat");
+				var hx = Math.ceil((cx - (v.x*size+dx))/size)+1;
+				var hy = Math.ceil((cy - (v.y*size+dy))/size)+1;
+				context.fillText(hx+","+hy,canvas.width-10,10);
 			}
 		},
 		refreshBackground: function() {
