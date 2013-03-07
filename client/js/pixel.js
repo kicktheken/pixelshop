@@ -35,7 +35,36 @@ define(function Pixel() {
 		toString: function() {
 			var d = this.d.data, x = this.x, y = this.y;
 			d = [d[0],d[1],d[2],d[3]];
-			return [x,y].join(',')+' -> rgba('+d.join(',')+')';
+			return [x+1,y+1].join(',')+' -> rgba('+d.join(',')+')';
+		},
+		line: function(dest) {
+			var ret = [];
+			var x = this.x, y = this.y;
+			var dx = dest.x - x, dy = dest.y - y;
+			if (Math.abs(dx) > Math.abs(dy)) {
+				var slope = (dx) ? dy/dx : 0;
+				if (dx > 0) {
+					for (x=x+1; x < dest.x; x++) {
+						ret.push([x,Math.round((x-this.x)*slope+this.y)]);
+					}
+				} else {
+					for (x=x-1; x > dest.x; x--) {
+						ret.push([x,Math.round((x-this.x)*slope+this.y)]);
+					}
+				}
+			} else {
+				var slope = (dy) ? dx/dy : 0;
+				if (dy > 0) {
+					for (y=y+1; y < dest.y; y++) {
+						ret.push([Math.round((y-this.y)*slope+this.x),y]);
+					}
+				} else {
+					for (y=y-1; y > dest.y; y--) {
+						ret.push([Math.round((y-this.y)*slope+this.x),y]);
+					}
+				}
+			}
+			return ret;
 		}
 	});
 });

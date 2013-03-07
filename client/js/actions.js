@@ -1,4 +1,4 @@
-define(["action"], function Actions(Action) {
+define(["action","pixel"], function Actions(Action,Pixel) {
 	var _this, actions, index;
 	return Class.extend({
 		init: function() {
@@ -16,14 +16,34 @@ define(["action"], function Actions(Action) {
 			if (!newp.diff(oldp)) {
 				return false;
 			}
+			var undoPixels = [oldp], redoPixels = [newp];
 			var action = actions[index];
 			if (!action || action.isComplete()) {
 				action = actions[index] = new Action(layer);
 				actions = actions.slice(0,index+1);
+			} else if (action.pixel) {
+				var line = action.pixel.line(newp);
+				for (var i in line) {
+					var px = line[i][0], py = line[i][1];
+					var prevp = new Pixel(layer.buf.context,px,py);
+					undoPixels.push(prevp);
+					var nextp = new Pixel(color,px,py);
+					redoPixels.push(nextp);
+					layer.draw(nextp);
+				}
 			}
+			action.pixel = newp;
 			action.enqueue(
-				function() { layer.buf.draw(oldp); },
-				function() { layer.buf.draw(newp); }
+				function() {
+					for (var i in undoPixels) {
+						layer.buf.draw(undoPixels[i]);
+					}
+				},
+				function() {
+					for (var i in redoPixels) {
+						layer.buf.draw(redoPixels[i]);
+					}
+				}
 			);
 			layer.draw(newp);
 			return true;
