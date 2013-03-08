@@ -50,9 +50,15 @@ define(["action","pixel"], function Actions(Action,Pixel) {
 			layer.draw(newp);
 			return true;
 		},
-		dragSelect: function(layer,selected) {
+		actionWrapper: function(layer,undo,redo) {
 			var action = actions[index] = new Action(layer);
 			actions = actions.slice(0,index+1);
+			action.enqueue(undo,redo);
+			redo();
+			action.complete();
+			index++;
+		},
+		dragSelect: function(layer,selected) {
 			var v = {}, r = {}, undo,redo;
 			v.done = r.done = true;
 			v.width = r.width = selected.width;
@@ -79,10 +85,7 @@ define(["action","pixel"], function Actions(Action,Pixel) {
 				layer.buf.clear(v.x,v.y,v.width,v.height);
 				return r;
 			};
-			action.enqueue(undo,redo);
-			redo();
-			action.complete();
-			index++;
+			_this.actionWrapper(layer,undo,redo);
 		},
 		load: function(layer,image) {
 			var oldx = layer.buf.offset.x - image.width/2;
@@ -101,15 +104,10 @@ define(["action","pixel"], function Actions(Action,Pixel) {
 					return true;
 				};
 			}
-			var action = actions[index] = new Action(layer);
-			actions = actions.slice(0,index+1);
-			action.enqueue(undo, function() {
+			_this.actionWrapper(layer,undo,function() {
 				layer.load(image);
 				return true;
 			});
-			layer.load(image);
-			action.complete();
-			index++;
 		},
 		endDraw: function() {
 			if (actions[index]) {
