@@ -312,6 +312,7 @@ define(["actions","layer","canvas"],function Engine(Actions, Layer, Canvas) {
 				}
 				if (typeof index !== 'undefined') {
 					layers[index].buf.context.drawImage(c,selected.x,selected.y);
+					layers[index].refresh();
 				}
 			}
 			selected = false;
