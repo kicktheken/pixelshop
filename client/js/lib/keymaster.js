@@ -29,6 +29,9 @@
       ';': 186, '\'': 222,
       '[': 219, ']': 221, '\\': 220
     },
+    code = function(x){
+      return _MAP[x] || x.toUpperCase().charCodeAt(0);
+    },
     _downKeys = [];
 
   for(k=1;k<20;k++) _MODIFIERS['f'+k] = 111+k;
@@ -39,6 +42,16 @@
     while(i--) if(array[i]===item) return i;
     return -1;
   }
+
+  var modifierMap = {
+      16:'shiftKey',
+      18:'altKey',
+      17:'ctrlKey',
+      91:'metaKey'
+  };
+  function updateModifierKey(event) {
+      for(k in _mods) _mods[k] = event[modifierMap[k]];
+  };
 
   // handle keydown event
   function dispatch(event, scope){
@@ -57,6 +70,7 @@
       for(k in _MODIFIERS) if(_MODIFIERS[k] == key) assignKey[k] = true;
       return;
     }
+    updateModifierKey(event);
 
     // see if we need to ignore the keypress (filter() can can be overridden)
     // by default ignore key presses if a select, textarea, or input is focused
@@ -136,7 +150,7 @@
       }
       // convert to keycode and...
       key = key[0]
-      key = _MAP[key] || key.toUpperCase().charCodeAt(0);
+      key = code(key);
       // ...store handler
       if (!(key in _handlers)) _handlers[key] = [];
       _handlers[key].push({ shortcut: keys[i], scope: scope, method: method, key: keys[i], mods: mods });
@@ -147,11 +161,7 @@
   // Converts strings into key codes.
   function isPressed(keyCode) {
       if (typeof(keyCode)=='string') {
-          if (keyCode.length == 1) {
-              keyCode = (keyCode.toUpperCase()).charCodeAt(0);
-          } else {
-              return false;
-          }
+        keyCode = code(keyCode);
       }
       return index(_downKeys, keyCode) != -1;
   }

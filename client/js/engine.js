@@ -204,7 +204,12 @@ define(["actions","layer","canvas"],function Engine(Actions, Layer, Canvas) {
 			} else {
 				canvas.style.cursor = "";
 			}
-			if (typeof cx !== 'undefined' && typeof cy !== 'undefined') {
+			$(canvas).removeClass();
+			if (mode === 'pan') {
+				$(canvas).addClass((pressed) ? "handclosed" : "handopen");
+			} else if (mode === 'move') {
+				canvas.style.cursor = "move";
+			} else if (typeof cx !== 'undefined' && typeof cy !== 'undefined') {
 				cx = Math.floor((cx-xrem)/size)*size + xrem - 1;
 				cy = Math.floor((cy-yrem)/size)*size + yrem - 1;
 				if (!selected) {

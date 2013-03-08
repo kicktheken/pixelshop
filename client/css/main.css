@@ -16,6 +16,12 @@ canvas
 {
 	display:block;
 }
+.handopen {
+	cursor: url(https://mail.google.com/mail/images/2/openhand.cur), default !important;
+}
+.handclosed {
+	cursor: url(https://mail.google.com/mail/images/2/closedhand.cur), default !important;
+}
 .preview {
 	background-color: #eee;
 }
