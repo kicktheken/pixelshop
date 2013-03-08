@@ -119,10 +119,11 @@ function Main(Engine) {
 				case 'u': id = 'move'; break;
 			}
 			if (id.length > 0) {
-				$('[name="radio"]').removeAttr("checked").button('refresh');
-				// jquery ui bug? have to explicitly highlight
-				$('label[for="'+id+'"]').addClass("ui-state-active");
-				engine.setMode(id);
+				if (engine.setMode(id)) {
+					$('[name="radio"]').removeAttr("checked").button('refresh');
+					// jquery ui bug? have to explicitly highlight
+					$('label[for="'+id+'"]').addClass("ui-state-active");
+				}
 			}
 		});
 		$('[name="radio"]').click(function(e) {

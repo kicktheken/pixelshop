@@ -38,15 +38,51 @@ define(["action","pixel"], function Actions(Action,Pixel) {
 					for (var i in undoPixels) {
 						layer.buf.draw(undoPixels[i]);
 					}
+					return true;
 				},
 				function() {
 					for (var i in redoPixels) {
 						layer.buf.draw(redoPixels[i]);
 					}
+					return true;
 				}
 			);
 			layer.draw(newp);
 			return true;
+		},
+		dragSelect: function(layer,selected) {
+			var action = actions[index] = new Action(layer);
+			actions = actions.slice(0,index+1);
+			var v = {}, r = {}, undo,redo;
+			v.done = r.done = true;
+			v.width = r.width = selected.width;
+			v.height = r.height = selected.height;
+			v.x = selected.src.x;
+			v.y = selected.src.y;
+			if (selected.data) {
+				v.data = selected.data;
+			} else {
+				v.data = layer.buf.context.getImageData(v.x,v.y,v.width,v.height);
+				selected.data = v.data;
+			}
+			r.data = v.data;
+			r.x = selected.x;
+			r.y = selected.y;
+			var restore = layer.buf.context.getImageData(r.x,r.y,r.width,r.height);
+			undo = function() {
+				layer.buf.context.putImageData(restore,r.x,r.y);
+				layer.buf.clear(v.x,v.y,v.width,v.height);
+				return v;
+			};
+			redo = function() {
+				layer.buf.context.putImageData(restore,r.x,r.y);
+				layer.buf.clear(v.x,v.y,v.width,v.height);
+				return r;
+			};
+			action.enqueue(undo,redo);
+			redo();
+			action.complete();
+			index++;
 		},
 		load: function(layer,image) {
 			var oldx = layer.buf.offset.x - image.width/2;
@@ -57,15 +93,20 @@ define(["action","pixel"], function Actions(Action,Pixel) {
 				undo = function() {
 					layer.buf.clear(oldx,oldy,image.width,image.height);
 					layer.buf.loadData(olddata,oldx,oldy);
+					return true;
 				};
 			} else {
 				undo = function() {
 					layer.buf.clear(oldx,oldy,image.width,image.height);
+					return true;
 				};
 			}
 			var action = actions[index] = new Action(layer);
 			actions = actions.slice(0,index+1);
-			action.enqueue(undo, function() { layer.load(image); });
+			action.enqueue(undo, function() {
+				layer.load(image);
+				return true;
+			});
 			layer.load(image);
 			action.complete();
 			index++;
@@ -87,17 +128,15 @@ define(["action","pixel"], function Actions(Action,Pixel) {
 			} else {
 				return false;
 			}
-			action.undo();
-			return true;
+			return action.undo();
 		},
 		redo: function() {
 			var action = actions[index];
 			if (!action || !action.isComplete()) {
 				return false;
 			}
-			action.redo();
 			index++;
-			return true;
+			return action.redo();
 		},
 		canUndo: function() {
 			return index > 0 || actions[index] && !actions[index].isComplete();

@@ -36,7 +36,7 @@ define(["actions","layer","canvas"],function Engine(Actions, Layer, Canvas) {
 			_this.initSignin();
 			_this.resize();
 			_this.initDialogs();
-			_this.updateDo();
+			_this._updateDo();
 		},
 		initSignin: function() {
 			var oauth2 = config.oauth2, query = [];
@@ -299,9 +299,13 @@ define(["actions","layer","canvas"],function Engine(Actions, Layer, Canvas) {
 			selected = false;
 		},
 		setMode: function(m) {
+			if (pressed) { // prevent switching modes while mousedown
+				return false;
+			}
 			mode = m;
 			_this.unloadSelected();
 			_this.refreshBackground();
+			return true;
 		},
 		perform: function(x,y) {
 			var changed = false;
@@ -332,7 +336,7 @@ define(["actions","layer","canvas"],function Engine(Actions, Layer, Canvas) {
 			actions.load(layers[activeLayer],image);
 			_this.queueSave();
 			_this.refresh();
-			_this.updateDo();
+			_this._updateDo();
 		},
 		resetWorkspace: function() {
 			var toRemove = layers.splice(1,layers.length-1);
@@ -511,7 +515,7 @@ define(["actions","layer","canvas"],function Engine(Actions, Layer, Canvas) {
 			var y = Math.floor((cy-canvas.height/2-pan.y)/size);
 			var ret = actions.draw(layers[activeLayer],color,x,y);
 			_this.refresh(cx,cy);
-			_this.updateDo();
+			_this._updateDo();
 			return ret;
 		},
 		pan: function(x,y) {
@@ -552,15 +556,18 @@ define(["actions","layer","canvas"],function Engine(Actions, Layer, Canvas) {
 			var x = Math.floor((cx-canvas.width/2-pan.x)/size)+Math.ceil(g.width/2);
 			var y = Math.floor((cy-canvas.height/2-pan.y)/size)+Math.ceil(g.height/2);
 			if (canvas.style.cursor == "move" && selected.done) {
-				if (!selected.data) {
-					var v = selected;
+				var v = selected;
+				if (!v.data) {
 					v.data = layers[activeLayer].buf.context.getImageData(v.x,v.y,v.width,v.height);
 					layers[activeLayer].buf.clear(v.x,v.y,v.width,v.height);
+				}
+				if (typeof v.dx === 'undefined') {
 					v.dx = x-v.x;
 					v.dy = y-v.y;
+					v.src = {x:v.x,y:v.y};
 				}
-				selected.x = x-selected.dx;
-				selected.y = y-selected.dy;
+				v.x = x-v.dx;
+				v.y = y-v.dy;
 			} else {
 				if (!selected || selected.done) {
 					_this.unloadSelected();
@@ -617,12 +624,34 @@ define(["actions","layer","canvas"],function Engine(Actions, Layer, Canvas) {
 			});
 		},
 		undo: function() {
-			if (actions.undo()) {
-				_this.refresh();
-				_this.updateDo();
-			}
+			_this.updateDo('undo');
 		},
-		updateDo: function() {
+		updateDo: function(task) {
+			if (mode === 'select' && pressed) {
+				return; // disable undo on dragging
+			}
+			var ret = actions[task]();
+			if (!ret) {
+				return;
+			}
+			if (typeof ret === 'object') {
+				selected = ret;
+				mode = 'select';
+				$('[name="radio"]').removeAttr("checked").button('refresh');
+				// jquery ui bug? have to explicitly highlight
+				$('label[for="select"]').addClass("ui-state-active");
+				_this.refresh();
+			} else {
+				if (task === 'undo') {
+					selected = false;
+				} else {
+					_this.unloadSelected();
+				}
+				_this.refreshBackground(); // restore cursor
+			}
+			_this._updateDo();
+		},
+		_updateDo: function() {
 			if (actions.canUndo()) {
 				$('#undo').button('enable');
 			} else {
@@ -635,10 +664,7 @@ define(["actions","layer","canvas"],function Engine(Actions, Layer, Canvas) {
 			}
 		},
 		redo: function() {
-			if (actions.redo()) {
-				_this.refresh();
-				_this.updateDo();
-			}
+			_this.updateDo('redo');
 		},
 		cursorMove: function(x,y) {
 			if (!pressed) {
@@ -653,13 +679,19 @@ define(["actions","layer","canvas"],function Engine(Actions, Layer, Canvas) {
 			pressed = {x:x,y:y,mx:0,my:0};
 			_this.perform(x,y);
 		},
-		cursorEnd: function() {
+		cursorEnd: function(e) {
 			pressed = false;
 			if (drawing) {
 				actions.endDraw();
 				drawing = false;
 			} else if (selected) {
-				selected.done = true;
+				if (selected.done) {
+					actions.dragSelect(layers[activeLayer],selected);
+					selected.src = {x:selected.x,y:selected.y};
+				} else {
+					selected.done = true;
+				}
+				_this.refresh(e.x,e.y-cheight);
 			}
 		},
 		cursorOut: function() {

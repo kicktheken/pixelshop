@@ -22,18 +22,22 @@ define(function Action() {
 			this.redoQueue.push(redo);
 		},
 		undo: function() {
+			var ret = true;
 			for (var i in this.undoQueue) {
-				this.undoQueue[i]();		
+				ret = this.undoQueue[i]();
 			}
 			this.layer.buf.bounds = this.undoBounds;
 			this.layer.refresh();
+			return ret;
 		},
 		redo: function() {
+			var ret = true;
 			for (var i in this.redoQueue) {
-				this.redoQueue[i]();		
+				ret = this.redoQueue[i]();		
 			}
 			this.layer.buf.bounds = this.redoBounds;
 			this.layer.refresh();
+			return ret;
 		}
 	});
 });
