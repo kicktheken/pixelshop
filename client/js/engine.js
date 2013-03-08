@@ -50,7 +50,7 @@ define(["actions","layer","canvas"],function Engine(Actions, Layer, Canvas) {
 				dialogClass: "no-close",
 				position: [canvas.width/2-274,41],
 				resizable: false,
-				width:548,
+				width:552,
 				height:56
 			});
 			$("#colors").dialog({
@@ -116,6 +116,7 @@ define(["actions","layer","canvas"],function Engine(Actions, Layer, Canvas) {
 			return canvas.height/sizes[s];
 		},
 		refresh: function(cx,cy) {
+			context.shadowBlur = 0;
 			var size = sizes[s], visible = 0;
 			var width = Math.ceil(canvas.width/size);
 			var height = Math.ceil(canvas.height/size);
@@ -204,15 +205,17 @@ define(["actions","layer","canvas"],function Engine(Actions, Layer, Canvas) {
 				canvas.style.cursor = "";
 			}
 			if (typeof cx !== 'undefined' && typeof cy !== 'undefined') {
-				cx = Math.floor((cx-remx)/size)*size + remx - 1;
-				cy = Math.floor((cy-remy)/size)*size + remy - 1;
+				cx = Math.floor((cx-xrem)/size)*size + xrem - 1;
+				cy = Math.floor((cy-yrem)/size)*size + yrem - 1;
 				if (!selected) {
 					context.drawImage(cursor.canvas,cx,cy);
 				}
-				context.font="bold 16px Verdana";
+				context.font="bold 14px Arial";
 				context.textAlign="right";
 				context.textBaseline="top";
-				context.fillStyle = context.createPattern(dotted,"repeat");
+				context.fillStyle = 'black';
+				context.shadowColor = 'white';
+				context.shadowBlur = 3;
 				var hx = Math.ceil((cx - (v.x*size+dx))/size)+1;
 				var hy = Math.ceil((cy - (v.y*size+dy))/size)+1;
 				context.fillText(hx+","+hy,canvas.width-10,10);
