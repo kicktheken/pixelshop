@@ -75,6 +75,7 @@ define(["action","pixel"], function Actions(Action,Pixel) {
 			r.x = selected.x;
 			r.y = selected.y;
 			var restore = layer.buf.context.getImageData(r.x,r.y,r.width,r.height);
+			r.index = v.index = layer.index;
 			undo = function() {
 				layer.buf.context.putImageData(restore,r.x,r.y);
 				layer.buf.clear(v.x,v.y,v.width,v.height);

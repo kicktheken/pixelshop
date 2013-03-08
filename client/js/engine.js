@@ -294,7 +294,20 @@ define(["actions","layer","canvas"],function Engine(Actions, Layer, Canvas) {
 				c.width = selected.width;
 				c.height = selected.height;
 				ct.putImageData(selected.data,0,0);
-				layers[activeLayer].buf.context.drawImage(c,selected.x,selected.y);
+				var index;
+				if (selected.index) {
+					for (var i in layers) {
+						if (layers[i].index === selected.index) {
+							index = i;
+							break;
+						}
+					}
+				} else {
+					index = activeLayer;
+				}
+				if (typeof index !== 'undefined') {
+					layers[index].buf.context.drawImage(c,selected.x,selected.y);
+				}
 			}
 			selected = false;
 		},
@@ -332,10 +345,11 @@ define(["actions","layer","canvas"],function Engine(Actions, Layer, Canvas) {
 			return saved;
 		},
 		load: function(image) {
+			_this.unloadSelected();
 			_this.addLayer();
 			actions.load(layers[activeLayer],image);
 			_this.queueSave();
-			_this.refresh();
+			_this.refreshBackground();
 			_this._updateDo();
 		},
 		resetWorkspace: function() {
@@ -636,16 +650,18 @@ define(["actions","layer","canvas"],function Engine(Actions, Layer, Canvas) {
 			}
 			if (typeof ret === 'object') {
 				selected = ret;
+			}
+			if (ret.index === layers[activeLayer].index) {
 				mode = 'select';
 				$('[name="radio"]').removeAttr("checked").button('refresh');
 				// jquery ui bug? have to explicitly highlight
 				$('label[for="select"]').addClass("ui-state-active");
 				_this.refresh();
 			} else {
-				if (task === 'undo') {
-					selected = false;
-				} else {
+				if (task === 'redo' || typeof ret === 'object') {
 					_this.unloadSelected();
+				} else {
+					selected = false;
 				}
 				_this.refreshBackground(); // restore cursor
 			}
