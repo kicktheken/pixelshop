@@ -108,24 +108,25 @@ function Main(Engine) {
 		});
 		var paintKeys = ['q','w','e','r','t','y','u'];
 		key(paintKeys.join(','), function(e,h) {
+			var id = '';
 			switch (h.shortcut) {
-				case 'q': return paintRadio('draw');
-				case 'w': return paintRadio('fill');
-				case 'e': return paintRadio('eraser');
-				case 'r': return paintRadio('pan');
-				case 't': return paintRadio('dropper');
-				case 'y': return paintRadio('select');
-				case 'u': return paintRadio('move');
+				case 'q': id = 'draw'; break;
+				case 'w': id = 'fill'; break;
+				case 'e': id = 'eraser'; break;
+				case 'r': id = 'pan'; break;
+				case 't': id = 'dropper'; break;
+				case 'y': id = 'select'; break;
+				case 'u': id = 'move'; break;
+			}
+			if (id.length > 0) {
+				$('[name="radio"]').removeAttr("checked").button('refresh');
+				// jquery ui bug? have to explicitly highlight
+				$('label[for="'+id+'"]').addClass("ui-state-active");
+				engine.setMode(id);
 			}
 		});
-		function paintRadio(id) {
-			$('[name="radio"]').removeAttr("checked").button('refresh');
-			// jquery ui bug? have to explicitly highlight
-			$('label[for="'+id+'"]').addClass("ui-state-active");
-			engine.setMode(id);
-		}
 		$('[name="radio"]').click(function(e) {
-			paintRadio(this.id);
+			engine.setMode(this.id);
 		});
 		$('#toolbar label').each(function(i,e) {
 			var title = $(e).attr('for');
