@@ -4,7 +4,7 @@ define(["actions","layer","canvas"],function Engine(Actions, Layer, Canvas) {
 	var host = /[^\/]+\/\/[^\/]+/g.exec(window.location.href) + g.proxyPrefix;
 	var sizes = [6,8,10,15,20,24,30], cursor, dotted, drawing;
 	var saveTimer, saved, email, cheight = $(".container").height() + 1;
-	var darkPattern, lightPattern, medPattern, pan;
+	var darkPattern, lightPattern, medPattern, pan, selected;
 	var authURL = "https://accounts.google.com/o/oauth2/auth";
 	var blankcolor = { toRgb: function() { return {r:0,g:0,b:0,a:0}; } };
 	return Class.extend({
@@ -24,6 +24,7 @@ define(["actions","layer","canvas"],function Engine(Actions, Layer, Canvas) {
 			buf = new Canvas(g.width,g.height);
 			bg = new Canvas(g.width,g.height);
 			cursor = new Canvas(sizes[s],sizes[s]);
+			selected = false;
 			pan = {x:0,y:0};
 			mode = 'draw';
 			saved = true;
@@ -167,10 +168,47 @@ define(["actions","layer","canvas"],function Engine(Actions, Layer, Canvas) {
 				}
 			}
 
+			if (selected) {
+				var mx = selected.x-Math.ceil(g.width/2);
+				var my = selected.y-Math.ceil(g.height/2);
+				width = selected.width;
+				height = selected.height;
+				cursor.canvas.width = width*size+2;
+				cursor.canvas.height = height*size+2;
+				cursor.context.strokeStyle = context.createPattern(dotted,"repeat");
+				cursor.context.lineWidth = 2;
+				cursor.context.strokeRect(1,1,width*size,height*size);
+				mx = mx*size + Math.ceil(canvas.width/2)+buf.offset.x + pan.x;
+				my = my*size + Math.ceil(canvas.height/2)+buf.offset.y + pan.y;
+				context.drawImage(cursor.canvas,mx,my);
+				if (selected.done && cx >= mx && cx <= mx+width*size && cy >= my && cy <= my+height*size) {
+					canvas.style.cursor = "move";
+				} else {
+					canvas.style.cursor = "";
+				}
+				if (selected.data) {
+					var d = selected.data;
+					for (var y=0; y<height; y++) {
+						for (var x=0; x<width; x++) {
+							var i = (x+y*width)*4;
+							if (d.data[i+3] > 0) {
+								context.fillStyle = 'rgba('+d.data[i]+','+d.data[i+1]+','+d.data[i+2]+','+d.data[i+3]+')';
+								var sx = x*size+mx;
+								var sy = y*size+my;
+								context.fillRect(sx, sy, size, size);
+							}
+						}
+					}
+				}
+			} else {
+				canvas.style.cursor = "";
+			}
 			if (typeof cx !== 'undefined' && typeof cy !== 'undefined') {
 				cx = Math.floor((cx-remx)/size)*size + remx - 1;
 				cy = Math.floor((cy-remy)/size)*size + remy - 1;
-				context.drawImage(cursor.canvas,cx,cy);
+				if (!selected) {
+					context.drawImage(cursor.canvas,cx,cy);
+				}
 				context.font="bold 16px Verdana";
 				context.textAlign="right";
 				context.textBaseline="top";
@@ -247,8 +285,20 @@ define(["actions","layer","canvas"],function Engine(Actions, Layer, Canvas) {
 			_this.setMode('draw');
             color = c;
 		},
+		unloadSelected: function() {
+			if (selected.data) {
+				var c = document.createElement("canvas"), ct = c.getContext('2d');
+				c.width = selected.width;
+				c.height = selected.height;
+				ct.putImageData(selected.data,0,0);
+				layers[activeLayer].buf.context.drawImage(c,selected.x,selected.y);
+			}
+			selected = false;
+		},
 		setMode: function(m) {
 			mode = m;
+			_this.unloadSelected();
+			_this.refreshBackground();
 		},
 		perform: function(x,y) {
 			var changed = false;
@@ -258,7 +308,7 @@ define(["actions","layer","canvas"],function Engine(Actions, Layer, Canvas) {
 			case 'eraser': 	changed = _this.draw(blankcolor,x,y); break;
 			case 'pan': 	return _this.pan(x,y);
 			case 'dropper': return;
-			case 'select': 	return;
+			case 'select': 	return _this.select(x,y);
 			case 'move':	return _this.move(x,y);
 			}
 			if (changed) {
@@ -494,6 +544,32 @@ define(["actions","layer","canvas"],function Engine(Actions, Layer, Canvas) {
 				_this.refresh();
 			}
 		},
+		select: function(cx,cy) {
+			var size = sizes[s];
+			var x = Math.floor((cx-canvas.width/2-pan.x)/size)+Math.ceil(g.width/2);
+			var y = Math.floor((cy-canvas.height/2-pan.y)/size)+Math.ceil(g.height/2);
+			if (canvas.style.cursor == "move" && selected.done) {
+				if (!selected.data) {
+					var v = selected;
+					v.data = layers[activeLayer].buf.context.getImageData(v.x,v.y,v.width,v.height);
+					layers[activeLayer].buf.clear(v.x,v.y,v.width,v.height);
+					v.dx = x-v.x;
+					v.dy = y-v.y;
+				}
+				selected.x = x-selected.dx;
+				selected.y = y-selected.dy;
+			} else {
+				if (!selected || selected.done) {
+					_this.unloadSelected();
+					selected = { src: {x:x,y:y} };
+				}
+				selected.width = Math.abs(selected.src.x-x)+1;
+				selected.height = Math.abs(selected.src.y-y)+1;
+				selected.x = Math.min(selected.src.x,x);
+				selected.y = Math.min(selected.src.y,y);
+			}
+			_this.refresh(cx,cy);
+		},
 		setDimensions: function() {
 			var $input = $('#dimensions');
 			var s = $input.val();
@@ -537,8 +613,6 @@ define(["actions","layer","canvas"],function Engine(Actions, Layer, Canvas) {
 				}
 			});
 		},
-		changeDimensions: function(width,height) {
-		},
 		undo: function() {
 			if (actions.undo()) {
 				_this.refresh();
@@ -581,6 +655,8 @@ define(["actions","layer","canvas"],function Engine(Actions, Layer, Canvas) {
 			if (drawing) {
 				actions.endDraw();
 				drawing = false;
+			} else if (selected) {
+				selected.done = true;
 			}
 		},
 		cursorOut: function() {
