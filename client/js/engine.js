@@ -749,7 +749,7 @@ define(["actions","layer","canvas"],function Engine(Actions, Layer, Canvas) {
 				} else {
 					selected.done = true;
 				}
-				_this.refresh(e.x,e.y-cheight);
+				_this.refresh(e.x-1,e.y-1-cheight);
 			}
 		},
 		cursorOut: function() {

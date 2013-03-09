@@ -146,8 +146,8 @@ function Main(Engine) {
 			var offset = $this.parent().offset();
 			var width = $(window).width();
 			var height = $(window).height() - cheight;
-			var x = e.pageX - offset.left;
-			var y = e.pageY - offset.top - cheight;
+			var x = e.pageX - offset.left - 1;
+			var y = e.pageY - offset.top - cheight - 1;
 			if (withinBounds(x,y,0,0,width,height)) {
 				f(x,y);
 			}
