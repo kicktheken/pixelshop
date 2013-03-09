@@ -52,6 +52,10 @@ function withinBounds(x,y,sx,sy,width,height) {
     return x >= sx && y >= sy && x < width && y < height;
 }
 
+function toId(tag) {
+	return parseInt(/\d+$/.exec(tag)[0]);
+}
+
 // code taken from https://developer.mozilla.org/en-US/docs/Mozilla_event_reference/wheel
 var initMouseScroll = function() {
     var prefix = "", _addEventListener, onwheel, support;

@@ -8,7 +8,7 @@ define(["canvas"], function Layer(Canvas) {
 			update: function(e,ui) {
 				var order = [];
 				$('#layers .sortable li').each(function(e) {
-					order.push(this.id[this.id.length-1]-1);
+					order.push(toId(this.id)-1);
 				});
 				g.Engine.setLayerOrder(order);
 			}
@@ -40,7 +40,7 @@ define(["canvas"], function Layer(Canvas) {
 			$("#li-layer"+index).mousedown(function() {
 				$("#layers .sortable li").removeClass("active");
 				var id = $(this).addClass("active").attr('id');
-				g.Engine.setActiveLayer(id[id.length-1]-1);
+				g.Engine.setActiveLayer(toId(id)-1);
 			});
 			this.index = index;
 			this.preview = pcanvas.getContext('2d');
@@ -65,6 +65,11 @@ define(["canvas"], function Layer(Canvas) {
 			$('#li-layer'+index+' a').click(function(e) {
 				g.Engine.setActiveLayer(i);
 			});
+		},
+		copy: function(layer) {
+			this.buf.copy(layer.buf);
+			this.visible = layer.visible;
+			this.refresh();
 		},
 		remove: function() {
 			if (numLayers > 1) {

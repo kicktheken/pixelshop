@@ -38,6 +38,7 @@ define(["actions","layer","canvas"],function Engine(Actions, Layer, Canvas) {
 			_this.resize();
 			_this.initDialogs();
 			_this._updateDo();
+			_this.updateLayers();
 		},
 		initSignin: function() {
 			var oauth2 = config.oauth2, query = [];
@@ -262,26 +263,84 @@ define(["actions","layer","canvas"],function Engine(Actions, Layer, Canvas) {
 			order = o;
 			_this.refresh();
 		},
+		updateLayers: function() {
+			var option = (layers.length > 1) ? 'enable' : 'disable';
+			$('#combinelayer').button(option);
+			$('#removelayer').button(option);
+		},
 		addLayer: function() {
-			if (layers.length >= 8) {
+			activeLayer = layers.length;
+			var layer = new Layer(activeLayer);
+			layers.push(layer);
+			order.unshift(activeLayer);
+			layer.refresh();
+			_this.updateLayers();
+			_this.setActiveLayer(activeLayer,true);
+		},
+		cloneLayer: function() {
+			var old = layers[activeLayer];
+			var i = order.indexOf(activeLayer);
+			activeLayer = layers.length;
+			order.splice(i,0,activeLayer);
+			var layer = new Layer(activeLayer);
+			layers.push(layer);
+			layer.copy(old);
+			_this.updateLayers();
+			_this.setActiveLayer(activeLayer,true);
+		},
+		combineLayer: function() {
+			if (layers.length <= 1) {
 				return;
 			}
-			if (activeLayer >= 0) {
-				$('#li-layer'+(activeLayer+1)).removeClass('active');
+			var src = layers.splice(activeLayer,1)[0], dest;
+			var ri;
+			for (var i in order) {
+				if (order[i] === activeLayer) {
+					order.splice(i,1);
+					ri = i;
+				} else if (order[i] > activeLayer) {
+					order[i]--;
+				}
 			}
-			activeLayer = layers.length;
-			layers.push(new Layer(activeLayer));
-			order.unshift(activeLayer);
-			for (var l in layers) {
-				layers[l].refresh();
+			if (ri == order.length) {
+				activeLayer = order[ri-1];
+				dest = layers[activeLayer];
+				src.buf.collapse(dest.buf);
+				dest.copy(src);
+			} else {
+				activeLayer = order[ri];
+				dest = layers[activeLayer];
+				dest.buf.collapse(src.buf);
 			}
-			return layers.length;
+			dest.refresh();
+			src.remove();
+			_this.updateLayers();
+			_this.setActiveLayer(activeLayer,true);
+		},
+		removeLayer: function() {
+			if (layers.length <= 1) {
+				return;
+			}
+			var layer = layers.splice(activeLayer,1)[0];
+			var ri;
+			for (var i in order) {
+				if (order[i] === activeLayer) {
+					order.splice(i,1);
+					ri = i;
+				} else if (order[i] > activeLayer) {
+					order[i]--;
+				}
+			}
+			layer.remove();
+			_this.updateLayers();
+			activeLayer = (ri == order.length) ? order[ri-1] : order[ri];
+			_this.setActiveLayer(activeLayer,true);
 		},
 		setActiveLayer: function(index,local) {
 			activeLayer = index;
 			if (local) {
 				$("#layers .sortable li").removeClass("active");
-				$("#li-layer"+(index+1)).addClass("active");
+				$("#li-layer"+layers[activeLayer].index).addClass("active");
 			}
 			_this.refresh();
 		},

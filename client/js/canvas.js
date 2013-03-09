@@ -77,6 +77,17 @@ define(["pixel"],function Canvas(Pixel) {
 			var ret = {x:x, y:y, width:this.canvas.width, height:this.canvas.height};
 			return ret;
 		},
+		copy: function(buf) {
+			this.canvas.width = buf.canvas.width;
+			this.canvas.height = buf.canvas.height;
+			this.context.drawImage(buf.canvas,0,0);
+			this.offset.x = buf.offset.x;
+			this.offset.y = buf.offset.y;
+			var b = buf.bounds;
+			if (b) {
+				this.updateBounds(b[0],b[1],b[2],b[3]);
+			}
+		},
 		collapse: function(buf) {
 			var x = this.offset.x - buf.offset.x;
 			var y = this.offset.y - buf.offset.y;

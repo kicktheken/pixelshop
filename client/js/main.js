@@ -34,13 +34,10 @@ function Main(Engine) {
 		// fix jqueryui bug
 		$('#addlayer').focus(function(e) {
 			$(this).blur();
-		}).blur();
-
-		$('#addlayer').click(function() {
-			if (engine.addLayer() >= 8) {
-				$(this).attr('disabled', true);
-			}
-		});
+		}).blur().click(engine.addLayer);
+		$('#clonelayer').click(engine.cloneLayer);
+		$('#combinelayer').click(engine.combineLayer);
+		$('#removelayer').click(engine.removeLayer);
 
 		var tabbar = $('#colors .sortable').sortable({
 			placeholder: "ui-state-highlight",
@@ -48,7 +45,7 @@ function Main(Engine) {
 			update: function (e,ui) {
 				var i = 1;
 				$('#colors .sortable li').each(function(e) {
-					var index = this.id[this.id.length-1];
+					var index = toId(this.id);
 					$('#key-color'+index).html(i);
 					colororder[i] = index;
 					i = (i+1)%10;
