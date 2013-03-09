@@ -1,5 +1,5 @@
 define(["action","pixel"], function Actions(Action,Pixel) {
-	var _this, actions, index;
+	var _this, actions, index, canvas, context;
 	return Class.extend({
 		init: function() {
 			if (typeof _this !== 'undefined') {
@@ -9,6 +9,8 @@ define(["action","pixel"], function Actions(Action,Pixel) {
 			g['Actions'] = this;
 			actions = [];
 			index = 0;
+			canvas = document.createElement("canvas");
+			context = canvas.getContext('2d');
 		},
 		draw: function(layer,color,x,y) {
 			var oldp = layer.buf.pixel(x,y);
@@ -65,27 +67,67 @@ define(["action","pixel"], function Actions(Action,Pixel) {
 			v.height = r.height = selected.height;
 			v.x = selected.src.x;
 			v.y = selected.src.y;
-			if (selected.data) {
-				v.data = selected.data;
-			} else {
-				v.data = layer.buf.context.getImageData(v.x,v.y,v.width,v.height);
-				selected.data = v.data;
-			}
-			r.data = v.data;
+			v.data = layer.buf.context.getImageData(v.x,v.y,v.width,v.height);
+			r.data = selected.data;
 			r.x = selected.x;
 			r.y = selected.y;
 			var restore = layer.buf.context.getImageData(r.x,r.y,r.width,r.height);
 			r.index = v.index = layer.index;
 			undo = function() {
 				layer.buf.context.putImageData(restore,r.x,r.y);
-				layer.buf.context.putImageData(v.data,v.x,v.y);
+				canvas.width = v.width;
+				canvas.height = v.height;
+				context.putImageData(v.data,0,0);
+				layer.buf.context.drawImage(canvas,v.x,v.y);
+				context.putImageData(r.data,0,0);
+				layer.buf.context.drawImage(canvas,v.x,v.y);
 				layer.refresh();
 				return true;
 			};
 			redo = function() {
 				layer.buf.context.putImageData(restore,r.x,r.y);
-				layer.buf.clear(v.x,v.y,v.width,v.height);
+				layer.buf.context.putImageData(v.data,v.x,v.y);
+				layer.refresh();
 				return r;
+			};
+			_this.actionWrapper(layer,undo,redo);
+		},
+		cut: function(layer,clipboard) {
+			var c = {};
+			c.x = clipboard.x;
+			c.y = clipboard.y;
+			c.width = clipboard.width;
+			c.height = clipboard.height;
+			c.data = layer.buf.context.getImageData(c.x,c.y,c.width,c.height);
+			c.index = layer.index;
+			c.done = true;
+			var undo = function() {
+				layer.buf.context.putImageData(c.data,c.x,c.y);
+				layer.refresh();
+				return true;
+			};
+			var redo = function() {
+				layer.buf.clear(c.x,c.y,c.width,c.height);
+				return true;
+			};
+			_this.actionWrapper(layer,undo,redo);
+		},
+		paste: function(layer,clipboard) {
+			var c = {};
+			c.x = ++clipboard.x; // add 1,1 offset to make paste more noticeable
+			c.y = ++clipboard.y;
+			c.width = clipboard.width;
+			c.height = clipboard.height;
+			c.data = clipboard.data;
+			var restore = layer.buf.context.getImageData(c.x,c.y,c.width,c.height);
+			c.index = layer.index;
+			c.done = true;
+			var undo = function() {
+				layer.buf.context.putImageData(restore,c.x,c.y);
+				return true;
+			};
+			var redo = function() {
+				return c;
 			};
 			_this.actionWrapper(layer,undo,redo);
 		},

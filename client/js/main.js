@@ -186,6 +186,9 @@ function Main(Engine) {
 		//$('#load').click(engine.loadWorkspace);
 		key('⌘+z, ctrl+z', engine.undo);
 		key('⌘+shift+z, ctrl+shift+z', engine.redo);
+		key('⌘+c, ctrl+c', engine.copy);
+		key('⌘+x, ctrl+x', engine.cut);
+		key('⌘+v, ctrl+v', engine.paste);
 
 		if (typeof FileReader !== 'undefined') {
 			log.info('file api available');

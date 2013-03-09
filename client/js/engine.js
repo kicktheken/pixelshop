@@ -4,7 +4,7 @@ define(["actions","layer","canvas"],function Engine(Actions, Layer, Canvas) {
 	var host = /[^\/]+\/\/[^\/]+/g.exec(window.location.href) + g.proxyPrefix;
 	var sizes = [6,8,10,15,20,24,30], cursor, dotted, drawing;
 	var saveTimer, saved, email, cheight = $(".container").height() + 1;
-	var darkPattern, lightPattern, medPattern, pan, selected;
+	var darkPattern, lightPattern, medPattern, pan, selected, clipboard;
 	var authURL = "https://accounts.google.com/o/oauth2/auth";
 	var blankcolor = { toRgb: function() { return {r:0,g:0,b:0,a:0}; } };
 	return Class.extend({
@@ -25,6 +25,7 @@ define(["actions","layer","canvas"],function Engine(Actions, Layer, Canvas) {
 			bg = new Canvas(g.width,g.height);
 			cursor = new Canvas(sizes[s],sizes[s]);
 			selected = false;
+			clipboard = false;
 			pan = {x:0,y:0};
 			mode = 'draw';
 			saved = true;
@@ -647,8 +648,8 @@ define(["actions","layer","canvas"],function Engine(Actions, Layer, Canvas) {
 			_this.updateDo('undo');
 		},
 		updateDo: function(task) {
-			if (mode === 'select' && pressed) {
-				return; // disable undo on dragging
+			if (pressed) {
+				return; // disable actions on mousedown
 			}
 			var ret = actions[task]();
 			if (!ret) {
@@ -688,6 +689,31 @@ define(["actions","layer","canvas"],function Engine(Actions, Layer, Canvas) {
 		redo: function() {
 			_this.updateDo('redo');
 		},
+		copy: function() {
+			if (selected && selected.done) {
+				var v = selected;
+				v.data = layers[activeLayer].buf.context.getImageData(v.x,v.y,v.width,v.height);
+				clipboard = selected; // keep reference as to not clear what was previously there
+			}
+		},
+		cut: function() {
+			if (selected && selected.done) {
+				var v = selected;
+				clipboard = {x:v.x,y:v.y,width:v.width,height:v.height,done:true};
+				clipboard.data = layers[activeLayer].buf.context.getImageData(v.x,v.y,v.width,v.height);
+				actions.cut(layers[activeLayer],clipboard);
+				_this.refresh();
+			}
+		},
+		paste: function() {
+			if (clipboard) {
+				actions.paste(layers[activeLayer],clipboard);
+				var c = clipboard;
+				selected = {x:c.x,y:c.y,width:c.width,height:c.height,data:c.data,done:true};
+				selected.src = {x:selected.x,y:selected.y};
+				_this.refresh();
+			}
+		},
 		cursorMove: function(x,y) {
 			if (!pressed) {
 				_this.refresh(x,y);
@@ -708,7 +734,15 @@ define(["actions","layer","canvas"],function Engine(Actions, Layer, Canvas) {
 				drawing = false;
 			} else if (selected) {
 				if (selected.done) {
-					actions.dragSelect(layers[activeLayer],selected);
+					// if references are same, it's a paste
+					if (clipboard === selected) {
+						actions.paste(layers[activeLayer],clipboard);
+						var c = clipboard; // undo reference so next time is a drag select
+						selected = {x:c.x,y:c.y,width:c.width,height:c.height,done:true};
+						selected.data = c.data;
+					} else {
+						actions.dragSelect(layers[activeLayer],selected);
+					}
 					selected.src = {x:selected.x,y:selected.y};
 				} else {
 					selected.done = true;
