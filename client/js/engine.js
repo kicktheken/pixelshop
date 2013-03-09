@@ -661,7 +661,6 @@ define(["actions","layer","canvas"],function Engine(Actions, Layer, Canvas) {
 			if (ret.index === layers[activeLayer].index) {
 				mode = 'select';
 				$('[name="radio"]').removeAttr("checked").button('refresh');
-				// jquery ui bug? have to explicitly highlight
 				$('label[for="select"]').addClass("ui-state-active");
 				_this.refresh();
 			} else {
@@ -711,6 +710,9 @@ define(["actions","layer","canvas"],function Engine(Actions, Layer, Canvas) {
 				var c = clipboard;
 				selected = {x:c.x,y:c.y,width:c.width,height:c.height,data:c.data,done:true};
 				selected.src = {x:selected.x,y:selected.y};
+				mode = 'select';
+				$('[name="radio"]').removeAttr("checked").button('refresh');
+				$('label[for="select"]').addClass("ui-state-active");
 				_this.refresh();
 			}
 		},
