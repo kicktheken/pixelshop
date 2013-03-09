@@ -108,6 +108,7 @@ define(["action","pixel"], function Actions(Action,Pixel) {
 			};
 			var redo = function() {
 				layer.buf.clear(c.x,c.y,c.width,c.height);
+				layer.refresh();
 				return true;
 			};
 			_this.actionWrapper(layer,undo,redo);
