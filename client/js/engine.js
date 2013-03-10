@@ -348,10 +348,12 @@ define(["actions","layer","canvas"],function Engine(Actions, Layer, Canvas) {
 			return ['blue','red','green','yellow','orange','brown','black','white','purple','beige'];
 		},
 		setColor: function(c) {
-			$('[name="radio"]').removeAttr("checked").button('refresh');
-			$('label[for="draw"]').addClass("ui-state-active");
-			_this.setMode('draw');
-            color = c;
+			if (mode !== 'fill') {
+				$('[name="radio"]').removeAttr("checked").button('refresh');
+				$('label[for="draw"]').addClass("ui-state-active");
+				_this.setMode('draw');
+			}
+			color = c;
 		},
 		unloadSelected: function() {
 			if (selected.data) {
@@ -390,12 +392,12 @@ define(["actions","layer","canvas"],function Engine(Actions, Layer, Canvas) {
 			var changed = false;
 			switch (mode) {
 			case 'draw': 	changed = _this.draw(color,x,y); break;
-			case 'fill': 	return;
+			case 'fill': 	changed = _this.fill(color,x,y); break;
 			case 'eraser': 	changed = _this.draw(blankcolor,x,y); break;
 			case 'pan': 	return _this.pan(x,y);
-			case 'dropper': return;
+			case 'dropper': changed = _this.selectColor(x,y); break;
 			case 'select': 	return _this.select(x,y);
-			case 'move':	return _this.move(x,y);
+			case 'move':	changed = _this.move(x,y); break;
 			}
 			if (changed) {
 				_this.queueSave();
@@ -597,6 +599,17 @@ define(["actions","layer","canvas"],function Engine(Actions, Layer, Canvas) {
 			_this.refresh(cx,cy);
 			_this._updateDo();
 			return ret;
+		},
+		fill: function(color,cx,cy) {
+			var size = sizes[s];
+			var x = Math.floor((cx-canvas.width/2-pan.x)/size);
+			var y = Math.floor((cy-canvas.height/2-pan.y)/size);
+			var ret = actions.fill(layers[activeLayer],color,x,y);
+			_this.refresh(cx,cy);
+			_this._updateDo();
+			return ret;
+		},
+		selectColor: function(x,y) {
 		},
 		pan: function(x,y) {
 			var size = sizes[s];
@@ -839,4 +852,4 @@ define(["actions","layer","canvas"],function Engine(Actions, Layer, Canvas) {
 			}
 		}
 	});
-})
+});

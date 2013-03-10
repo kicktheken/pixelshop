@@ -1,4 +1,4 @@
-define(["pixel"],function Canvas(Pixel) {
+define(["pixel","map"],function Canvas(Pixel,Map) {
 	return Class.extend({
 		init: function(width,height) {
 			this.canvas = document.createElement('canvas');
@@ -37,6 +37,61 @@ define(["pixel"],function Canvas(Pixel) {
 			pixel.draw(this.context);
 			var x = pixel.x, y = pixel.y;
 			this.updateBounds(x,y,x,y);
+		},
+		fill: function(pixel,map) {
+			if (typeof map === 'undefined') {
+				map = this.map = new Map();
+				this.fillColor(new Pixel(this.context,pixel.x,pixel.y),pixel);
+				delete this.map;
+				return map;
+			} else {
+				this.fillMap(map,pixel);
+			}
+		},
+		fillColor: function(oldp,newp) {
+			newp.draw(this.context);
+			var x = newp.x, y = newp.y;
+			this.map.set(x,y,true);
+			var p;
+			if (x < this.canvas.width-1) {
+				p = new Pixel(this.context,x+1,y);
+				if (!oldp.diffColor(p)) {
+					newp.x = p.x;
+					newp.y = p.y;
+					this.fillColor(oldp,newp);
+				}
+			}
+			if (y < this.canvas.height-1) {
+				p = new Pixel(this.context,x,y+1);
+				if (!oldp.diffColor(p)) {
+					newp.x = p.x;
+					newp.y = p.y;
+					this.fillColor(oldp,newp);
+				}
+			}
+			if (x > 0) {
+				p = new Pixel(this.context,x-1,y);
+				if (!oldp.diffColor(p)) {
+					newp.x = p.x;
+					newp.y = p.y;
+					this.fillColor(oldp,newp);
+				}
+			}
+			if (y > 0) {
+				p = new Pixel(this.context,x,y-1);
+				if (!oldp.diffColor(p)) {
+					newp.x = p.x;
+					newp.y = p.y;
+					this.fillColor(oldp,newp);
+				}
+			}
+		},
+		fillMap: function(m,pixel) {
+			for (var y in m.map) {
+				for (var x in m.map[y]) {
+					this.context.putImageData(pixel.d,x,y);
+				}
+			}
 		},
 		pixel: function(x,y,color) {
 			x += this.offset.x + Math.ceil(this.canvas.width/2);

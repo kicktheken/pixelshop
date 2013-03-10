@@ -15,7 +15,7 @@ define(["action","pixel"], function Actions(Action,Pixel) {
 		draw: function(layer,color,x,y) {
 			var oldp = layer.buf.pixel(x,y);
 			var newp = layer.buf.pixel(x,y,color);
-			if (!newp.diff(oldp)) {
+			if (!newp.diffColor(oldp)) {
 				return false;
 			}
 			var undoPixels = [oldp], redoPixels = [newp];
@@ -59,6 +59,25 @@ define(["action","pixel"], function Actions(Action,Pixel) {
 			redo();
 			action.complete();
 			index++;
+		},
+		fill: function(layer,color,x,y) {
+			var oldp = layer.buf.pixel(x,y);
+			var newp = layer.buf.pixel(x,y,color);
+			if (!newp.diffColor(oldp)) {
+				return false;
+			}
+			var map;
+			var undo = function() {
+				layer.buf.fill(oldp,map);
+				layer.refresh();
+				return true;
+			};
+			var redo = function() {
+				map = layer.buf.fill(newp);
+				layer.refresh();
+				return true;
+			};
+			_this.actionWrapper(layer,undo,redo);
 		},
 		dragSelect: function(layer,selected) {
 			var v = {}, r = {}, undo,redo;

@@ -26,11 +26,13 @@ define(function Pixel() {
 			context.putImageData(this.d,this.x,this.y);
 		},
 		diff: function(p) {
+			return this.diffColor(p) || this.y !== p.y || this.x !== p.x;
+		},
+		diffColor: function(p) {
 			return  p.d.data[0] !== this.d.data[0]
 				|| p.d.data[1] !== this.d.data[1]
 				|| p.d.data[2] !== this.d.data[2]
-				|| p.d.data[3] !== this.d.data[3]
-				|| this.y !== p.y || this.x !== p.x;
+				|| p.d.data[3] !== this.d.data[3];
 		},
 		toString: function() {
 			var d = this.d.data, x = this.x, y = this.y;
