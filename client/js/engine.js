@@ -1,6 +1,6 @@
 define(["actions","layer","canvas"],function Engine(Actions, Layer, Canvas) {
 	var _this, actions, canvas, context;
-	var bg, buf, s, pressed, mode, color, layers, order, activeLayer = -1;
+	var bg, buf, s, pressed, mode, color, colori, layers, order, activeLayer = -1;
 	var host = /[^\/]+\/\/[^\/]+/g.exec(window.location.href) + g.proxyPrefix;
 	var sizes = [6,8,10,15,20,24,30], cursor, dotted, drawing;
 	var saveTimer, saved, email, cheight = $(".container").height() + 1;
@@ -347,13 +347,14 @@ define(["actions","layer","canvas"],function Engine(Actions, Layer, Canvas) {
 		defaultColors: function() {
 			return ['blue','red','green','yellow','orange','brown','black','white','purple','beige'];
 		},
-		setColor: function(c) {
+		setColor: function(c,i) {
 			if (mode !== 'fill') {
 				$('[name="radio"]').removeAttr("checked").button('refresh');
 				$('label[for="draw"]').addClass("ui-state-active");
 				_this.setMode('draw');
 			}
 			color = c;
+			colori = i;
 		},
 		unloadSelected: function() {
 			if (selected.data) {
@@ -609,7 +610,16 @@ define(["actions","layer","canvas"],function Engine(Actions, Layer, Canvas) {
 			_this._updateDo();
 			return ret;
 		},
-		selectColor: function(x,y) {
+		selectColor: function(cx,cy) {
+			var size = sizes[s];
+			var x = Math.floor((cx-canvas.width/2-pan.x)/size);
+			var y = Math.floor((cy-canvas.height/2-pan.y)/size);
+			var pixel = layers[activeLayer].buf.pixel(x,y);
+			color = $('#color'+colori).spectrum('set',pixel.toColorString()).spectrum('get');
+			$("#li-color"+colori).css({
+				"background" : color.toHexString(),
+				"border" : "1px solid black"
+			});
 		},
 		pan: function(x,y) {
 			var size = sizes[s];

@@ -70,10 +70,10 @@ function Main(Engine) {
 				$("#li-"+this.id).css({
 					"background" : color.toHexString()
 				});
-				engine.setColor(color);
+				engine.setColor(color,toId(this.id));
 			},
 			show: function() {
-				engine.setColor($('#color'+i).spectrum('get'));
+				engine.setColor($('#color'+i).spectrum('get'),toId(this.id));
 				disableClick = true;
 			},
 			hide: function() {
@@ -86,16 +86,18 @@ function Main(Engine) {
 		});
 		function setColor(i) {
 			$("#colors .sortable li").css({
-				"background" : ""
+				"background" : "",
+				"border" : ""
 			});
 			var color = $("#color"+i).spectrum('get');
 			$("#li-color"+i).css({
-				"background" : color.toHexString()
+				"background" : color.toHexString(),
+				"border" : "1px solid black"
 			});
-			engine.setColor(color);
+			engine.setColor(color,i);
 		}
 		$("#colors .sortable li").mousedown(function(e) {
-			setColor(this.id.substr(-1));
+			setColor(toId(this.id));
 		});
 		setColor(1);
 

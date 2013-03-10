@@ -35,9 +35,12 @@ define(function Pixel() {
 				|| p.d.data[3] !== this.d.data[3];
 		},
 		toString: function() {
-			var d = this.d.data, x = this.x, y = this.y;
-			d = [d[0],d[1],d[2],d[3]];
-			return [x+1,y+1].join(',')+' -> rgba('+d.join(',')+')';
+			var x = this.x, y = this.y;
+			return [x+1,y+1].join(',')+' -> '+this.toColorString();
+		},
+		toColorString: function() {
+			var d = this.d.data;
+			return 'rgba('+d[0]+','+d[1]+','+d[2]+','+d[3]+')';
 		},
 		line: function(dest) {
 			var ret = [];
