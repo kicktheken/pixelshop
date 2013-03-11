@@ -52,7 +52,7 @@ define(["action","pixel"], function Actions(Action,Pixel) {
 			layer.draw(newp);
 			return true;
 		},
-		actionWrapper: function(layer,undo,redo) {
+		actionWrapper: function(undo,redo,layer) {
 			var action = actions[index] = new Action(layer);
 			actions = actions.slice(0,index+1);
 			action.enqueue(undo,redo);
@@ -77,7 +77,7 @@ define(["action","pixel"], function Actions(Action,Pixel) {
 				layer.refresh();
 				return true;
 			};
-			_this.actionWrapper(layer,undo,redo);
+			_this.actionWrapper(undo,redo,layer);
 		},
 		dragSelect: function(layer,selected) {
 			var v = {}, r = {}, undo,redo;
@@ -109,7 +109,7 @@ define(["action","pixel"], function Actions(Action,Pixel) {
 				layer.refresh();
 				return r;
 			};
-			_this.actionWrapper(layer,undo,redo);
+			_this.actionWrapper(undo,redo,layer);
 		},
 		cut: function(layer,clipboard) {
 			var c = {};
@@ -130,7 +130,7 @@ define(["action","pixel"], function Actions(Action,Pixel) {
 				layer.refresh();
 				return true;
 			};
-			_this.actionWrapper(layer,undo,redo);
+			_this.actionWrapper(undo,redo,layer);
 		},
 		paste: function(layer,clipboard) {
 			var c = {};
@@ -149,12 +149,12 @@ define(["action","pixel"], function Actions(Action,Pixel) {
 			var redo = function() {
 				return c;
 			};
-			_this.actionWrapper(layer,undo,redo);
+			_this.actionWrapper(undo,redo,layer);
 		},
 		load: function(layer,image) {
 			var oldx = layer.buf.offset.x - image.width/2;
 			var oldy = layer.buf.offset.y - image.height/2;
-			var undo;
+			var undo, redo;
 			if (layer.buf.bounds) {
 				var olddata = layer.buf.getData(image.width,image.height);
 				undo = function() {
@@ -168,10 +168,11 @@ define(["action","pixel"], function Actions(Action,Pixel) {
 					return true;
 				};
 			}
-			_this.actionWrapper(layer,undo,function() {
+			redo = function() {
 				layer.load(image);
 				return true;
-			});
+			};
+			_this.actionWrapper(undo,redo,layer);
 		},
 		endDraw: function() {
 			if (actions[index]) {

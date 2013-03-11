@@ -61,10 +61,9 @@ function Main(Engine) {
 			showInitial: true,
 			showButtons: false,
 			change: function(color) {
-				engine.setColor(toId(this.id));
+				engine.setColor();
 			},
 			show: function() {
-				engine.setColor(toId(this.id));
 				disableClick = true;
 			},
 			hide: function() {
@@ -73,12 +72,12 @@ function Main(Engine) {
 		});
 		engine.loadWorkspace();
 		$("#colors .sortable li").mousedown(function(e) {
-			engine.setColor(toId(this.id));
+			engine.setColorIndex(toId(this.id));
 		});
 
 		//key('⌘+r, ctrl+r', function(){ return false });
 		key('1,2,3,4,5,6,7,8,9,0', function(e,h) {
-			engine.setColor(colororder[h.shortcut]);
+			engine.setColorIndex(colororder[h.shortcut]);
 		});
 		var paintKeys = ['q','w','e','r','t','y','u'];
 		key(paintKeys.join(','), function(e,h) {

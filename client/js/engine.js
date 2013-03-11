@@ -1,6 +1,6 @@
 define(["actions","layer","canvas"],function Engine(Actions, Layer, Canvas) {
 	var _this, actions, canvas, context;
-	var bg, buf, s, pressed, mode, color, colori, layers, order, activeLayer = -1;
+	var bg, buf, s, pressed, mode, colorsel, layers, order, activeLayer = -1;
 	var host = /[^\/]+\/\/[^\/]+/g.exec(window.location.href) + g.proxyPrefix;
 	var sizes = [6,8,10,15,20,24,30], cursor, dotted, drawing;
 	var saveTimer, saved, email, cheight = $(".container").height() + 1;
@@ -26,6 +26,7 @@ define(["actions","layer","canvas"],function Engine(Actions, Layer, Canvas) {
 			cursor = new Canvas(sizes[s],sizes[s]);
 			selected = false;
 			clipboard = false;
+			colorsel = new Object();
 			pan = {x:0,y:0};
 			mode = 'draw';
 			saved = true;
@@ -347,22 +348,56 @@ define(["actions","layer","canvas"],function Engine(Actions, Layer, Canvas) {
 		defaultColors: function() {
 			return ['blue','red','green','yellow','orange','brown','black','white','purple','beige'];
 		},
-		setColor: function(i) {
+		setColor: function() {
 			if (mode !== 'fill') {
 				$('[name="radio"]').removeAttr("checked").button('refresh');
 				$('label[for="draw"]').addClass("ui-state-active");
 				_this.setMode('draw');
 			}
-			color = $("#color"+i).spectrum('get');
+			var oldcolor = colorsel.c;
+			var color = colorsel.c = $("#color"+colorsel.i).spectrum('get');
+			var i = colorsel.i;
+			var undo = function() {
+				colorsel.c = oldcolor;
+				$("#color"+i).spectrum('set',oldcolor.toHexString());
+				if (colorsel.i === i) {
+					$("#li-color"+i).css({
+						"background" : oldcolor.toHexString(),
+						"border" : "1px solid black"
+					});
+				}
+				return true;
+			};
+			var redo = function() {
+				colorsel.c = color;
+				$("#color"+i).spectrum('set',color.toHexString());
+				if (colorsel.i === i) {
+					$("#li-color"+i).css({
+						"background" : color.toHexString(),
+						"border" : "1px solid black"
+					});
+				}
+				return true;
+			};
+			actions.actionWrapper(undo,redo);
+			_this._updateDo();
+		},
+		setColorIndex: function(i) {
+			if (mode !== 'fill') {
+				$('[name="radio"]').removeAttr("checked").button('refresh');
+				$('label[for="draw"]').addClass("ui-state-active");
+				_this.setMode('draw');
+			}
+			colorsel.c = $("#color"+i).spectrum('get');
 			$("#colors .sortable li").css({
 				"background" : "",
 				"border" : ""
 			});
 			$("#li-color"+i).css({
-				"background" : color.toHexString(),
+				"background" : colorsel.c.toHexString(),
 				"border" : "1px solid black"
 			});
-			colori = i;
+			colorsel.i = i;
 		},
 		unloadSelected: function() {
 			if (selected.data) {
@@ -400,8 +435,8 @@ define(["actions","layer","canvas"],function Engine(Actions, Layer, Canvas) {
 		perform: function(x,y) {
 			var changed = false;
 			switch (mode) {
-			case 'draw': 	changed = _this.draw(color,x,y); break;
-			case 'fill': 	changed = _this.fill(color,x,y); break;
+			case 'draw': 	changed = _this.draw(colorsel.c,x,y); break;
+			case 'fill': 	changed = _this.fill(colorsel.c,x,y); break;
 			case 'eraser': 	changed = _this.draw(blankcolor,x,y); break;
 			case 'pan': 	return _this.pan(x,y);
 			case 'dropper': changed = _this.selectColor(x,y); break;
@@ -504,7 +539,7 @@ define(["actions","layer","canvas"],function Engine(Actions, Layer, Canvas) {
 						i = (i+1)%10;
 						$('#color'+i).spectrum('set', c);
 					});
-					_this.setColor(1);
+					_this.setColorIndex(1);
 				}
 				saved = false;
 			});
@@ -588,7 +623,7 @@ define(["actions","layer","canvas"],function Engine(Actions, Layer, Canvas) {
 					var index = (i+1)%10;
 					$('#color'+index).spectrum('set',workspace.colors[i]);
 				}
-				_this.setColor(1);
+				_this.setColorIndex(1);
 				_this.refresh();
 			}
 			for (var i=0; i<workspace.numLayers; i++) {
@@ -634,7 +669,7 @@ define(["actions","layer","canvas"],function Engine(Actions, Layer, Canvas) {
 					success: function(data) {
 						log.info("save successful (length: "+binstring.length+")");
 						saved = true;
-						if (logoff) {
+						if (action === 'logoff') {
 							_this.resetWorkspace();
 							_this.initSignin();
 						}
@@ -642,7 +677,7 @@ define(["actions","layer","canvas"],function Engine(Actions, Layer, Canvas) {
 					},
 					error: function(err) {
 						//log.error("failed to save workspave");
-						if (logoff) {
+						if (action === 'logoff') {
 							_this.resetWorkspace();
 							_this.initSignin();
 						}
@@ -700,11 +735,8 @@ define(["actions","layer","canvas"],function Engine(Actions, Layer, Canvas) {
 			var x = Math.floor((cx-canvas.width/2-pan.x)/size);
 			var y = Math.floor((cy-canvas.height/2-pan.y)/size);
 			var pixel = layers[activeLayer].buf.pixel(x,y);
-			color = $('#color'+colori).spectrum('set',pixel.toColorString()).spectrum('get');
-			$("#li-color"+colori).css({
-				"background" : color.toHexString(),
-				"border" : "1px solid black"
-			});
+			$('#color'+colorsel.i).spectrum('set',pixel.toColorString());
+			_this.setColor();
 		},
 		pan: function(x,y) {
 			var size = sizes[s];
