@@ -25,11 +25,7 @@ function Main(Engine) {
 		$(window).resize(engine.resize);
 		var defaultColors = engine.defaultColors();
 		engine.loadWorkspace();
-		$(window).bind('beforeunload', function() {
-			if (!engine.isSaved()) {
-				return "You have unsaved changes.";
-			}
-		});
+		$(window).bind('beforeunload',engine.beforeUnload);
 
 		// fix jqueryui bug
 		$('#addlayer').focus(function(e) {

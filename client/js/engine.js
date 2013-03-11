@@ -413,6 +413,15 @@ define(["actions","layer","canvas"],function Engine(Actions, Layer, Canvas) {
 		isSaved: function() {
 			return saved;
 		},
+		beforeUnload: function() {
+			if (!_this.isSaved()) {
+				if (Modernizr.localstorage) {
+					_this.saveWorkspace('local');
+				} else {
+					return "You have unsaved changes.";
+				}
+			}
+		},
 		load: function(image) {
 			_this.unloadSelected();
 			_this.addLayer();
@@ -455,7 +464,7 @@ define(["actions","layer","canvas"],function Engine(Actions, Layer, Canvas) {
 						log.info("commencing signoff");
 						$(this).unbind('click');
 
-						_this.saveWorkspace(true);
+						_this.saveWorkspace('logoff');
 					});
 				}
 				if (!workspace.layers) {
@@ -467,12 +476,60 @@ define(["actions","layer","canvas"],function Engine(Actions, Layer, Canvas) {
 				}
 				LZMA.decompress(binarray, function(json) {
 					workspace.layers = JSON.parse(json);
-					_this._loadWorkspace(workspace);
+					var localWorkspace = _this.getLocalWorkspace();
+					if (localWorkspace) {
+						localWorkspace.email = workspace.email;
+						_this._loadWorkspace(localWorkspace);
+					} else {
+						_this._loadWorkspace(workspace);
+					}
 				});
 			}).fail(function(err) {
-				log.error("unable to load workspace");
-				$(window).unbind('beforeunload');
+				var workspace = _this.getLocalWorkspace();
+				if (workspace) {
+					_this._loadWorkspace(workspace);
+				} else {
+					log.error("unable to load workspace");
+				}
+				saved = false;
 			});
+		},
+		deleteLocalWorkspace: function() {
+			Object.keys(localStorage).forEach(function(key){
+				localStorage.removeItem(key);
+			});
+		},
+		getLocalWorkspace: function() {
+			if (!Modernizr.localstorage || !localStorage.workspace) {
+				return false;
+			}
+			var workspace = JSON.parse(localStorage.workspace);
+			var valid = isInt(workspace.numLayers);
+			valid = valid && workspace.layers instanceof Array && workspace.layers.length > 0;
+			valid = valid && typeof workspace.pan === 'object';
+			valid = valid && isInt(workspace.pan.x) && isInt(workspace.pan.y);
+			if (!valid) {
+				_this.deleteLocalWorkspace();
+				return false;
+			}
+			var w = workspace.layers;
+			for (var i in w) {
+				if (typeof w[i] !== 'object' || !isInt(w[i].ox) || !isInt(w[i].oy)) {
+					_this.deleteLocalWorkspace();
+					return false;
+				}
+				if (w[i].data) {
+					valid = /^data:image\/png;base64,[A-Za-z0-9+/=]+/.test(w[i].data);
+					valid = valid && isInt(w[i].x) && isInt(w[i].y) && isInt(w[i].w) && isInt(w[i].h);
+					if (!valid) {
+						_this.deleteLocalWorkspace();
+						return false;
+					}
+				}
+			}
+			delete workspace.email;
+			_this.deleteLocalWorkspace();
+			return workspace;
 		},
 		_loadWorkspace: function(workspace) {
 			var finished = 0;
@@ -525,13 +582,17 @@ define(["actions","layer","canvas"],function Engine(Actions, Layer, Canvas) {
 				img.src = workspace.layers[i].data;
 			}
 		},
-		saveWorkspace: function(logoff) {
+		saveWorkspace: function(action) {
 			var workspace = { numLayers: layers.length, layers: [], pan: pan };
 			for (var i=layers.length-1; i>=0; i--) {
 				if (activeLayer === order[i]) {
 					workspace.active = i;
 				}
 				workspace.layers[i] = layers[order[i]].getWorkspace();
+			}
+			if (action === 'local') {
+				localStorage.workspace = JSON.stringify(workspace);
+				return;
 			}
 			var layersData = JSON.stringify(workspace.layers);
 			LZMA.compress(layersData,1,function(result) {
@@ -541,7 +602,7 @@ define(["actions","layer","canvas"],function Engine(Actions, Layer, Canvas) {
 				}
 				workspace.layers = binstring;
 				var data = JSON.stringify(workspace);
-				var action = (logoff) ? '/newworkspace' : '/saveworkspace';
+				var action = (action === 'logoff') ? '/newworkspace' : '/saveworkspace';
 				$.ajax({
 					type: "POST",
 					url: host+action,
