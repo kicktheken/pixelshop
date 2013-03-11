@@ -23,8 +23,6 @@ function Main(Engine) {
 		$('.buttonset').buttonset();
 		var engine = new Engine($canvas), disableClick = false;
 		$(window).resize(engine.resize);
-		var defaultColors = engine.defaultColors();
-		engine.loadWorkspace();
 		$(window).bind('beforeunload',engine.beforeUnload);
 
 		// fix jqueryui bug
@@ -63,43 +61,24 @@ function Main(Engine) {
 			showInitial: true,
 			showButtons: false,
 			change: function(color) {
-				$("#li-"+this.id).css({
-					"background" : color.toHexString()
-				});
-				engine.setColor(color,toId(this.id));
+				engine.setColor(toId(this.id));
 			},
 			show: function() {
-				engine.setColor($('#color'+i).spectrum('get'),toId(this.id));
+				engine.setColor(toId(this.id));
 				disableClick = true;
 			},
 			hide: function() {
 				disableClick = false;
 			}
-		}).each(function(i) {
-			var c = defaultColors[i];
-			i = (i+1)%10;
-			$('#color'+i).spectrum('set', c);
 		});
-		function setColor(i) {
-			$("#colors .sortable li").css({
-				"background" : "",
-				"border" : ""
-			});
-			var color = $("#color"+i).spectrum('get');
-			$("#li-color"+i).css({
-				"background" : color.toHexString(),
-				"border" : "1px solid black"
-			});
-			engine.setColor(color,i);
-		}
+		engine.loadWorkspace();
 		$("#colors .sortable li").mousedown(function(e) {
-			setColor(toId(this.id));
+			engine.setColor(toId(this.id));
 		});
-		setColor(1);
 
 		//key('⌘+r, ctrl+r', function(){ return false });
 		key('1,2,3,4,5,6,7,8,9,0', function(e,h) {
-			setColor(colororder[h.shortcut]);
+			engine.setColor(colororder[h.shortcut]);
 		});
 		var paintKeys = ['q','w','e','r','t','y','u'];
 		key(paintKeys.join(','), function(e,h) {

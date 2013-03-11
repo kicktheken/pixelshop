@@ -347,13 +347,21 @@ define(["actions","layer","canvas"],function Engine(Actions, Layer, Canvas) {
 		defaultColors: function() {
 			return ['blue','red','green','yellow','orange','brown','black','white','purple','beige'];
 		},
-		setColor: function(c,i) {
+		setColor: function(i) {
 			if (mode !== 'fill') {
 				$('[name="radio"]').removeAttr("checked").button('refresh');
 				$('label[for="draw"]').addClass("ui-state-active");
 				_this.setMode('draw');
 			}
-			color = c;
+			color = $("#color"+i).spectrum('get');
+			$("#colors .sortable li").css({
+				"background" : "",
+				"border" : ""
+			});
+			$("#li-color"+i).css({
+				"background" : color.toHexString(),
+				"border" : "1px solid black"
+			});
 			colori = i;
 		},
 		unloadSelected: function() {
@@ -490,6 +498,13 @@ define(["actions","layer","canvas"],function Engine(Actions, Layer, Canvas) {
 					_this._loadWorkspace(workspace);
 				} else {
 					log.error("unable to load workspace");
+					var defaultColors = _this.defaultColors();
+					$('.colorpicker').each(function(i) {
+						var c = defaultColors[i];
+						i = (i+1)%10;
+						$('#color'+i).spectrum('set', c);
+					});
+					_this.setColor(1);
 				}
 				saved = false;
 			});
@@ -569,6 +584,11 @@ define(["actions","layer","canvas"],function Engine(Actions, Layer, Canvas) {
 				$('#li-layer'+(activeLayer+1)).removeClass('active');
 				_this.setActiveLayer(i,true);
 				pan = workspace.pan;
+				for (var i=0; i<workspace.colors.length; i++) {
+					var index = (i+1)%10;
+					$('#color'+index).spectrum('set',workspace.colors[i]);
+				}
+				_this.setColor(1);
 				_this.refresh();
 			}
 			for (var i=0; i<workspace.numLayers; i++) {
@@ -583,13 +603,17 @@ define(["actions","layer","canvas"],function Engine(Actions, Layer, Canvas) {
 			}
 		},
 		saveWorkspace: function(action) {
-			var workspace = { numLayers: layers.length, layers: [], pan: pan };
+			var workspace = { numLayers: layers.length, layers: [], colors: [], pan: pan };
 			for (var i=layers.length-1; i>=0; i--) {
 				if (activeLayer === order[i]) {
 					workspace.active = i;
 				}
 				workspace.layers[i] = layers[order[i]].getWorkspace();
 			}
+			$('.colorpicker').each(function(i) {
+				i = (i+1)%10;
+				workspace.colors.push($('#color'+i).spectrum('get').toRgbString());
+			});
 			if (action === 'local') {
 				localStorage.workspace = JSON.stringify(workspace);
 				return;
