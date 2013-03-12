@@ -270,10 +270,17 @@ define(["actions","layer","canvas"],function Engine(Actions, Layer, Canvas) {
 			$('#removelayer').button(option);
 		},
 		addLayer: function() {
+			var i = order.indexOf(activeLayer);
 			activeLayer = layers.length;
-			var layer = new Layer(activeLayer);
+			var l = (i<=0) ? -1 : layers[order[i-1]].index;
+			log.info([l,i]);
+			var layer = new Layer(l);
 			layers.push(layer);
-			order.unshift(activeLayer);
+			if (i > 0) {
+				order.splice(i,0,activeLayer);
+			} else {
+				order.unshift(activeLayer);
+			}
 			layer.refresh();
 			_this.updateLayers();
 			_this.setActiveLayer(activeLayer,true);
@@ -332,7 +339,7 @@ define(["actions","layer","canvas"],function Engine(Actions, Layer, Canvas) {
 					order.splice(i+1,0,l);
 				} else {
 					order.unshift(l);
-					layer = new Layer(-1);
+					layer = new Layer();
 				}
 				layers.push(layer);
 				layer.setWorkspace(workspace);
@@ -644,7 +651,7 @@ define(["actions","layer","canvas"],function Engine(Actions, Layer, Canvas) {
 					diff *= -1;
 					for (var i=0; i<diff; i++) {
 						var l = layers.length;
-						layers.push(new Layer(l));
+						layers.push(new Layer());
 						order.unshift(l);
 					}
 				}

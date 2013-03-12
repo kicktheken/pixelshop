@@ -15,32 +15,33 @@ define(["canvas"], function Layer(Canvas) {
 		});
 	}
 	return Class.extend({
-		init: function(i) {
-			var pcanvas, index = i+1;
-			if (i === 1) {
+		init: function(insertafter) {
+			var pcanvas, index;
+			if (numLayers === 0) {
 				initTabbar();
 			}
 			numLayers++;
 			if (numLayers > 1) {
 				if (pool.length === 0) {
-					var ohtml = html.replace(/(ayer( )?)1/g,"$1"+index);
+					var ohtml = html.replace(/(ayer( )?)1/g,"$1"+numLayers);
 					$tabbar.prepend(ohtml);
+					index = numLayers;
 				} else {
-					index--;
 					var $layer = pool.shift();
 					$tabbar.prepend($layer);
-					if (index >= 0) {
-						$layer.insertAfter($("#li-layer"+index));
-					}
 					$layer.removeClass('active');
 					index = toId($layer.attr('id'));
 				}
 				pcanvas = $('#layer'+index).get(0);
 			} else {
 				//$('#layer-tabbar .active a').css({'cursor':'default'});
-				pcanvas = $('#layer'+index).get(0);
+				pcanvas = $('#layer'+numLayers).get(0);
 				pwidth = pcanvas.width;
 				pheight = pcanvas.height;
+				index = numLayers;
+			}
+			if (insertafter > 0) {
+				$("#li-layer"+index).insertAfter($("#li-layer"+insertafter));
 			}
 			$("#li-layer"+index).mousedown(function() {
 				$("#layers .sortable li").removeClass("active");
