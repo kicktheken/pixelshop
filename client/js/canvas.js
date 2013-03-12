@@ -200,7 +200,13 @@ define(["pixel","map"],function Canvas(Pixel,Map) {
 			}
 			return ret;
 		},
+		putData: function(data) {
+			this.context.putImageData(data,0,0);
+		},
 		getData: function(width,height) {
+			if (arguments.length === 0) {
+				return this.context.getImageData(0,0,this.canvas.width,this.canvas.height);
+			}
 			var x = this.offset.x - width/2;
 			var y = this.offset.y - height/2;
 			return this.context.getImageData(x,y,width,height);

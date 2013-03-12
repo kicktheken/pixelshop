@@ -151,6 +151,22 @@ define(["action","pixel"], function Actions(Action,Pixel) {
 			};
 			_this.actionWrapper(undo,redo,layer);
 		},
+		clear: function(layer) {
+			var data;
+			var undo = function() {
+				layer.buf.putData(data);
+				layer.refresh();
+				data = null;
+				return true;
+			};
+			var redo = function() {
+				data = layer.buf.getData();
+				layer.buf.clear();
+				layer.refresh();
+				return true;
+			};
+			_this.actionWrapper(undo,redo,layer);
+		},
 		load: function(layer,image) {
 			var oldx = layer.buf.offset.x - image.width/2;
 			var oldy = layer.buf.offset.y - image.height/2;

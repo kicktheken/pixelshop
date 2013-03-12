@@ -267,7 +267,6 @@ define(["actions","layer","canvas"],function Engine(Actions, Layer, Canvas) {
 		updateLayers: function() {
 			var option = (layers.length > 1) ? 'enable' : 'disable';
 			$('#combinelayer').button(option);
-			$('#removelayer').button(option);
 		},
 		addLayer: function() {
 			var i = order.indexOf(activeLayer);
@@ -327,6 +326,8 @@ define(["actions","layer","canvas"],function Engine(Actions, Layer, Canvas) {
 		},
 		removeLayer: function() {
 			if (layers.length <= 1) {
+				actions.clear(layers[activeLayer]);
+				_this.refresh();
 				return;
 			}
 			var l = activeLayer, workspace;
