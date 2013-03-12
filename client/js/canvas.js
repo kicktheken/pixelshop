@@ -174,7 +174,7 @@ define(["pixel","map"],function Canvas(Pixel,Map) {
 			this.bounds = [obj.x, obj.y, obj.x+obj.w, obj.y+obj.h];
 			this.context.drawImage(obj.img,obj.x,obj.y);
 		},
-		toDataObject: function() {
+		toDataObject: function(local) {
 			var ret = {
 				ox: this.offset.x,
 				oy: this.offset.y
@@ -193,7 +193,11 @@ define(["pixel","map"],function Canvas(Pixel,Map) {
 			ret.y = b[1];
 			ret.w = width;
 			ret.h = height;
-			ret.data = canvas.toDataURL();
+			if (local) {
+				ret.img = canvas;
+			} else {
+				ret.data = canvas.toDataURL();
+			}
 			return ret;
 		},
 		getData: function(width,height) {

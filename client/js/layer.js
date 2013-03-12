@@ -7,8 +7,8 @@ define(["canvas"], function Layer(Canvas) {
 			axis: "y",
 			update: function(e,ui) {
 				var order = [];
-				$('#layers .sortable li').each(function(e) {
-					order.push(toId(this.id)-1);
+				$('#layers .sortable li').each(function(e) { // this is O(n^2)... owell
+					order.push(g.Engine.indexTranslation(toId(this.id)));
 				});
 				g.Engine.setLayerOrder(order);
 			}
@@ -22,13 +22,18 @@ define(["canvas"], function Layer(Canvas) {
 			}
 			numLayers++;
 			if (numLayers > 1) {
-				if (pool[index] === undefined) {
+				if (pool.length === 0) {
 					var ohtml = html.replace(/(ayer( )?)1/g,"$1"+index);
 					$tabbar.prepend(ohtml);
 				} else {
-					pool[index].addClass('active');
-					$tabbar.prepend(pool[index]);
-					delete pool[index];
+					index--;
+					var $layer = pool.shift();
+					$tabbar.prepend($layer);
+					if (index >= 0) {
+						$layer.insertAfter($("#li-layer"+index));
+					}
+					$layer.removeClass('active');
+					index = toId($layer.attr('id'));
 				}
 				pcanvas = $('#layer'+index).get(0);
 			} else {
@@ -39,8 +44,8 @@ define(["canvas"], function Layer(Canvas) {
 			}
 			$("#li-layer"+index).mousedown(function() {
 				$("#layers .sortable li").removeClass("active");
-				var id = $(this).addClass("active").attr('id');
-				g.Engine.setActiveLayer(toId(id)-1);
+				$(this).addClass("active");
+				g.Engine.setActiveLayer(g.Engine.indexTranslation(index));
 			});
 			this.index = index;
 			this.preview = pcanvas.getContext('2d');
@@ -73,12 +78,12 @@ define(["canvas"], function Layer(Canvas) {
 		},
 		remove: function() {
 			if (numLayers > 1) {
-				pool[this.index] = $("#li-layer"+this.index).detach();
+				pool.push($("#li-layer"+this.index).detach());
 				numLayers--;
 			}
 		},
-		getWorkspace: function() {
-			return this.buf.toDataObject();
+		getWorkspace: function(local) {
+			return this.buf.toDataObject(local);
 		},
 		setWorkspace: function(obj) {
 			this.buf.setCanvas(obj);

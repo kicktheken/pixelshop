@@ -322,20 +322,49 @@ define(["actions","layer","canvas"],function Engine(Actions, Layer, Canvas) {
 			if (layers.length <= 1) {
 				return;
 			}
-			var layer = layers.splice(activeLayer,1)[0];
-			var ri;
-			for (var i in order) {
-				if (order[i] === activeLayer) {
-					order.splice(i,1);
-					ri = i;
-				} else if (order[i] > activeLayer) {
-					order[i]--;
+			var l = activeLayer, workspace;
+			var undo = function() {
+				var i = order.indexOf(l);
+				l = layers.length;
+				var layer;
+				if (i >= 0) {
+					layer = new Layer(layers[order[i]].index);
+					order.splice(i+1,0,l);
+				} else {
+					order.unshift(l);
+					layer = new Layer(-1);
 				}
-			}
-			layer.remove();
-			_this.updateLayers();
-			activeLayer = (ri == order.length) ? order[ri-1] : order[ri];
-			_this.setActiveLayer(activeLayer,true);
+				layers.push(layer);
+				layer.setWorkspace(workspace);
+				layer.refresh();
+				_this.updateLayers();
+				_this.refresh();
+				workspace = null;
+			};
+			var redo = function() {
+				var layer = layers[l];
+				if (l >= 0) {
+					var ri;
+					for (var i in order) {
+						if (order[i] == l) {
+							ri = i;
+						} else if (order[i] > l) {
+							order[i]--;
+						}
+					}
+					order.splice(ri,1);
+					layers.splice(l,1);
+					workspace = layer.getWorkspace(true);
+					layer.remove();
+					if (activeLayer === l) {
+						activeLayer = (ri > 0) ? order[ri-1] : order[ri];
+						_this.setActiveLayer(activeLayer,true);
+					}
+					l = (ri > 0) ? order[ri-1] : -1;
+					_this.updateLayers();
+				}
+			};
+			actions.actionWrapper(undo,redo);
 		},
 		setActiveLayer: function(index,local) {
 			activeLayer = index;
@@ -344,6 +373,13 @@ define(["actions","layer","canvas"],function Engine(Actions, Layer, Canvas) {
 				$("#li-layer"+layers[activeLayer].index).addClass("active");
 			}
 			_this.refresh();
+		},
+		indexTranslation: function(index) {
+			for (var i in layers) {
+				if (layers[i].index === index) {
+					return parseInt(i);
+				}
+			}
 		},
 		defaultColors: function() {
 			return ['blue','red','green','yellow','orange','brown','black','white','purple','beige'];
@@ -624,6 +660,7 @@ define(["actions","layer","canvas"],function Engine(Actions, Layer, Canvas) {
 					$('#color'+index).spectrum('set',workspace.colors[i]);
 				}
 				_this.setColorIndex(1);
+				_this.updateLayers();
 				_this.refresh();
 			}
 			for (var i=0; i<workspace.numLayers; i++) {
