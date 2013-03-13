@@ -2,7 +2,7 @@ define(["actions","layer","canvas"],function Engine(Actions, Layer, Canvas) {
 	var _this, actions, canvas, context;
 	var bg, buf, s, pressed, mode, colorsel, layers, order, activeLayer = -1;
 	var host = /[^\/]+\/\/[^\/]+/g.exec(window.location.href) + g.proxyPrefix;
-	var sizes = [6,8,10,15,20,24,30], cursor, dotted, drawing;
+	var sizes = [6,8,10,15,20,24,30], cursor, dotted, drawing, moving;
 	var saveTimer, saved, email, cheight = $(".container").height() + 1;
 	var darkPattern, lightPattern, medPattern, pan, selected, clipboard;
 	var authURL = "https://accounts.google.com/o/oauth2/auth";
@@ -31,6 +31,7 @@ define(["actions","layer","canvas"],function Engine(Actions, Layer, Canvas) {
 			mode = 'draw';
 			saved = true;
 			drawing = false;
+			moving = false;
 			email = "";
 			_this.initDotted();
 			_this.addLayer();
@@ -844,6 +845,9 @@ define(["actions","layer","canvas"],function Engine(Actions, Layer, Canvas) {
 			if (x !== 0 || y !== 0) {
 				pressed.mx -= x*size;
 				pressed.my -= y*size;
+				if (!moving) {
+					moving = layers[activeLayer].buf.getOffset();
+				}
 				layers[activeLayer].buf.move(-x,-y);
 				_this.refresh();
 			}
@@ -1010,6 +1014,9 @@ define(["actions","layer","canvas"],function Engine(Actions, Layer, Canvas) {
 			if (drawing) {
 				actions.endDraw();
 				drawing = false;
+			} else if (moving) {
+				actions.move(layers[activeLayer],moving);
+				moving = false;
 			} else if (selected) {
 				if (selected.done) {
 					// if references are same, it's a paste

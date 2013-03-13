@@ -126,6 +126,13 @@ define(["pixel","map"],function Canvas(Pixel,Map) {
 				this.offset.y = this.canvas.height-1;
 			}
 		},
+		getOffset: function() {
+			return {x:this.offset.x,y:this.offset.y};
+		},
+		setOffset: function(offset) {
+			this.offset.x = offset.x;
+			this.offset.y = offset.y;
+		},
 		viewable: function(width,height) {
 			var x = Math.ceil(width/2) - Math.ceil(this.canvas.width/2) - this.offset.x;
 			var y = Math.ceil(height/2) - Math.ceil(this.canvas.height/2) - this.offset.y;

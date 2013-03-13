@@ -111,6 +111,18 @@ define(["action","pixel"], function Actions(Action,Pixel) {
 			};
 			_this.actionWrapper(undo,redo,layer);
 		},
+		move: function(layer,offset) {
+			var newOffset = layer.buf.getOffset();
+			var undo = function() {
+				layer.buf.setOffset(offset);
+				return true;
+			};
+			var redo = function() {
+				layer.buf.setOffset(newOffset);
+				return true;
+			};
+			_this.actionWrapper(undo,redo);
+		},
 		cut: function(layer,clipboard) {
 			var c = {};
 			c.x = clipboard.x;
