@@ -59,6 +59,7 @@ define(["action","pixel"], function Actions(Action,Pixel) {
 			redo();
 			action.complete();
 			index++;
+			g.Engine._updateDo();
 		},
 		fill: function(layer,color,x,y) {
 			var oldp = layer.buf.pixel(x,y);

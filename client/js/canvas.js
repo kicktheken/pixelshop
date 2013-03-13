@@ -30,8 +30,14 @@ define(["pixel","map"],function Canvas(Pixel,Map) {
 			canvas.height = height;
 			var context = canvas.getContext('2d');
 			context.drawImage(this.canvas,0,0);
+			var ret = [this.canvas,this.context];
 			this.canvas = canvas;
 			this.context = context;
+			return ret;
+		},
+		resetDimensions: function(cc) {
+			this.canvas = cc[0];
+			this.context = cc[1];
 		},
 		draw: function(pixel) {
 			pixel.draw(this.context);

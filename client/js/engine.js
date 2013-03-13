@@ -468,7 +468,6 @@ define(["actions","layer","canvas"],function Engine(Actions, Layer, Canvas) {
 				return true;
 			};
 			actions.actionWrapper(undo,redo);
-			_this._updateDo();
 		},
 		setColorIndex: function(i) {
 			if (mode !== 'fill') {
@@ -559,7 +558,6 @@ define(["actions","layer","canvas"],function Engine(Actions, Layer, Canvas) {
 			actions.load(layers[activeLayer],image);
 			_this.queueSave();
 			_this.refreshBackground();
-			_this._updateDo();
 		},
 		resetWorkspace: function() {
 			var toRemove = layers.splice(1,layers.length-1);
@@ -805,7 +803,6 @@ define(["actions","layer","canvas"],function Engine(Actions, Layer, Canvas) {
 			var y = Math.floor((cy-canvas.height/2-pan.y)/size);
 			var ret = actions.fill(layers[activeLayer],color,x,y);
 			_this.refresh(cx,cy);
-			_this._updateDo();
 			return ret;
 		},
 		selectColor: function(cx,cy) {
@@ -886,13 +883,29 @@ define(["actions","layer","canvas"],function Engine(Actions, Layer, Canvas) {
 			var s = $input.val();
 			s = s.split(/[^0-9]+/);
 			if (s.length > 1 && isInt(s[0]) && isInt(s[1])) {
-				g.width = s[0];
-				g.height = s[1];
-				buf.setDimensions(g.width,g.height);
-				for (var i in layers) {
-					layers[i].buf.setDimensions(g.width,g.height);
-				}
-				_this.refresh();
+				var old = [g.width,g.height], restore = [];
+				var undo = function() {
+					g.width = old[0];
+					g.height = old[1];
+					buf.setDimensions(g.width,g.height);
+					for (var i in restore) {
+						layers[i].buf.resetDimensions(restore[i]);
+					}
+					restore = [];
+					_this.refresh();
+					return true;
+				};
+				var redo = function() {
+					g.width = s[0];
+					g.height = s[1];
+					buf.setDimensions(g.width,g.height);
+					for (var i in layers) {
+						restore.push(layers[i].buf.setDimensions(g.width,g.height));
+					}
+					_this.refresh();
+					return true;
+				};
+				actions.actionWrapper(undo,redo);
 			}
 			$('#resize-dialog').dialog('close');
 			$input.val("");
