@@ -162,6 +162,7 @@ function Main(Engine) {
 		key('⌘+c, ctrl+c', engine.copy);
 		key('⌘+x, ctrl+x', engine.cut);
 		key('⌘+v, ctrl+v', engine.paste);
+		key('⌘+shift+s, ctrl+shift+s', engine.save); // purge corrupted workspace
 
 		if (typeof FileReader !== 'undefined') {
 			log.info('file api available');

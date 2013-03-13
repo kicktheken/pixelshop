@@ -15,7 +15,7 @@ define(["canvas"], function Layer(Canvas) {
 		});
 	}
 	return Class.extend({
-		init: function(insertafter) {
+		init: function(insertafter,isBefore) {
 			var pcanvas, index;
 			if (numLayers === 0) {
 				initTabbar();
@@ -41,7 +41,8 @@ define(["canvas"], function Layer(Canvas) {
 				index = numLayers;
 			}
 			if (insertafter > 0) {
-				$("#li-layer"+index).insertAfter($("#li-layer"+insertafter));
+				var method = (isBefore) ? 'insertBefore' : 'insertAfter';
+				$("#li-layer"+index)[method]($("#li-layer"+insertafter));
 			}
 			$("#li-layer"+index).mousedown(function() {
 				$("#layers .sortable li").removeClass("active");

@@ -272,7 +272,6 @@ define(["actions","layer","canvas"],function Engine(Actions, Layer, Canvas) {
 			var i = order.indexOf(activeLayer);
 			activeLayer = layers.length;
 			var l = (i<=0) ? -1 : layers[order[i-1]].index;
-			log.info([l,i]);
 			var layer = new Layer(l);
 			layers.push(layer);
 			if (i > 0) {
@@ -299,30 +298,69 @@ define(["actions","layer","canvas"],function Engine(Actions, Layer, Canvas) {
 			if (layers.length <= 1) {
 				return;
 			}
-			var src = layers.splice(activeLayer,1)[0], dest;
-			var ri;
-			for (var i in order) {
-				if (order[i] === activeLayer) {
-					order.splice(i,1);
-					ri = i;
-				} else if (order[i] > activeLayer) {
-					order[i]--;
+			var l = activeLayer, isBefore, workspace, data;
+			var undo = function() {
+				var i = order.indexOf(l);
+				l = layers.length;
+				var src,dest;
+				if (i >= 0) {
+					dest = layers[order[i]];
+					order.splice((isBefore) ? i : i+1,0,l);
+					src = new Layer(dest.index,isBefore);
+				} else {
+					throw "fatal error: missing layer"
 				}
-			}
-			if (ri == order.length) {
-				activeLayer = order[ri-1];
-				dest = layers[activeLayer];
-				src.buf.collapse(dest.buf);
-				dest.copy(src);
-			} else {
-				activeLayer = order[ri];
-				dest = layers[activeLayer];
-				dest.buf.collapse(src.buf);
-			}
-			dest.refresh();
-			src.remove();
-			_this.updateLayers();
-			_this.setActiveLayer(activeLayer,true);
+				src.setWorkspace(workspace);
+				dest.buf.putData(data);
+				layers.push(src);
+				dest.refresh();
+				_this.updateLayers();
+				_this.refresh();
+				workspace = null;
+				data = null;
+				return true;
+			};
+			var redo = function() {
+				var src = layers[l], dest;
+				if (l >= 0) {
+					var ri, nl;
+					for (var i in order) {
+						if (order[i] == l) {
+							ri = i;
+						} else if (order[i] > l) {
+							order[i]--;
+						}
+					}
+					order.splice(ri,1);
+					layers.splice(l,1);
+					workspace = src.getWorkspace(true);
+					isBefore = ri < order.length;
+					if (!isBefore) {
+						nl = order[ri-1];
+						dest = layers[nl];
+						data = dest.buf.getData();
+						src.buf.collapse(dest.buf);
+						dest.copy(src);
+					} else {
+						nl = order[ri];
+						dest = layers[nl];
+						data = dest.buf.getData();
+						dest.buf.collapse(src.buf);
+					}
+					dest.refresh();
+					src.remove();
+					_this.updateLayers();
+					if (activeLayer === l) {
+						activeLayer = nl;
+						_this.setActiveLayer(activeLayer,true);
+					} else {
+						_this.refresh();
+					}
+					l = nl;
+				}
+				return true;
+			};
+			actions.actionWrapper(undo,redo);
 		},
 		removeLayer: function() {
 			if (layers.length <= 1) {
@@ -348,6 +386,7 @@ define(["actions","layer","canvas"],function Engine(Actions, Layer, Canvas) {
 				_this.updateLayers();
 				_this.refresh();
 				workspace = null;
+				return true;
 			};
 			var redo = function() {
 				var layer = layers[l];
@@ -365,12 +404,15 @@ define(["actions","layer","canvas"],function Engine(Actions, Layer, Canvas) {
 					workspace = layer.getWorkspace(true);
 					layer.remove();
 					if (activeLayer === l) {
-						activeLayer = (ri > 0) ? order[ri-1] : order[ri];
+						activeLayer = (ri == order.length) ? order[ri-1] : order[ri];
 						_this.setActiveLayer(activeLayer,true);
+					} else {
+						_this.refresh();
 					}
 					l = (ri > 0) ? order[ri-1] : -1;
 					_this.updateLayers();
 				}
+				return true;
 			};
 			actions.actionWrapper(undo,redo);
 		},
@@ -388,6 +430,7 @@ define(["actions","layer","canvas"],function Engine(Actions, Layer, Canvas) {
 					return parseInt(i);
 				}
 			}
+			throw "cannot find index "+index;
 		},
 		defaultColors: function() {
 			return ['blue','red','green','yellow','orange','brown','black','white','purple','beige'];
@@ -732,19 +775,8 @@ define(["actions","layer","canvas"],function Engine(Actions, Layer, Canvas) {
 			});
 		},
 		save: function() {
-			var data = buf.canvas.toDataURL();
-			data = JSON.stringify(buf.toDataObject());
-			LZMA.compress(data,1, function(result) {
-				var binstring = String.fromCharCode.apply(null,result);
-				log.info(binstring.length);
-				var binarray = [];
-				for (var i=0; i<binstring.length; i++) {
-					binarray.push(binstring.charCodeAt(i));
-				}
-				LZMA.decompress(binarray, function(result) {
-					log.info(result);
-				});
-			});
+			saved = true;
+			log.info('workspace purged on restart');
 		},
 		export: function() {
 			var obj = buf.toDataObject();
