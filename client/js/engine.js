@@ -640,7 +640,9 @@ define(["actions","layer","canvas"],function Engine(Actions, Layer, Canvas) {
 				return false;
 			}
 			var workspace = JSON.parse(localStorage.workspace);
-			var valid = isInt(workspace.numLayers);
+			// check if the workspace is valid
+			var valid = isInt(workspace.numLayers) && isInt(workspace.width) && isInt(workspace.height);
+			valid = valid && workspace.colors instanceof Array && workspace.colors.length === 10;
 			valid = valid && workspace.layers instanceof Array && workspace.layers.length > 0;
 			valid = valid && typeof workspace.pan === 'object';
 			valid = valid && isInt(workspace.pan.x) && isInt(workspace.pan.y);
@@ -678,6 +680,9 @@ define(["actions","layer","canvas"],function Engine(Actions, Layer, Canvas) {
 				if (finished < workspace.numLayers) {
 					return;
 				}
+				g.width = workspace.width;
+				g.height = workspace.height;
+				buf.setDimensions(g.width,g.height);
 				var diff = layers.length - workspace.numLayers;
 				if (diff > 0) {
 					var toRemove = layers.splice(layers.length - diff,diff);
@@ -699,6 +704,7 @@ define(["actions","layer","canvas"],function Engine(Actions, Layer, Canvas) {
 					}
 				}
 				for (var i=layers.length-1; i>=0; i--) {
+					layers[order[i]].buf.setDimensions(g.width,g.height);
 					layers[order[i]].setWorkspace(workspace.layers[i]);
 				}
 				var i = order[workspace.active];
@@ -725,7 +731,14 @@ define(["actions","layer","canvas"],function Engine(Actions, Layer, Canvas) {
 			}
 		},
 		saveWorkspace: function(action) {
-			var workspace = { numLayers: layers.length, layers: [], colors: [], pan: pan };
+			var workspace = {
+				numLayers: layers.length,
+				layers: [],
+				colors: [],
+				width: g.width,
+				height: g.height,
+				pan: pan
+			};
 			for (var i=layers.length-1; i>=0; i--) {
 				if (activeLayer === order[i]) {
 					workspace.active = i;
