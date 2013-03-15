@@ -18,9 +18,9 @@ if (document.styleSheets[0].cssRules.length === 0) { // for development
 		<div class="container">
 			<a class="brand" href="#"><i class="icon-space-invaders"></i>Pixelshop</a>
 			<div class="input-prepend input-append">
-				<button id="load" class="btn btn-warning"><i class="icon-folder-open-alt"></i></button>
+				<button id="upload" class="btn btn-warning"><i class="icon-upload-alt"></i></button>
 				<input type="text" class="searchbox" placeholder="Image Link or Search Library" />
-				<button id="save" class="btn btn-primary"><i class="icon-save"></i></button>
+				<button id="download" class="btn btn-primary"><i class="icon-download-alt"></i></button>
 			</div>
 			<ul class="nav pull-right">
 				<li><a id="email" class="pull-right"></a></li>
@@ -80,6 +80,7 @@ if (document.styleSheets[0].cssRules.length === 0) { // for development
 			Dimensions:
 			<input id="dimensions" type="text" placeholder="300x200" maxlength="9">
 		</label>
+		<hr />
 		<label class="numeric">
 			Frame:
 			<input id="frame" type="text" placeholder="300x200" maxlength="9"></label>

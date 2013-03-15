@@ -382,3 +382,6 @@ ul.icons li [class*=" icon-"] {
 .icon-move:before {
 	content: "\f047";
 }
+.icon-download-alt:before {
+	content: "\f019";
+}

@@ -940,7 +940,7 @@ define(["actions","layer","canvas"],function Engine(Actions, Layer, Canvas) {
 				draggable:false,
 				resizable:false,
 				width:190,
-				height:150,
+				height:180,
 				title: "Dimensions",
 				buttons: {
 					Apply: _this.setDimensions,

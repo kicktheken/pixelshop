@@ -84,7 +84,8 @@ form {
 	padding: 3px 0;
 }
 .tooltip .key {
-	margin-left:6px;
+	margin-left:5px;
+	margin-right:2px;
 	padding-top:2px;
 	padding-bottom:3px;
 }
@@ -170,3 +171,6 @@ form {
 	float: right;
 }
 
+#resize-dialog hr {
+	margin-bottom:14px;
+}

@@ -102,17 +102,42 @@ function Main(Engine) {
 		$('[name="radio"]').click(function(e) {
 			engine.setMode(this.id);
 		});
-		$('#toolbar label').each(function(i,e) {
-			var title = $(e).attr('for');
-			title += "<div class='light key'>"+paintKeys[i]+"</div>";
-			$(e).tooltip({
+		function uk(k) {
+			return "<div class='light key'>"+k+"</div>";
+		}
+		function uks() {
+			var a = Array.prototype.slice.call(arguments,0);
+			return $.map(a,uk).join(' +');
+		}
+		function tooltip(elem,title,placement) {
+			if (!placement) {
+				placement = 'top';
+			}
+			$(elem).tooltip({
 				title: title,
 				html: true,
-				placement:'top',
+				placement:placement,
 				container: 'body',
 				delay: 500
 			});
+		}
+		$('#toolbar label').each(function(i,e) {
+			var title = $(e).attr('for');
+			title = title[0].toUpperCase() + title.substr(1);
+			tooltip(e,title+uk(paintKeys[i].toUpperCase()));
 		});
+		var metakey = (/Mac OS/i.test(navigator.userAgent)) ? '⌘' : 'Ctrl';
+		tooltip('#zoomin','Zoom In');
+		tooltip('#zoomout','Zoom Out');
+		tooltip('#undo','Undo'+uks(metakey,'Z'));
+		tooltip('#redo','Redo'+uks(metakey,'shift','Z'));
+		tooltip('#resize','Resize');
+		tooltip('#addlayer','Add Layer');
+		tooltip('#clonelayer','Clone Layer');
+		tooltip('#combinelayer','Combine Layer');
+		tooltip('#removelayer','Remove Layer');
+		tooltip('#download','Download','bottom');
+		tooltip('#upload','Upload','bottom');
 
 		var cheight = $(".container").height()+1;
 		function canvasCoords(f,e,$this) {
@@ -154,7 +179,7 @@ function Main(Engine) {
 		$('#zoomout').click(engine.zoomOut);
 		$('#undo').click(engine.undo);
 		$('#redo').click(engine.redo);
-		$('#save').click(engine.export);
+		$('#download').click(engine.export);
 		$('#resize').click(engine.resizeCanvas);
 		//$('#load').click(engine.loadWorkspace);
 		key('⌘+z, ctrl+z', engine.undo);
