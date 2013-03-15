@@ -54,12 +54,13 @@ function Main(Engine) {
 		}
 		tabbar.html(html);
 
+		g.mobile = 'ontouchstart' in window;
 		$('.colorpicker').spectrum({
 			preferredFormat: 'name',
 			showInput: true,
 			showAlpha: true,
 			showInitial: true,
-			showButtons: false,
+			showButtons: g.mobile,
 			change: function(color) {
 				engine.setColor();
 			},
@@ -71,7 +72,8 @@ function Main(Engine) {
 			}
 		});
 		engine.loadWorkspace();
-		$("#colors .sortable li").mousedown(function(e) {
+		g.cursorstart = (g.mobile) ? 'mousedown' : 'touchstart';
+		$("#colors .sortable li")[g.cursorstart](function(e) {
 			engine.setColorIndex(toId(this.id));
 		});
 
@@ -151,14 +153,14 @@ function Main(Engine) {
 			}
 		}
 		document.onselectstart = function() {return false;};
-		if ('ontouchstart' in window) {
+		if (g.mobile) {
 			$canvas.bind('touchmove', function(e) {
 				e.preventDefault();
-				e = e.orginalEvent.touches[0];
+				e = e.originalEvent.touches[0];
 				canvasCoords(engine.cursorMove,e,$canvas);
 			}).bind('touchstart', function(e) {
 				e.preventDefault();
-				e = e.orginalEvent.touches[0];
+				e = e.originalEvent.touches[0];
 				canvasCoords(engine.cursorStart,e,$canvas);
 			}).bind('touchend', function(e) {
 				engine.cursorEnd();
