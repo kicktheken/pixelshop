@@ -213,6 +213,33 @@ define(["pixel","map"],function Canvas(Pixel,Map) {
 			}
 			return ret;
 		},
+		export: function(selected,scale) {
+			var x = 0, y = 0, width = this.canvas.width, height = this.canvas.height;
+			if (selected) {
+				x = selected.x;
+				y = selected.y;
+				width = selected.width;
+				height = selected.height;
+			}
+			var canvas = this.canvas;
+			if (scale > 1) {
+				canvas = document.createElement("canvas");
+				var context = canvas.getContext('2d');
+				canvas.width = width*scale;
+				canvas.height = height*scale;
+				var d = this.context.getImageData(x,y,width,height);
+				for (var j=y; j<height; j++) {
+					for (var k=0; k<width; k++) {
+						var i = (k+j*width)*4;
+						if (d.data[i+3] > 0) {
+							context.fillStyle = 'rgba('+d.data[i]+','+d.data[i+1]+','+d.data[i+2]+','+d.data[i+3]+')';
+							context.fillRect(k*scale, j*scale, scale, scale);
+						}
+					}
+				}
+			}
+			return canvas.toDataURL();
+		},
 		putData: function(data) {
 			this.context.putImageData(data,0,0);
 		},

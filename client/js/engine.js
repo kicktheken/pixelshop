@@ -631,7 +631,7 @@ define(["actions","layer","canvas"],function Engine(Actions, Layer, Canvas) {
 					}
 				});
 			}).fail(function(err) {
-				failLoad();
+				_this.defaultWorkspace();
 			});
 		},
 		deleteLocalWorkspace: function() {
@@ -796,6 +796,11 @@ define(["actions","layer","canvas"],function Engine(Actions, Layer, Canvas) {
 			log.info('workspace purged on restart');
 		},
 		download: function() {
+			$("#exportname").keyup(function (e) {
+				if (e.keyCode == 13) { // enter key
+					_this.export($(this).val(),/\d+/.exec($('#scale').val()));
+				}
+			});
 			var dialog = $dialog = $('#download-dialog');
 			$dialog.dialog({
 				dialogClass: "no-close",
@@ -807,7 +812,7 @@ define(["actions","layer","canvas"],function Engine(Actions, Layer, Canvas) {
 				title:"Save to Disk",
 				buttons: {
 					Download: function() {
-						_this.export($('#exportname').val());
+						_this.export($('#exportname').val(),/\d+/.exec($('#scale').val()));
 						$(this).dialog('close');
 					},
 					Cancel: function() {
@@ -818,12 +823,8 @@ define(["actions","layer","canvas"],function Engine(Actions, Layer, Canvas) {
 			$dialog.parent().find('.ui-dialog-title').css('display','inherit');
 			$dialog.dialog('close').dialog('open'); // hack to update height for adding titlebar
 		},
-		export: function(name) {
-			var obj = buf.toDataObject();
-			if (!obj.data) {
-				return;
-			}
-			var dataURL = obj.data;
+		export: function(name,scale) {
+			var dataURL = buf.export(selected,scale);
 			var base64img = dataURL.substr(dataURL.indexOf(',')+1).toString();
 			$('#filename').val(name);
 			$('#hidden').val(base64img);
