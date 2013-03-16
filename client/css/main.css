@@ -16,6 +16,9 @@ canvas
 {
 	display:block;
 }
+a:focus {
+	outline: none;
+}
 .handopen {
 	cursor: url(https://mail.google.com/mail/images/2/openhand.cur), default !important;
 }
@@ -160,17 +163,33 @@ form {
 	background-color: #bd362f;
 }
 
-.numeric {
+.modalinput {
 	margin: 10px;
 }
-.numeric input {
+.modalinput input {
 	height:14px;
+	float: right;
+}
+.numeric {
 	margin-bottom: 0;
 	margin-left: 5px;
 	width:68px;
-	float: right;
+}
+#scale {
+	margin-bottom: 0;
+	margin-left: 5px;
+	width:50px;
+	float:none;
+}
+.filename {
+	width: 200px;
 }
 
-#resize-dialog hr {
+hr {
 	margin-bottom:14px;
 }
+
+.ui-slider {
+	margin:15px;
+}
+

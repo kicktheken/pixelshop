@@ -35,6 +35,20 @@ function Main(Engine) {
 		$('#combinelayer').click(engine.combineLayer);
 		$('#removelayer').click(engine.removeLayer);
 
+		$('#slider').slider({
+			value:1,
+			min:1,
+			max:30,
+			slide:function(e,ui) {
+				$('#scale').val(ui.value+'x');
+			}
+		});
+		$('#scale').change(function(e) {
+			var val = /\d+/.exec($(this).val());
+			val = (isInt(val) && val > 0) ? val : 1;
+			$('#slider').slider('value',val);
+		});
+
 		var tabbar = $('#colors .sortable').sortable({
 			placeholder: "ui-state-highlight",
 			axis: "y",
@@ -184,7 +198,7 @@ function Main(Engine) {
 		$('#zoomout').click(engine.zoomOut);
 		$('#undo').click(engine.undo);
 		$('#redo').click(engine.redo);
-		$('#download').click(engine.export);
+		$('#download').click(engine.download);
 		$('#resize').click(engine.resizeCanvas);
 		//$('#load').click(engine.loadWorkspace);
 		key('⌘+z, ctrl+z', engine.undo);
@@ -192,7 +206,7 @@ function Main(Engine) {
 		key('⌘+c, ctrl+c', engine.copy);
 		key('⌘+x, ctrl+x', engine.cut);
 		key('⌘+v, ctrl+v', engine.paste);
-		key('⌘+shift+s, ctrl+shift+s', engine.save); // purge corrupted workspace
+		key('⌘+shift+s, ctrl+shift+s', engine.purge); // purge corrupted workspace
 
 		if (typeof FileReader !== 'undefined') {
 			log.info('file api available');

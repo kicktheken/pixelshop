@@ -568,6 +568,22 @@ define(["actions","layer","canvas"],function Engine(Actions, Layer, Canvas) {
 			order = [0];
 			_this.setActiveLayer(0,true);
 		},
+		defaultWorkspace: function() {
+			var workspace = _this.getLocalWorkspace();
+			if (workspace) {
+				_this._loadWorkspace(workspace);
+			} else {
+				log.info("loading default workspace");
+				var defaultColors = _this.defaultColors();
+				$('.colorpicker').each(function(i) {
+					var c = defaultColors[i];
+					i = (i+1)%10;
+					$('#color'+i).spectrum('set', c);
+				});
+				_this.setColorIndex(1);
+			}
+			saved = false;
+		},
 		loadWorkspace: function() {
 			var qs = window.location.hash, query = "";
 			if (qs.length && /#access_token=\w+/.test(qs)) {
@@ -577,6 +593,7 @@ define(["actions","layer","canvas"],function Engine(Actions, Layer, Canvas) {
 			}
 			$.get(host+'/getworkspace'+query, function(data) {
 				if (!data || data.length === 0) {
+					_this.defaultWorkspace();
 					return;
 				}
 				var workspace = typeof data === 'object' ? data : JSON.parse(data);
@@ -614,20 +631,7 @@ define(["actions","layer","canvas"],function Engine(Actions, Layer, Canvas) {
 					}
 				});
 			}).fail(function(err) {
-				var workspace = _this.getLocalWorkspace();
-				if (workspace) {
-					_this._loadWorkspace(workspace);
-				} else {
-					log.error("unable to load workspace");
-					var defaultColors = _this.defaultColors();
-					$('.colorpicker').each(function(i) {
-						var c = defaultColors[i];
-						i = (i+1)%10;
-						$('#color'+i).spectrum('set', c);
-					});
-					_this.setColorIndex(1);
-				}
-				saved = false;
+				failLoad();
 			});
 		},
 		deleteLocalWorkspace: function() {
@@ -786,17 +790,42 @@ define(["actions","layer","canvas"],function Engine(Actions, Layer, Canvas) {
 				});
 			});
 		},
-		save: function() {
+		purge: function() {
 			saved = true;
+			$.get(host+'/deleteworkspace');
 			log.info('workspace purged on restart');
 		},
-		export: function() {
+		download: function() {
+			var dialog = $dialog = $('#download-dialog');
+			$dialog.dialog({
+				dialogClass: "no-close",
+				modal:true,
+				draggable:false,
+				resizable:false,
+				width:300,
+				height:250,
+				title:"Save to Disk",
+				buttons: {
+					Download: function() {
+						_this.export($('#exportname').val());
+						$(this).dialog('close');
+					},
+					Cancel: function() {
+						$(this).dialog('close');
+					}
+				}
+			});
+			$dialog.parent().find('.ui-dialog-title').css('display','inherit');
+			$dialog.dialog('close').dialog('open'); // hack to update height for adding titlebar
+		},
+		export: function(name) {
 			var obj = buf.toDataObject();
 			if (!obj.data) {
 				return;
 			}
 			var dataURL = obj.data;
 			var base64img = dataURL.substr(dataURL.indexOf(',')+1).toString();
+			$('#filename').val(name);
 			$('#hidden').val(base64img);
 			$('form').attr("action",host+'/exportpng').submit();
 		},
@@ -926,22 +955,20 @@ define(["actions","layer","canvas"],function Engine(Actions, Layer, Canvas) {
 		resizeCanvas: function() {
 			$('#dimensions').attr('placeholder',g.width+'x'+g.height);
 			$('#frame').attr('placeholder',g.width+'x'+g.height);
-			function apply() {
-				
-			}
-			$(".numeric input").keyup(function (e) {
-				if (e.keyCode == 13) {
+			$("#dimensions,#frame").keyup(function (e) {
+				if (e.keyCode == 13) { // enter key
 					_this.setDimensions();
 				}
 			});
-			$('#resize-dialog').dialog({
+			var $dialog = $('#resize-dialog');
+			$dialog.dialog({
 				dialogClass: "no-close",
 				modal:true,
 				draggable:false,
 				resizable:false,
 				width:190,
-				height:180,
-				title: "Dimensions",
+				height:220,
+				title: "Resize",
 				buttons: {
 					Apply: _this.setDimensions,
 					Cancel: function() {
@@ -949,6 +976,8 @@ define(["actions","layer","canvas"],function Engine(Actions, Layer, Canvas) {
 					}
 				}
 			});
+			$dialog.parent().find('.ui-dialog-title').css('display','inherit');
+			$dialog.dialog('close').dialog('open'); // hack to update height for adding titlebar
 		},
 		undo: function() {
 			_this.updateDo('undo');
@@ -983,12 +1012,12 @@ define(["actions","layer","canvas"],function Engine(Actions, Layer, Canvas) {
 			if (actions.canUndo()) {
 				$('#undo').button('enable');
 			} else {
-				$('#undo').button('disable');
+				$('#undo').button('disable').tooltip('hide');
 			}
 			if (actions.canRedo()) {
 				$('#redo').button('enable');
 			} else {
-				$('#redo').button('disable');
+				$('#redo').button('disable').tooltip('hide');
 			}
 		},
 		redo: function() {
@@ -1080,9 +1109,9 @@ define(["actions","layer","canvas"],function Engine(Actions, Layer, Canvas) {
 		},
 		updateZoom: function() {
 			if (s+1 === sizes.length) {
-				$('#zoomin').button('disable');
+				$('#zoomin').button('disable').tooltip('hide');
 			} else if (s === 0) {
-				$('#zoomout').button('disable');
+				$('#zoomout').button('disable').tooltip('hide');
 			} else {
 				$('#zoomin').button('enable');
 				$('#zoomout').button('enable');

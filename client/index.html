@@ -76,17 +76,46 @@ if (document.styleSheets[0].cssRules.length === 0) { // for development
 
 <div id="resize-dialog" style="display:none;">
 	<fieldset>
+		<label class="modalinput">
+			Dimensions:
+			<input id="dimensions" type="text" placeholder="30x30" class="numeric" maxlength="9">
+		</label>
+		<hr />
+		<label class="modalinput">
+			Frame:
+			<input id="frame" type="text" placeholder="30x30" class="numeric" maxlength="9"></label>
+	</fieldset>
+</div>
+<div id="download-dialog" style="display:none;">
+	<fieldset>
+		<label class="modalinput">
+			Filename:
+			<input id="exportname" class="filename" type="text">
+		</label>
+		<hr />
+		<label class="modalinput">
+			Scale:
+			<input type="text" id="scale" placeholder="1x" maxlength="4">
+		</label>
+		<div id="slider"></div>
+	</fieldset>
+</div>
+<div id="upload-dialog" style="display:none;">
+	<fieldset>
 		<label class="numeric">
 			Dimensions:
-			<input id="dimensions" type="text" placeholder="300x200" maxlength="9">
+			<input id="dimensions" type="text">
 		</label>
 		<hr />
 		<label class="numeric">
 			Frame:
-			<input id="frame" type="text" placeholder="300x200" maxlength="9"></label>
+			<input id="frame" type="text"></label>
 	</fieldset>
 </div>
-<form method="POST"><input type="hidden" id="hidden" name="data" value="" /></form>
+<form method="POST">
+	<input type="hidden" id="filename" name="name" value="export" />
+	<input type="hidden" id="hidden" name="data" value="" />
+</form>
 
 <!-- load scripts at end -->
 <script type="text/javascript" src="js/main-built.js"></script>
