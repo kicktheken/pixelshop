@@ -21,6 +21,8 @@ function Main(Engine) {
 		g.INITTIME = g.ts();
 
 		$('.buttonset').buttonset();
+		g.mobile = 'ontouchstart' in window;
+		g.cursorstart = (g.mobile) ? 'touchstart' : 'mousedown';
 		var engine = new Engine($canvas), disableClick = false;
 		$(window).resize(engine.resize);
 		$(window).bind('beforeunload',engine.beforeUnload);
@@ -54,7 +56,6 @@ function Main(Engine) {
 		}
 		tabbar.html(html);
 
-		g.mobile = 'ontouchstart' in window;
 		$('.colorpicker').spectrum({
 			preferredFormat: 'name',
 			showInput: true,
@@ -65,6 +66,9 @@ function Main(Engine) {
 				engine.setColor();
 			},
 			show: function() {
+				if (g.mobile) {
+					engine.setColorIndex(toId(this.id));
+				}
 				disableClick = true;
 			},
 			hide: function() {
@@ -72,8 +76,7 @@ function Main(Engine) {
 			}
 		});
 		engine.loadWorkspace();
-		g.cursorstart = (g.mobile) ? 'mousedown' : 'touchstart';
-		$("#colors .sortable li")[g.cursorstart](function(e) {
+		$("#colors .sortable li").bind(g.cursorstart, function(e) {
 			engine.setColorIndex(toId(this.id));
 		});
 

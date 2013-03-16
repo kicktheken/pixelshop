@@ -44,7 +44,7 @@ define(["canvas"], function Layer(Canvas) {
 				var method = (isBefore) ? 'insertBefore' : 'insertAfter';
 				$("#li-layer"+index)[method]($("#li-layer"+insertafter));
 			}
-			$("#li-layer"+index)[g.cursorstart](function() {
+			$("#li-layer"+index).bind(g.cursorstart, function() {
 				$("#layers .sortable li").removeClass("active");
 				$(this).addClass("active");
 				g.Engine.setActiveLayer(g.Engine.indexTranslation(index));
