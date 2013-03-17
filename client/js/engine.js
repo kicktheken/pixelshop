@@ -753,7 +753,10 @@ define(["actions","layer","canvas"],function Engine(Actions, Layer, Canvas) {
 			}
 			var layersData = JSON.stringify(workspace.layers);
 			LZMA.compress(layersData,1,function(result) {
-				var binstring = String.fromCharCode.apply(null,result);
+				var binstring = '';
+				for (var i=0; i<result.length; i++) {
+					binstring += String.fromCharCode(result[i]);
+				}
 				if (email.length) {
 					workspace.email = email;
 				}

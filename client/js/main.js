@@ -32,7 +32,7 @@ function Main(Engine) {
 			$(this).blur();
 		}).blur();
 		$('#addlayer').focus(function(e) {
-			$(this).blur();
+			$(this).blur().tooltip('hide');
 		}).blur().click(engine.addLayer);
 		$('#clonelayer').click(engine.cloneLayer);
 		$('#combinelayer').click(engine.combineLayer);

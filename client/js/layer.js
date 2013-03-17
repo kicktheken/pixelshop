@@ -10,6 +10,7 @@ define(["canvas"], function Layer(Canvas) {
 				$('#layers .sortable li').each(function(e) { // this is O(n^2)... owell
 					order.push(g.Engine.indexTranslation(toId(this.id)));
 				});
+				$('#addlayer').tooltip('hide'); // hack to fix tooltip bug
 				g.Engine.setLayerOrder(order);
 			}
 		});

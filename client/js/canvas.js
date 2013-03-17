@@ -59,40 +59,24 @@ define(["pixel","map"],function Canvas(Pixel,Map) {
 			}
 		},
 		fillColor: function(oldp,newp) {
-			newp.draw(this.context);
-			var x = newp.x, y = newp.y;
-			this.map.set(x,y,true);
-			var p;
-			if (x < this.canvas.width-1) {
-				p = new Pixel(this.context,x+1,y);
-				if (!oldp.diffColor(p)) {
-					newp.x = p.x;
-					newp.y = p.y;
-					this.fillColor(oldp,newp);
-				}
-			}
-			if (y < this.canvas.height-1) {
-				p = new Pixel(this.context,x,y+1);
-				if (!oldp.diffColor(p)) {
-					newp.x = p.x;
-					newp.y = p.y;
-					this.fillColor(oldp,newp);
-				}
-			}
-			if (x > 0) {
-				p = new Pixel(this.context,x-1,y);
-				if (!oldp.diffColor(p)) {
-					newp.x = p.x;
-					newp.y = p.y;
-					this.fillColor(oldp,newp);
-				}
-			}
-			if (y > 0) {
-				p = new Pixel(this.context,x,y-1);
-				if (!oldp.diffColor(p)) {
-					newp.x = p.x;
-					newp.y = p.y;
-					this.fillColor(oldp,newp);
+			var queue = [newp], p, np;
+			while (queue.length > 0) {
+				p = queue.shift();
+				if (!oldp.diffColor(new Pixel(this.context,p.x,p.y))) {
+					p.draw(this.context);
+					this.map.set(p.x,p.y,true);
+					if (p.x < this.canvas.width-1) {
+						queue.push(new Pixel(p,p.x+1,p.y));
+					}
+					if (p.y < this.canvas.height-1) {
+						queue.push(new Pixel(p,p.x,p.y+1));
+					}
+					if (p.x > 0) {
+						queue.push(new Pixel(p,p.x-1,p.y));
+					}
+					if (p.y > 0) {
+						queue.push(new Pixel(p,p.x,p.y-1));
+					}
 				}
 			}
 		},
