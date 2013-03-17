@@ -228,7 +228,7 @@ define(["pixel","map"],function Canvas(Pixel,Map) {
 				canvas.width = width*scale;
 				canvas.height = height*scale;
 				var d = this.context.getImageData(x,y,width,height);
-				for (var j=y; j<height; j++) {
+				for (var j=0; j<height; j++) {
 					for (var k=0; k<width; k++) {
 						var i = (k+j*width)*4;
 						if (d.data[i+3] > 0) {
