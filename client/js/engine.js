@@ -123,8 +123,8 @@ define(["actions","layer","canvas"],function Engine(Actions, Layer, Canvas) {
 		refresh: function(cx,cy) {
 			context.shadowBlur = 0;
 			var size = sizes[s], visible = 0;
-			var width = Math.ceil(canvas.width/size);
-			var height = Math.ceil(canvas.height/size);
+			var width = Math.ceil(canvas.width/size)+1;
+			var height = Math.ceil(canvas.height/size)+1;
 			var xrem = Math.ceil(canvas.width/2)+buf.offset.x + pan.x;
 			xrem = xrem%size - ((xrem%size > 0) ? size : 0);
 			var yrem = Math.ceil(canvas.height/2)+buf.offset.y + pan.y;
@@ -163,13 +163,14 @@ define(["actions","layer","canvas"],function Engine(Actions, Layer, Canvas) {
 				return;
 			}
 
-			var d = buf.getViewData(width,height);
+			var ox = Math.floor((pan.x-xrem)/size), oy = Math.floor((pan.y-yrem)/size);
+			var d = buf.getViewData(-ox,-oy,width,height);
 			for (var y=0; y<height; y++) {
 				for (var x=0; x<width; x++) {
 					var i = (x+y*width)*4;
 					if (d.data[i+3] > 0) {
 						context.fillStyle = 'rgba('+d.data[i]+','+d.data[i+1]+','+d.data[i+2]+','+d.data[i+3]+')';
-						context.fillRect(x*size+remx+pan.x, y*size+remy+pan.y, size, size);
+						context.fillRect(x*size+xrem, y*size+yrem, size, size);
 					}
 				}
 			}

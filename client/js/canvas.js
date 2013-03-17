@@ -288,9 +288,9 @@ define(["pixel","map"],function Canvas(Pixel,Map) {
 			var y = this.offset.y - height/2;
 			return this.context.getImageData(x,y,width,height);
 		},
-		getViewData: function(width,height) {
-			var x = Math.ceil(this.canvas.width/2) - Math.ceil(width/2);
-			var y = Math.ceil(this.canvas.height/2) - Math.ceil(height/2);
+		getViewData: function(x,y,width,height) {
+			x += Math.ceil(this.canvas.width/2) - Math.ceil(width/2);
+			y += Math.ceil(this.canvas.height/2) - Math.ceil(height/2);
 			return this.context.getImageData(x,y,width,height);
 		},
 		getViewDataFromBounds: function(width,height) {
