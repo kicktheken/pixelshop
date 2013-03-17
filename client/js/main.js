@@ -28,6 +28,9 @@ function Main(Engine) {
 		$(window).bind('beforeunload',engine.beforeUnload);
 
 		// fix jqueryui bug
+		$('#draw').focus(function(e) {
+			$(this).blur();
+		}).blur();
 		$('#addlayer').focus(function(e) {
 			$(this).blur();
 		}).blur().click(engine.addLayer);

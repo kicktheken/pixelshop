@@ -34,6 +34,9 @@ define(function Pixel() {
 				|| p.d.data[2] !== this.d.data[2]
 				|| p.d.data[3] !== this.d.data[3];
 		},
+		isClear: function() {
+			return this.d.data[3] === 0;
+		},
 		toString: function() {
 			var x = this.x, y = this.y;
 			return [x+1,y+1].join(',')+' -> '+this.toColorString();

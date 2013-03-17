@@ -439,7 +439,7 @@ define(["actions","layer","canvas"],function Engine(Actions, Layer, Canvas) {
 			return ['blue','red','green','yellow','orange','brown','black','white','purple','beige'];
 		},
 		setColor: function() {
-			if (mode !== 'fill') {
+			if (mode !== 'fill' && mode !== 'dropper') {
 				$('[name="radio"]').removeAttr("checked").button('refresh');
 				$('label[for="draw"]').addClass("ui-state-active");
 				_this.setMode('draw');
@@ -472,7 +472,7 @@ define(["actions","layer","canvas"],function Engine(Actions, Layer, Canvas) {
 			actions.actionWrapper(undo,redo);
 		},
 		setColorIndex: function(i) {
-			if (mode !== 'fill') {
+			if (mode !== 'fill' && mode !== 'dropper') {
 				$('[name="radio"]').removeAttr("checked").button('refresh');
 				$('label[for="draw"]').addClass("ui-state-active");
 				_this.setMode('draw');
@@ -908,6 +908,9 @@ define(["actions","layer","canvas"],function Engine(Actions, Layer, Canvas) {
 			var x = Math.floor((cx-canvas.width/2-pan.x)/size);
 			var y = Math.floor((cy-canvas.height/2-pan.y)/size);
 			var pixel = layers[activeLayer].buf.pixel(x,y);
+			if (pixel.isClear()) {
+				return; // don't select zero alpha pixel
+			}
 			$('#color'+colorsel.i).spectrum('set',pixel.toColorString());
 			_this.setColor();
 		},
