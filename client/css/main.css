@@ -19,6 +19,9 @@ canvas
 a:focus {
 	outline: none;
 }
+button:focus {
+	outline: none;
+}
 .handopen {
 	cursor: url(https://mail.google.com/mail/images/2/openhand.cur), default !important;
 }
@@ -192,4 +195,15 @@ hr {
 .ui-slider {
 	margin:15px;
 }
-
+#upload-file {
+	display:none;
+}
+#upload-preview {
+	margin:10px;
+	width:450px;
+	height:257px;
+	border:1px solid #ccc;
+}
+#expand {
+	margin:0 10px;
+}

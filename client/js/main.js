@@ -199,8 +199,12 @@ function Main(Engine) {
 		$('#undo').click(engine.undo);
 		$('#redo').click(engine.redo);
 		$('#download').click(engine.download);
+		$('#upload').click(function() {
+			var e = document.createEvent("MouseEvents");
+			e.initEvent("click", true, false);
+			$('#upload-file').get(0).dispatchEvent(e);
+		});
 		$('#resize').click(engine.resizeCanvas);
-		//$('#load').click(engine.loadWorkspace);
 		key('⌘+z, ctrl+z', engine.undo);
 		key('⌘+shift+z, ctrl+shift+z', engine.redo);
 		key('⌘+c, ctrl+c', engine.copy);
@@ -210,23 +214,36 @@ function Main(Engine) {
 
 		if (typeof FileReader !== 'undefined') {
 			log.info('file api available');
-			document.ondragover = function () { return false; };
-			document.ondragend = function () { return false; };
-			document.ondrop = function(e) {
-				e.preventDefault();
-				var file = e.dataTransfer.files[0], reader = new FileReader();
+			function handleFileUpload(file) {
+				if (!/^image/.test(file.type)) {
+					log.error("file "+file.name+" is not an image type");
+					return false;
+				}
+				var reader = new FileReader();
 				reader.onload = function(e) {
 					reader.onload = null;
 					var image = new Image();
 					image.onload = function() {
 						this.onload = null;
-						engine.load(this);
+						engine.upload(this);
 					};
 					image.src = e.target.result;
 				};
 				reader.readAsDataURL(file);
 				return false;
 			};
+			$('#upload-file').change(function(e) {
+				e.preventDefault();
+				handleFileUpload(e.delegateTarget.files[0]);
+			});
+			document.ondragover = function () { return false; };
+			document.ondragend = function () { return false; };
+			document.ondrop = function(e) {
+				e.preventDefault();
+				handleFileUpload(e.dataTransfer.files[0]);
+			};
+		} else {
+			log.info('file api unavailable');
 		}
 
 		key('enter', function() { $('.searchbox').focus(); });

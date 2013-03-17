@@ -180,29 +180,6 @@ define(["action","pixel"], function Actions(Action,Pixel) {
 			};
 			_this.actionWrapper(undo,redo,layer);
 		},
-		load: function(layer,image) {
-			var oldx = layer.buf.offset.x - image.width/2;
-			var oldy = layer.buf.offset.y - image.height/2;
-			var undo, redo;
-			if (layer.buf.bounds) {
-				var olddata = layer.buf.getData(image.width,image.height);
-				undo = function() {
-					layer.buf.clear(oldx,oldy,image.width,image.height);
-					layer.buf.loadData(olddata,oldx,oldy);
-					return true;
-				};
-			} else {
-				undo = function() {
-					layer.buf.clear(oldx,oldy,image.width,image.height);
-					return true;
-				};
-			}
-			redo = function() {
-				layer.load(image);
-				return true;
-			};
-			_this.actionWrapper(undo,redo,layer);
-		},
 		endDraw: function() {
 			if (actions[index]) {
 				actions[index].complete();

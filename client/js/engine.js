@@ -1,5 +1,5 @@
 define(["actions","layer","canvas"],function Engine(Actions, Layer, Canvas) {
-	var _this, actions, canvas, context;
+	var _this, actions, canvas, context, uploadPreview;
 	var bg, buf, s, pressed, mode, colorsel, layers, order, activeLayer = -1;
 	var host = /[^\/]+\/\/[^\/]+/g.exec(window.location.href) + g.proxyPrefix;
 	var sizes = [6,8,10,15,20,24,30], cursor, dotted, drawing, moving;
@@ -24,6 +24,7 @@ define(["actions","layer","canvas"],function Engine(Actions, Layer, Canvas) {
 			buf = new Canvas(g.width,g.height);
 			bg = new Canvas(g.width,g.height);
 			cursor = new Canvas(sizes[s],sizes[s]);
+			uploadPreview = new Canvas(450,257,$('#upload-preview').get(0));
 			selected = false;
 			clipboard = false;
 			colorsel = new Object();
@@ -552,13 +553,6 @@ define(["actions","layer","canvas"],function Engine(Actions, Layer, Canvas) {
 				}
 			}
 		},
-		load: function(image) {
-			_this.unloadSelected();
-			_this.addLayer();
-			actions.load(layers[activeLayer],image);
-			_this.queueSave();
-			_this.refreshBackground();
-		},
 		resetWorkspace: function() {
 			var toRemove = layers.splice(1,layers.length-1);
 			for (var i in toRemove) {
@@ -795,6 +789,66 @@ define(["actions","layer","canvas"],function Engine(Actions, Layer, Canvas) {
 			$.get(host+'/deleteworkspace');
 			log.info('workspace purged on restart');
 		},
+		upload: function(image) {
+			if (image.width <= buf.canvas.width && image.height <= buf.canvas.height) {
+				_this.load('loadActualSize',image);
+				return;
+			}
+			uploadPreview.loadActualSize(image);
+			var dialog = $dialog = $('#upload-dialog');
+			var width = Math.max(image.width,buf.canvas.width);
+			var height = Math.max(image.height,buf.canvas.height);
+			$dialog.dialog({
+				dialogClass: "no-close",
+				modal:true,
+				draggable:false,
+				resizable:false,
+				width:473,
+				height:428,
+				title:"Load Image",
+				buttons: {
+					"Actual Size": function() {
+						if ($('#expand').is(":checked")) {
+							_this.setDimensions(width,height);
+						}
+						_this.load('loadActualSize',image);
+						$(this).dialog('close');
+					},
+					"Scale to Fit": function() {
+						_this.load('loadFit',image);
+						$(this).dialog('close');
+					},
+					"Fit Vertical": function() {
+						if ($('#expand').is(":checked")) {
+							_this.setDimensions(width,height);
+						}
+						_this.load('loadFitVertical',image);
+					},
+					"Fit Horizontal": function() {
+						if ($('#expand').is(":checked")) {
+							_this.setDimensions(width,height);
+						}
+						_this.load('loadFitHorizontal',image);
+					}
+				}
+			});
+			$('#expand').blur(); // fix jqueryui focus bug
+			$dialog.parent().find('.ui-dialog-title').css('display','inherit');
+			$dialog.dialog('close').dialog('open'); // hack to update height for adding titlebar
+			var methodMap = ['loadActualSize','loadFit','loadFitVertical','loadFitHorizontal'];
+			$dialog.next().find('.ui-button').each(function(i) {
+				$(this).hover(function(e) {
+					uploadPreview[methodMap[i]](image);
+				});
+			});
+		},
+		load: function(method,image) {
+			_this.unloadSelected();
+			_this.addLayer();
+			layers[activeLayer].load(method,image);
+			_this.queueSave();
+			_this.refreshBackground();
+		},
 		download: function() {
 			$("#exportname").keyup(function (e) {
 				if (e.keyCode == 13) { // enter key
@@ -921,15 +975,14 @@ define(["actions","layer","canvas"],function Engine(Actions, Layer, Canvas) {
 			}
 			_this.refresh(cx,cy);
 		},
-		setDimensions: function() {
-			var $input = $('#dimensions');
-			var s = $input.val();
-			s = s.split(/[^0-9]+/);
-			if (s.length > 1 && isInt(s[0]) && isInt(s[1])) {
-				var old = [g.width,g.height], restore = [];
+		setDimensions: function(width,height) {
+			width = parseInt(width);
+			height = parseInt(height);
+			if (isInt(width) && isInt(height)) {
+				var oldwidth = g.width, oldheight = g.height, restore = [];
 				var undo = function() {
-					g.width = old[0];
-					g.height = old[1];
+					g.width = oldwidth;
+					g.height = oldheight;
 					buf.setDimensions(g.width,g.height);
 					for (var i in restore) {
 						layers[i].buf.resetDimensions(restore[i]);
@@ -939,8 +992,8 @@ define(["actions","layer","canvas"],function Engine(Actions, Layer, Canvas) {
 					return true;
 				};
 				var redo = function() {
-					g.width = s[0];
-					g.height = s[1];
+					g.width = width;
+					g.height = height;
 					buf.setDimensions(g.width,g.height);
 					for (var i in layers) {
 						restore.push(layers[i].buf.setDimensions(g.width,g.height));
@@ -950,15 +1003,15 @@ define(["actions","layer","canvas"],function Engine(Actions, Layer, Canvas) {
 				};
 				actions.actionWrapper(undo,redo);
 			}
-			$('#resize-dialog').dialog('close');
-			$input.val("");
+			$('#dimensions').val("");
 		},
 		resizeCanvas: function() {
 			$('#dimensions').attr('placeholder',g.width+'x'+g.height);
 			$('#frame').attr('placeholder',g.width+'x'+g.height);
 			$("#dimensions,#frame").keyup(function (e) {
 				if (e.keyCode == 13) { // enter key
-					_this.setDimensions();
+					_this.setDimensions.apply(_this,$('#dimensions').val().split(/[^0-9]+/));
+					$('#resize-dialog').dialog('close');
 				}
 			});
 			var $dialog = $('#resize-dialog');
@@ -971,7 +1024,10 @@ define(["actions","layer","canvas"],function Engine(Actions, Layer, Canvas) {
 				height:220,
 				title: "Resize",
 				buttons: {
-					Apply: _this.setDimensions,
+					Apply: function() {
+						_this.setDimensions.apply(_this,$('#dimensions').val().split(/[^0-9]+/));
+						$(this).dialog('close');
+					},
 					Cancel: function() {
 						$(this).dialog('close');
 					}

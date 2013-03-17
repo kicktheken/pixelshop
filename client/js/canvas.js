@@ -1,7 +1,11 @@
 define(["pixel","map"],function Canvas(Pixel,Map) {
 	return Class.extend({
-		init: function(width,height) {
-			this.canvas = document.createElement('canvas');
+		init: function(width,height,canvas) {
+			if (canvas) {
+				this.canvas = canvas;
+			} else {
+				this.canvas = document.createElement('canvas');
+			}
 			this.canvas.width = width;
 			this.canvas.height = height;
 			this.context = this.canvas.getContext('2d');
@@ -107,13 +111,46 @@ define(["pixel","map"],function Canvas(Pixel,Map) {
 			}
 			return new Pixel(this.context,x,y);
 		},
-		load: function(image) {
-			var x = this.offset.x-image.width/2;
-			var y = this.offset.y-image.height/2;
-			var maxx = this.offset.x+image.width/2;
-			var maxy = this.offset.y+image.height/2;
+		loadActualSize: function(image) {
+			this.clear();
+			var x = Math.max(Math.ceil((this.canvas.width-image.width)/2),0);
+			var y = Math.max(Math.ceil((this.canvas.height-image.height)/2),0);
+			var width = Math.min(this.canvas.width,image.width);
+			var height = Math.min(this.canvas.height,image.height);
 			this.context.drawImage(image,x,y);
-			this.updateBounds(x,y,maxx,maxy);
+			this.updateBounds(x,y,x+width,y+height);
+		},
+		loadFit: function(image) {
+			this.clear();
+			var hs = this.canvas.width/image.width;
+			var vs = this.canvas.height/image.height;
+			this.context.save();
+			this.context.scale(hs,vs);
+			this.context.drawImage(image,0,0);
+			this.context.restore();
+			this.updateBounds(0,0,this.canvas.width,this.canvas.height);
+		},
+		loadFitVertical: function(image) {
+			this.clear();
+			var x = Math.max(Math.ceil((this.canvas.width-image.width)/2),0);
+			var vs = this.canvas.height/image.height;
+			var width = Math.min(this.canvas.width,image.width);
+			this.context.save();
+			this.context.scale(1,vs);
+			this.context.drawImage(image,x,0);
+			this.context.restore();
+			this.updateBounds(x,0,x+width,this.canvas.height);
+		},
+		loadFitHorizontal: function(image) {
+			this.clear();
+			var y = Math.max(Math.ceil((this.canvas.height-image.height)/2),0);
+			var hs = this.canvas.width/image.width;
+			var height = Math.min(this.canvas.height,image.height);
+			this.context.save();
+			this.context.scale(hs,1);
+			this.context.drawImage(image,0,y);
+			this.context.restore();
+			this.updateBounds(0,y,this.canvas.width,y+height);
 		},
 		loadData: function(data,x,y) {
 			this.context.putImageData(data,x,y);

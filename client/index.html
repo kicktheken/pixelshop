@@ -19,7 +19,7 @@ if (document.styleSheets[0].cssRules.length === 0) { // for development
 			<a class="brand" href="#"><i class="icon-space-invaders"></i>Pixelshop</a>
 			<div class="input-prepend input-append">
 				<button id="upload" class="btn btn-warning"><i class="icon-upload-alt"></i></button>
-				<input type="text" class="searchbox" placeholder="Image Link or Search Library" />
+				<input type="text" class="searchbox" placeholder="Image Link" />
 				<button id="download" class="btn btn-primary"><i class="icon-download-alt"></i></button>
 			</div>
 			<ul class="nav pull-right">
@@ -101,21 +101,14 @@ if (document.styleSheets[0].cssRules.length === 0) { // for development
 	</fieldset>
 </div>
 <div id="upload-dialog" style="display:none;">
-	<fieldset>
-		<label class="numeric">
-			Dimensions:
-			<input id="dimensions" type="text">
-		</label>
-		<hr />
-		<label class="numeric">
-			Frame:
-			<input id="frame" type="text"></label>
-	</fieldset>
+	<canvas id="upload-preview"></canvas>
+	<label><input type="checkbox" id="expand">Expand on overflow</label>
 </div>
 <form method="POST">
 	<input type="hidden" id="filename" name="name" value="export" />
 	<input type="hidden" id="hidden" name="data" value="" />
 </form>
+<input type="file" id="upload-file">
 
 <!-- load scripts at end -->
 <script type="text/javascript" src="js/main-built.js"></script>

@@ -95,8 +95,8 @@ define(["canvas"], function Layer(Canvas) {
 			this.buf.reset();
 			this.refresh();
 		},
-		load: function(image) {
-			this.buf.load(image);
+		load: function(method,image) {
+			this.buf[method](image);
 			this.refresh();
 		},
 		draw: function(pixel) {
