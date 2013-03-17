@@ -55,10 +55,10 @@ define(["canvas"], function Layer(Canvas) {
 			this.preview.height = pcanvas.height;
 			this.buf = new Canvas(g.width,g.height);
 			this.visible = true;
-			this.initEvents(i);
+			this.initEvents(index);
 		},
-		initEvents: function(i) {
-			var _this = this, index = i+1;
+		initEvents: function(index) {
+			var _this = this;
 			$('#eyelayer'+index).click(function(e) {
 				if (_this.visible) {
 					_this.visible = false;
