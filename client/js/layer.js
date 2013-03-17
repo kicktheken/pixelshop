@@ -69,9 +69,6 @@ define(["canvas"], function Layer(Canvas) {
 				}
 				g.Engine.refresh();
 			});
-			$('#li-layer'+index+' a').click(function(e) {
-				g.Engine.setActiveLayer(i);
-			});
 		},
 		copy: function(layer) {
 			this.buf.copy(layer.buf);
