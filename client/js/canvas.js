@@ -291,7 +291,7 @@ define(["pixel","map"],function Canvas(Pixel,Map) {
 		getViewData: function(x,y,width,height) {
 			x += Math.ceil(this.canvas.width/2) - Math.ceil(width/2);
 			y += Math.ceil(this.canvas.height/2) - Math.ceil(height/2);
-			return this.context.getImageData(x,y,width,height);
+			return this.context.getImageData(x,y,width+1,height+1);
 		},
 		getViewDataFromBounds: function(width,height) {
 			if (!this.bounds) {
