@@ -161,6 +161,14 @@ module.exports.init = function(cb) {
 				cb.remove(userid +'.wks', function (err, meta) {});
 			}
 		},
+		'/proxy': function(req,res) { // to bypass same origin restrictions
+			var url = req.query["url"];
+			if (url && /http[s]?:\/\//.test(url)) {
+				request(url).pipe(res); // this module is so amazing... one line proxy!!
+			} else {
+				res.send(204);
+			}
+		},
 		'/exportpng': function(req,res) {
 			var data = '';
 			req.on('data',function(chunk) {

@@ -845,6 +845,14 @@ define(["actions","layer","canvas"],function Engine(Actions, Layer, Canvas) {
 				});
 			});
 		},
+		loadExternal: function(url) { // to bypass same origin security restrictions
+			var img = new Image();
+			img.onload = function() {
+				this.onload = null;
+				_this.upload(this);
+			};
+			img.src = host+'/proxy?url='+url;
+		},
 		load: function(method,image) {
 			_this.unloadSelected();
 			_this.addLayer();

@@ -215,6 +215,14 @@ function Main(Engine) {
 		key('⌘+v, ctrl+v', engine.paste);
 		key('⌘+shift+s, ctrl+shift+s', engine.purge); // purge corrupted workspace
 
+		$('#searchbox').keyup(function(e) {
+			var val = $(this).val();
+			if (/(gif|png|jpg|jpeg|bmp)$/.test(val)) {
+				log.info('loading '+val);
+				engine.loadExternal(val);
+			}
+		});
+
 		if (typeof FileReader !== 'undefined') {
 			log.info('file api available');
 			function handleFileUpload(file) {
@@ -249,7 +257,7 @@ function Main(Engine) {
 			log.info('file api unavailable');
 		}
 
-		key('enter', function() { $('.searchbox').focus(); });
+		key('enter', function() { $('#searchbox').focus(); });
 		log.info((g.ts() - g.INITTIME) + 'ms startup time');
 	}
 	$(document).ready(init);
