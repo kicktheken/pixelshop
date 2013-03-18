@@ -2,11 +2,17 @@
 <html lang="en">
 <head>
 <meta charset="utf-8" />
+<meta http-equiv="cache-control" content="max-age=0" />
+<meta http-equiv="cache-control" content="no-cache" />
+<meta http-equiv="expires" content="0" />
+<meta http-equiv="expires" content="Tue, 01 Jan 1980 1:00:00 GMT" />
+<meta http-equiv="pragma" content="no-cache" />
 <title>Pixelshop</title>
 <link rel="shortcut icon" href="favicon.ico" />
-<link href="css/main-built.css" rel="stylesheet" type="text/css" />
 <script type="text/javascript">
-if (document.styleSheets[0].cssRules.length === 0) { // for development
+var version = "v0.5"; // I have to manually increment this and the main-built.js version... <sob>
+document.write('<link href="css/main-built.css?v='+version+'" rel="stylesheet" type="text/css" />');
+if (!document.styleSheets[0] || document.styleSheets[0].cssRules.length === 0) { // for development
 	document.write('<link href="css/main.css" rel="stylesheet" type="text/css" />');
 }
 </script>
@@ -16,7 +22,7 @@ if (document.styleSheets[0].cssRules.length === 0) { // for development
 <div class="navbar navbar-static-top">
 	<div class="navbar-inner">
 		<div class="container">
-			<a class="brand" href="#"><i class="icon-space-invaders"></i>Pixelshop</a>
+			<a class="brand" href="#"><i class="icon-space-invaders"></i>Pixelshop <small></small></a>
 			<div class="input-prepend input-append">
 				<button id="upload" class="btn btn-warning"><i class="icon-upload-alt"></i></button>
 				<input type="text" id="searchbox" placeholder="Image Link" />
@@ -25,6 +31,7 @@ if (document.styleSheets[0].cssRules.length === 0) { // for development
 			<ul class="nav pull-right">
 				<li><a id="email" class="pull-right"></a></li>
 				<li><a id="signin" class="btn btn-danger" href="#">Sign in</a></li>
+				<li><a id="feedback" href="#">Feedback <i class="icon-question-sign"></i></a></li>
 			</ul>
 		</div>
 	</div>
@@ -104,6 +111,22 @@ if (document.styleSheets[0].cssRules.length === 0) { // for development
 	<canvas id="upload-preview"></canvas>
 	<label><input type="checkbox" id="expand">Expand on overflow</label>
 </div>
+<div id="feedback-dialog" style="display:none;">
+	<label><input type='checkbox'> Draw lines</input></label>
+	<label><input type='checkbox'> Resizable selection box</input></label>
+	<label><input type='checkbox'> More color hotkeys</input></label>
+	<label><input type='checkbox'> Resizable selection box</input></label>
+	<label><input type='checkbox'> Minimap window</input></label>
+	<label><input type='checkbox'> History window</input></label>
+	<label><input type='checkbox'> Load common colors from layer</input></label>
+	<label><input type='checkbox'> Save/search/load color palettes from other users</input></label>
+	<label><input type='checkbox'> Save/search/load pictures from other users</input></label>
+	<label><input type='checkbox'> Create animations</input></label>
+	<label><input type='checkbox'> Optimize large canvases</input></label>
+	<label><input type='checkbox'> Fix bug:</input></label>
+	<label><input type='checkbox'> Other:</input></label>
+	<textarea rows='4' cols='90'></textarea>
+</div>
 <form method="POST">
 	<input type="hidden" id="filename" name="name" value="export" />
 	<input type="hidden" id="hidden" name="data" value="" />
@@ -111,8 +134,11 @@ if (document.styleSheets[0].cssRules.length === 0) { // for development
 <input type="file" id="upload-file">
 
 <!-- load scripts at end -->
-<script type="text/javascript" src="js/main-built.js"></script>
+<script type="text/javascript" src="js/main-built.js?v=v0.5"></script>
 <script type="text/javascript">
+if (typeof jQuery !== "function") { // for development
+	document.write("<scr"+"ipt data-main='js/home' src='js/lib/require.js'></scr"+"ipt>");
+}
 var _gaq = _gaq || [];
 _gaq.push(['_setAccount', window.googlekey]);
 _gaq.push(['_trackPageview']);
@@ -122,9 +148,6 @@ var ga = document.createElement('script'); ga.type = 'text/javascript'; ga.async
 ga.src = ('https:' == document.location.protocol ? 'https://ssl' : 'http://www') + '.google-analytics.com/ga.js';
 var s = document.getElementsByTagName('script')[0]; s.parentNode.insertBefore(ga, s);
 })();
-if (typeof jQuery !== "function") { // for development
-	document.write("<scr"+"ipt data-main='js/home' src='js/lib/require.js'></scr"+"ipt>");
-}
 </script>
 
 </body>

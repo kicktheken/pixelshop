@@ -1129,6 +1129,28 @@ define(["actions","layer","canvas"],function Engine(Actions, Layer, Canvas) {
 				_this.refresh();
 			}
 		},
+		feedback: function() {
+			var $dialog = $('#feedback-dialog');
+			$dialog.dialog({
+				dialogClass: "no-close",
+				modal:true,
+				draggable:false,
+				resizable:false,
+				width:400,
+				height:550,
+				title: "What to Improve?",
+				buttons: {
+					Submit: function() {
+						$(this).dialog('close');
+					},
+					Cancel: function() {
+						$(this).dialog('close');
+					}
+				}
+			});
+			$dialog.parent().find('.ui-dialog-title').css('display','inherit');
+			$dialog.dialog('close').dialog('open'); // hack to update height for adding titlebar
+		},
 		cursorMove: function(x,y) {
 			if (!pressed) {
 				_this.refresh(x,y);

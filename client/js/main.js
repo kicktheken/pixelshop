@@ -20,6 +20,7 @@ function Main(Engine) {
 		g.height = 30;
 		g.INITTIME = g.ts();
 
+		$('.brand small').html(version);
 		$('.buttonset').buttonset();
 		g.mobile = 'ontouchstart' in window;
 		g.cursorstart = (g.mobile) ? 'touchstart' : 'mousedown';
@@ -208,6 +209,7 @@ function Main(Engine) {
 			$('#upload-file').get(0).dispatchEvent(e);
 		});
 		$('#resize').click(engine.resizeCanvas);
+		$('#feedback').click(engine.feedback);
 		key('⌘+z, ctrl+z', engine.undo);
 		key('⌘+shift+z, ctrl+shift+z', engine.redo);
 		key('⌘+c, ctrl+c', engine.copy);

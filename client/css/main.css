@@ -16,6 +16,9 @@ canvas
 {
 	display:block;
 }
+.brand small {
+	font-size:50%;
+}
 a:focus {
 	outline: none;
 }
@@ -40,7 +43,7 @@ form {
 .container .input-prepend {
 	position:relative;
 	top:5px;
-	width:50%;
+	width:45%;
 	min-width:300px;
 }
 .no-close .ui-dialog-titlebar-close {
@@ -206,4 +209,13 @@ hr {
 }
 #expand {
 	margin:0 10px;
+}
+#feedback-dialog {
+	padding:10px;
+}
+#feedback-dialog input {
+	vertical-align:top;
+}
+#feedback-dialog textarea {
+	width: 368px;
 }
