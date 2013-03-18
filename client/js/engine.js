@@ -24,7 +24,7 @@ define(["actions","layer","canvas"],function Engine(Actions, Layer, Canvas) {
 			buf = new Canvas(g.width,g.height);
 			bg = new Canvas(g.width,g.height);
 			cursor = new Canvas(sizes[s],sizes[s]);
-			uploadPreview = new Canvas(450,257,$('#upload-preview').get(0));
+			uploadPreview = new Canvas(497,257,$('#upload-preview').get(0));
 			selected = false;
 			clipboard = false;
 			colorsel = new Object();
@@ -806,7 +806,7 @@ define(["actions","layer","canvas"],function Engine(Actions, Layer, Canvas) {
 				modal:true,
 				draggable:false,
 				resizable:false,
-				width:473,
+				width:520,
 				height:428,
 				title:"Load Image",
 				buttons: {
@@ -826,16 +826,23 @@ define(["actions","layer","canvas"],function Engine(Actions, Layer, Canvas) {
 							_this.setDimensions(width,height);
 						}
 						_this.load('loadFitVertical',image);
+						$(this).dialog('close');
 					},
 					"Fit Horizontal": function() {
 						if ($('#expand').is(":checked")) {
 							_this.setDimensions(width,height);
 						}
 						_this.load('loadFitHorizontal',image);
+						$(this).dialog('close');
+					},
+					"Cancel": function() {
+						$(this).dialog('close');
 					}
 				}
 			});
-			$('#expand').blur(); // fix jqueryui focus bug
+			$('#expand').focus(function(e) { // fix jqueryui focus bug
+				$(this).blur();
+			}).blur();
 			$dialog.parent().find('.ui-dialog-title').css('display','inherit');
 			$dialog.dialog('close').dialog('open'); // hack to update height for adding titlebar
 			var methodMap = ['loadActualSize','loadFit','loadFitVertical','loadFitHorizontal'];

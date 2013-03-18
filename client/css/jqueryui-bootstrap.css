@@ -2061,7 +2061,7 @@ textarea,
 
 /***Dialog fixes**/
 
-.ui-dialog-buttonset .ui-button:nth-child(2) {
+.ui-dialog-buttonset .ui-button:last-child {
   cursor: pointer;
   display: inline-block;
   background-color: #e6e6e6;
