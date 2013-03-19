@@ -48,6 +48,10 @@ define(["pixel","map"],function Canvas(Pixel,Map) {
 			var x = pixel.x, y = pixel.y;
 			this.updateBounds(x,y,x,y);
 		},
+		isValid: function(p) {
+			return p.x < this.canvas.width && p.x >= 0 &&
+				p.y < this.canvas.height && p.y >=0;
+		},
 		fill: function(pixel,map) {
 			if (typeof map === 'undefined') {
 				map = this.map = new Map();

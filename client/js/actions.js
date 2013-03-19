@@ -15,7 +15,7 @@ define(["action","pixel"], function Actions(Action,Pixel) {
 		draw: function(layer,color,x,y) {
 			var oldp = layer.buf.pixel(x,y);
 			var newp = layer.buf.pixel(x,y,color);
-			if (!newp.diffColor(oldp)) {
+			if (!newp.diffColor(oldp) || !layer.buf.isValid(newp)) {
 				return false;
 			}
 			var undoPixels = [oldp], redoPixels = [newp];
@@ -64,7 +64,7 @@ define(["action","pixel"], function Actions(Action,Pixel) {
 		fill: function(layer,color,x,y) {
 			var oldp = layer.buf.pixel(x,y);
 			var newp = layer.buf.pixel(x,y,color);
-			if (!newp.diffColor(oldp)) {
+			if (!newp.diffColor(oldp) || !layer.buf.isValid(newp)) {
 				return false;
 			}
 			var map;
