@@ -56,6 +56,8 @@ define(["pixel","map"],function Canvas(Pixel,Map) {
 			if (typeof map === 'undefined') {
 				map = this.map = new Map();
 				this.fillColor(new Pixel(this.context,pixel.x,pixel.y),pixel);
+				var b = map.bounds;
+				this.updateBounds(b[0],b[1],b[2],b[3]);
 				delete this.map;
 				return map;
 			} else {
