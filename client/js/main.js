@@ -216,6 +216,7 @@ function Main(Engine) {
 		key('⌘+c, ctrl+c', engine.copy);
 		key('⌘+x, ctrl+x', engine.cut);
 		key('⌘+v, ctrl+v', engine.paste);
+		key('⌘+a, ctrl+a', engine.selectAll);
 		key('⌘+shift+s, ctrl+shift+s', engine.purge); // purge corrupted workspace
 
 		$('#searchbox').keyup(function(e) {

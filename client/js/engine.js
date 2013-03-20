@@ -974,6 +974,17 @@ define(["actions","layer","canvas"],function Engine(Actions, Layer, Canvas) {
 			}
 			_this.refresh(cx,cy);
 		},
+		selectAll: function() {
+			if (mode !== 'select') {
+				mode = 'select';
+				$('[name="radio"]').removeAttr("checked").button('refresh');
+				// jquery ui bug? have to explicitly highlight
+				$('label[for="select"]').addClass("ui-state-active");
+			}
+			_this.unloadSelected();
+			selected = { width:g.width, height:g.height, x:0, y:0, done:true};
+			_this.refresh();
+		},
 		setDimensions: function(width,height) {
 			width = parseInt(width);
 			height = parseInt(height);
