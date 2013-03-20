@@ -67,10 +67,8 @@ define(["actions","layer","canvas"],function Engine(Actions, Layer, Canvas) {
 			});
 			$("#layers").dialog({
 				dialogClass: "no-close",
-				position: [canvas.width-129,100],
-				resizable: false,
-				width:129,
-				minWidth:129,
+				position: [canvas.width-140,100],
+				width:140,
 				height:400
 			});
 			$(".ui-dialog").draggable("option", "containment", "#canvas");
@@ -1022,7 +1020,7 @@ define(["actions","layer","canvas"],function Engine(Actions, Layer, Canvas) {
 				draggable:false,
 				resizable:false,
 				width:190,
-				height:220,
+				height:222,
 				title: "Resize",
 				buttons: {
 					Apply: function() {

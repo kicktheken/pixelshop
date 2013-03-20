@@ -102,7 +102,9 @@ form {
 #searchbox {
 	width:100%;
 }
-
+#colors {
+	overflow:hidden;
+}
 #colors li {
 	height:32px;
 }
