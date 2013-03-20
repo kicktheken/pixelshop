@@ -151,8 +151,8 @@ function Main(Engine) {
 			tooltip(e,title+uk(paintKeys[i].toUpperCase()));
 		});
 		var metakey = (/Mac OS/i.test(navigator.userAgent)) ? '⌘' : 'Ctrl';
-		tooltip('#zoomin','Zoom In');
-		tooltip('#zoomout','Zoom Out');
+		tooltip('#zoomin','Zoom In'+uk('+'));
+		tooltip('#zoomout','Zoom Out'+uk('-'));
 		tooltip('#undo','Undo'+uks(metakey,'Z'));
 		tooltip('#redo','Redo'+uks(metakey,'shift','Z'));
 		tooltip('#resize','Resize');
@@ -217,6 +217,8 @@ function Main(Engine) {
 		key('⌘+x, ctrl+x', engine.cut);
 		key('⌘+v, ctrl+v', engine.paste);
 		key('⌘+a, ctrl+a', engine.selectAll);
+		key('shift+=,+', engine.zoomIn);
+		key('-', engine.zoomOut);
 		key('⌘+shift+s, ctrl+shift+s', engine.purge); // purge corrupted workspace
 
 		$('#searchbox').keyup(function(e) {

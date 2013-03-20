@@ -1,5 +1,5 @@
 //     keymaster.js
-//     (c) 2011-2012 Thomas Fuchs
+//     (c) 2011-2012 Thomas Fuchs (modified by Kenneth Chan)
 //     keymaster.js may be freely distributed under the MIT license.
 
 ;(function(global){
@@ -23,7 +23,7 @@
       right: 39, down: 40,
       del: 46, 'delete': 46,
       home: 36, end: 35,
-      pageup: 33, pagedown: 34,
+      pageup: 33, pagedown: 34, '+': 107,
       ',': 188, '.': 190, '/': 191,
       '`': 192, '-': 189, '=': 187,
       ';': 186, '\'': 222,
@@ -58,13 +58,15 @@
     var key, handler, k, i, modifiersMatch;
     key = event.keyCode;
 
-    if (index(_downKeys, key) == -1) {
-        _downKeys.push(key);
-    }
 	// numpad translation
 	if (key >= 96 && key <= 105) {
 		key-=47;
+	} else if (key === 109) { // -
+		key = 189;
 	}
+    if (index(_downKeys, key) == -1) {
+        _downKeys.push(key);
+    }
 
     // if a modifier key, set the key.<modifierkeyname> property to true and return
     if(key == 93 || key == 224) key = 91; // right command on webkit, command on Gecko
@@ -129,37 +131,41 @@
     for(k in _MODIFIERS) assignKey[k] = false;
   }
 
-  // parse and assign shortcut
-  function assignKey(key, scope, method){
-    var keys, mods, i, mi;
-    if (method === undefined) {
-      method = scope;
-      scope = 'all';
-    }
-    key = key.replace(/\s/g,'');
-    keys = key.split(',');
+	// parse and assign shortcut
+	function assignKey(key, scope, method){
+		var keys, mods, i, mi;
+		if (method === undefined) {
+			method = scope;
+			scope = 'all';
+		}
+		key = key.replace(/\s/g,'');
+		keys = key.split(',');
 
-    if((keys[keys.length-1])=='')
-      keys[keys.length-2] += ',';
-    // for each shortcut
-    for (i = 0; i < keys.length; i++) {
-      // set modifier keys if any
-      mods = [];
-      key = keys[i].split('+');
-      if(key.length > 1){
-        mods = key.slice(0,key.length-1);
-        for (mi = 0; mi < mods.length; mi++)
-          mods[mi] = _MODIFIERS[mods[mi]];
-        key = [key[key.length-1]];
-      }
-      // convert to keycode and...
-      key = key[0]
-      key = code(key);
-      // ...store handler
-      if (!(key in _handlers)) _handlers[key] = [];
-      _handlers[key].push({ shortcut: keys[i], scope: scope, method: method, key: keys[i], mods: mods });
-    }
-  };
+		if((keys[keys.length-1])=='')
+			keys[keys.length-2] += ',';
+		// for each shortcut
+		for (i = 0; i < keys.length; i++) {
+			// set modifier keys if any
+			mods = [];
+			if (keys[i] === '+') {
+				key = '+';
+			} else {
+				key = keys[i].split('+');
+				if (key.length > 1) {
+					mods = key.slice(0,key.length-1);
+					for (mi = 0; mi < mods.length; mi++)
+						mods[mi] = _MODIFIERS[mods[mi]];
+					key = [key[key.length-1]];
+				}
+				// convert to keycode and...
+				key = key[0]
+			}
+			key = code(key);
+			// ...store handler
+			if (!(key in _handlers)) _handlers[key] = [];
+			_handlers[key].push({ shortcut: keys[i], scope: scope, method: method, key: keys[i], mods: mods });
+		}
+	};
 
   // Returns true if the key with code 'keyCode' is currently down
   // Converts strings into key codes.

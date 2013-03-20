@@ -112,6 +112,9 @@ form {
 	margin-left:8px;
 	margin-right:0;
 }
+#toolbar {
+	overflow:hidden;
+}
 #layers li {
 	height:30px;
 }
