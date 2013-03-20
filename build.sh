@@ -21,14 +21,8 @@ if [ ! -f "$DIR/config.js" ]; then
 fi
 
 cd $DIR
-if [ ! -e "$JSDIR/config.js" ]; then
-    echo "One time symlink of $JSDIR/config.js"
-    ln -s "$DIR/config.js" "$JSDIR/config.js"
-fi
-if [ ! -e "$SERVERDIR/config.js" ]; then
-    echo "One time symlink of $SERVERDIR/config.js"
-    ln -s "$DIR/config.js" "$SERVERDIR/config.js"
-fi
+cp "$DIR/config.js" "$JSDIR/config.js"
+cp  "$DIR/config.js" "$SERVERDIR/config.js"
 echo "Building client with RequireJS w/ Almond"
 cd $JSDIR
 node ../../r.js -o build.js

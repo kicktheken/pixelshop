@@ -157,7 +157,7 @@ function Main(Engine) {
 		tooltip('#resize','Resize');
 		tooltip('#addlayer','Add Layer');
 		tooltip('#clonelayer','Clone Layer');
-		tooltip('#combinelayer','Combine Layer');
+		tooltip('#combinelayer','Combine Down Layer');
 		tooltip('#removelayer','Remove Layer');
 		tooltip('#download','Download','bottom');
 		tooltip('#upload','Upload','bottom');

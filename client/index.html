@@ -112,20 +112,20 @@ if (!document.styleSheets[0] || document.styleSheets[0].cssRules.length === 0) {
 	<label><input type="checkbox" id="expand">Expand on overflow</label>
 </div>
 <div id="feedback-dialog" style="display:none;">
-	<label><input type='checkbox'> Draw lines</input></label>
-	<label><input type='checkbox'> Resizable selection box</input></label>
-	<label><input type='checkbox'> More color hotkeys</input></label>
-	<label><input type='checkbox'> Resizable selection box</input></label>
-	<label><input type='checkbox'> Minimap window</input></label>
-	<label><input type='checkbox'> History window</input></label>
-	<label><input type='checkbox'> Load common colors from layer</input></label>
-	<label><input type='checkbox'> Save/search/load color palettes from other users</input></label>
-	<label><input type='checkbox'> Save/search/load pictures from other users</input></label>
-	<label><input type='checkbox'> Create animations</input></label>
-	<label><input type='checkbox'> Optimize large canvases</input></label>
-	<label><input type='checkbox'> Fix bug:</input></label>
-	<label><input type='checkbox'> Other:</input></label>
-	<textarea rows='4' cols='90'></textarea>
+	<label><input type='checkbox' name="f0"> Draw lines</label>
+	<label><input type='checkbox' name="f1"> Resizable selection box</label>
+	<label><input type='checkbox' name="f2"> More color hotkeys</label>
+	<label><input type='checkbox' name="f3"> Resizable selection box</label>
+	<label><input type='checkbox' name="f4"> Minimap window</label>
+	<label><input type='checkbox' name="f5"> History window</label>
+	<label><input type='checkbox' name="f6"> Load common colors from layer</label>
+	<label><input type='checkbox' name="f7"> Save/search/load color palettes from other users</label>
+	<label><input type='checkbox' name="f8"> Save/search/load pictures from other users</label>
+	<label><input type='checkbox' name="f9"> Create animations</label>
+	<label><input type='checkbox' name="f10"> Optimize large canvases</label>
+	<label><input type='checkbox' name="bug"> Fix bug:</label>
+	<label><input type='checkbox' name="other"> Other:</label>
+	<textarea rows='4' cols='90' name="textbox"></textarea>
 </div>
 <form method="POST">
 	<input type="hidden" id="filename" name="name" value="export" />

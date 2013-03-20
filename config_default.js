@@ -6,6 +6,11 @@ var config = {
 		redirect_uri: "", // use root path of hostname
 		client_id: ""
 	},
+	mailgun: {
+		api_key: "",
+		domain: "",
+		to: ""
+	},
 	oauthURL: "https://www.googleapis.com/oauth2/v1/userinfo?access_token=",
 	oauthPrefix: "goog_user_",
 	sslkey: "/path/to/ssl/key",

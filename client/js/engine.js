@@ -1141,6 +1141,18 @@ define(["actions","layer","canvas"],function Engine(Actions, Layer, Canvas) {
 				title: "What to Improve?",
 				buttons: {
 					Submit: function() {
+						var checklist = [], textarea = "";
+						$('#feedback-dialog input,textarea').each(function(i) {
+							if ("INPUT" == $(this).prop("tagName")) {
+								if ($(this).is(':checked')) {
+									checklist.push($(this).attr('name'));
+								}
+							} else {
+								textarea = $(this).val();
+							}
+						});
+						var tosend = "v="+version+"&check="+checklist.join(',')+'&text='+textarea;
+						$.post(host+'/feedback', tosend);
 						$(this).dialog('close');
 					},
 					Cancel: function() {

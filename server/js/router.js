@@ -1,6 +1,10 @@
 var crypto = require('crypto');
 var request = require('request');
 var config = require('./config');
+var mailgun = false;
+if (config.mailgun && config.mailgun.api_key.length > 0 && config.mailgun.api_key.length > 0) {
+	mailgun = require('mailgun-js')(config.mailgun.api_key, config.mailgun.domain);
+}
 
 function sha1(s) {
 	return crypto.createHash('sha1').update(s).digest('hex');
@@ -168,6 +172,31 @@ module.exports.init = function(cb) {
 			} else {
 				res.send(204);
 			}
+		},
+		'/feedback': function(req,res) {
+			var data = '';
+			req.on('data',function(chunk) {
+				data += chunk;
+			});
+			req.on('end',function() {
+				var info = req.header('x-real-ip') || req.connection.remoteAddress;
+				info += ' ' + req.headers['user-agent'];
+				data = "\n"+info+"\n"+data.replace("\n"," ");
+				if (mailgun) {
+					var tosend = {
+						from: 'Excited User <me@samples.mailgun.org>',
+						to: mailgun.to,
+						subject: 'Feedback from '+info,
+						text: data
+					};
+					mailgun.messages.send(tosend, function (error, response, body) {
+						//console.log(body);
+					});
+				} else {
+					console.log(data);
+				}
+				res.send(204);
+			});
 		},
 		'/exportpng': function(req,res) {
 			var data = '';
