@@ -920,6 +920,7 @@ define(["actions","layer","canvas"],function Engine(Actions, Layer, Canvas) {
 			var x = Math.floor((cx-canvas.width/2-pan.x)/size);
 			var y = Math.floor((cy-canvas.height/2-pan.y)/size);
 			var pixel = layers[activeLayer].buf.pixel(x,y);
+			_this.refresh(cx,cy);
 			if (pixel.isClear()) {
 				return; // don't select zero alpha pixel
 			}
@@ -1200,14 +1201,20 @@ define(["actions","layer","canvas"],function Engine(Actions, Layer, Canvas) {
 		},
 		zoomIn: function() {
 			if (s+1 < sizes.length) {
+				var oldsize = sizes[s];
 				s++;
+				pan.x = Math.round(pan.x*sizes[s]/oldsize);
+				pan.y = Math.round(pan.y*sizes[s]/oldsize);
 				_this.refreshBackground();
 				_this.updateZoom();
 			}
 		},
 		zoomOut: function() {
 			if (s > 0) {
+				var oldsize = sizes[s];
 				s--;
+				pan.x = Math.round(pan.x*sizes[s]/oldsize);
+				pan.y = Math.round(pan.y*sizes[s]/oldsize);
 				_this.refreshBackground();
 				_this.updateZoom();
 			}
