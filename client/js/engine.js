@@ -978,6 +978,12 @@ define(["actions","layer","canvas"],function Engine(Actions, Layer, Canvas) {
 			width = parseInt(width);
 			height = parseInt(height);
 			if (isInt(width) && isInt(height)) {
+				if (width > 256) {
+					width = 256;
+				}
+				if (height > 256) {
+					height = 256;
+				}
 				var oldwidth = g.width, oldheight = g.height, restore = [];
 				var undo = function() {
 					g.width = oldwidth;
@@ -1020,7 +1026,7 @@ define(["actions","layer","canvas"],function Engine(Actions, Layer, Canvas) {
 				draggable:false,
 				resizable:false,
 				width:190,
-				height:222,
+				height:168,
 				title: "Resize",
 				buttons: {
 					Apply: function() {

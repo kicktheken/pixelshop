@@ -16,8 +16,8 @@ function Main(Engine) {
 
 		// default globals
 		g.ts = function() { return new Date().getTime(); };
-		g.width = 30;
-		g.height = 30;
+		g.width = 40;
+		g.height = 40;
 		g.INITTIME = g.ts();
 
 		$('.brand small').html(version);
@@ -33,8 +33,10 @@ function Main(Engine) {
 			$(this).blur();
 		}).blur();
 		$('#addlayer').focus(function(e) {
-			$(this).blur().tooltip('hide');
-		}).blur().click(engine.addLayer);
+			$(this).blur();
+		}).blur().click(engine.addLayer).mouseout(function(e) {
+			$(this).tooltip('hide');
+		});
 		$('#clonelayer').click(engine.cloneLayer);
 		$('#combinelayer').click(engine.combineLayer);
 		$('#removelayer').click(engine.removeLayer);
