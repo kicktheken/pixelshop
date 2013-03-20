@@ -48,6 +48,20 @@ define(["pixel","map"],function Canvas(Pixel,Map) {
 			var x = pixel.x, y = pixel.y;
 			this.updateBounds(x,y,x,y);
 		},
+		drawData: function(d,p) {
+			var i = (p.x+p.y*this.canvas.width)*4;
+			d.data[i] = p.d.data[0];
+			d.data[i+1] = p.d.data[1];
+			d.data[i+2] = p.d.data[2];
+			d.data[i+3] = p.d.data[3];
+		},
+		diffColor: function(d,p,x,y) {
+			var i = (x+y*this.canvas.width)*4;
+			return d.data[i] !== p.d.data[0]
+				|| d.data[i+1] !== p.d.data[1]
+				|| d.data[i+2] !== p.d.data[2]
+				|| d.data[i+3] !== p.d.data[3];
+		},
 		isValid: function(p) {
 			return p.x < this.canvas.width && p.x >= 0 &&
 				p.y < this.canvas.height && p.y >=0;
@@ -78,10 +92,11 @@ define(["pixel","map"],function Canvas(Pixel,Map) {
 		},
 		fillColor: function(oldp) {
 			var p, np, i = 0;
+			var d = this.context.getImageData(0,0,this.canvas.width,this.canvas.height);
 			while (this.queue.length > 0 && i < 10000) {
 				p = this.queue.shift();
-				if (!oldp.diffColor(new Pixel(this.context,p.x,p.y))) {
-					p.draw(this.context);
+				if (!this.diffColor(d,oldp,p.x,p.y)) {
+					this.drawData(d,p);
 					this.map.set(p.x,p.y,true);
 					if (p.x < this.canvas.width-1 && typeof this.map.get(p.x+1,p.y) !== 'boolean') {
 						this.map.set(p.x+1,p.y,false);
@@ -103,6 +118,7 @@ define(["pixel","map"],function Canvas(Pixel,Map) {
 				}
 				i++;
 			}
+			this.context.putImageData(d,0,0);
 			return (this.queue.length === 0);
 		},
 		fillMap: function(pixel,m) {
