@@ -61,6 +61,10 @@
     if (index(_downKeys, key) == -1) {
         _downKeys.push(key);
     }
+	// numpad translation
+	if (key >= 96 && key <= 105) {
+		key-=47;
+	}
 
     // if a modifier key, set the key.<modifierkeyname> property to true and return
     if(key == 93 || key == 224) key = 91; // right command on webkit, command on Gecko
