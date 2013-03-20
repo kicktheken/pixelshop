@@ -1,4 +1,4 @@
-define(["actions","layer","canvas"],function Engine(Actions, Layer, Canvas) {
+define(["actions","layer","canvas","pixel"],function Engine(Actions, Layer, Canvas, Pixel) {
 	var _this, actions, canvas, context, uploadPreview;
 	var bg, buf, s, pressed, mode, colorsel, layers, order, activeLayer = -1;
 	var host = /[^\/]+\/\/[^\/]+/g.exec(window.location.href) + g.proxyPrefix;
@@ -923,6 +923,10 @@ define(["actions","layer","canvas"],function Engine(Actions, Layer, Canvas) {
 			_this.refresh(cx,cy);
 			if (pixel.isClear()) {
 				return; // don't select zero alpha pixel
+			}
+			var p = new Pixel(colorsel.c,x,y);
+			if (!p.diffColor(pixel)) {
+				return;
 			}
 			$('#color'+colorsel.i).spectrum('set',pixel.toColorString());
 			_this.setColor();
