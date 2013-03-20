@@ -66,12 +66,14 @@ module.exports.init = function(cb) {
 			if (email) {
 				data.email = email;
 			}
+			console.log("sending key: "+key);
 			res.send(data);
 			res.end();
 			if (email) {
 				cbSet(key,data);
 			}
 		}, function(err) {
+			console.log("failed to fetch key: "+key);
 			if (email) {
 				var data = { email: email };
 				res.send(data);

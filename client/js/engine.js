@@ -602,6 +602,7 @@ define(["actions","layer","canvas"],function Engine(Actions, Layer, Canvas) {
 					});
 				}
 				if (!workspace.layers) {
+					_this.defaultWorkspace();
 					return;
 				}
 				var binarray = [];
