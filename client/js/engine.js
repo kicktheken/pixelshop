@@ -2,7 +2,7 @@ define(["actions","layer","canvas"],function Engine(Actions, Layer, Canvas) {
 	var _this, actions, canvas, context, uploadPreview;
 	var bg, buf, s, pressed, mode, colorsel, layers, order, activeLayer = -1;
 	var host = /[^\/]+\/\/[^\/]+/g.exec(window.location.href) + g.proxyPrefix;
-	var sizes = [6,8,10,15,20,24,30], cursor, dotted, drawing, moving;
+	var sizes = [6,8,10,15,20,24,30], cursor, dotted, drawing;
 	var saveTimer, saved, email, cheight = $(".container").height() + 1;
 	var darkPattern, lightPattern, medPattern, pan, selected, clipboard;
 	var authURL = "https://accounts.google.com/o/oauth2/auth";
@@ -32,7 +32,6 @@ define(["actions","layer","canvas"],function Engine(Actions, Layer, Canvas) {
 			mode = 'draw';
 			saved = true;
 			drawing = false;
-			moving = false;
 			email = "";
 			_this.initDotted();
 			_this.addLayer();
@@ -53,9 +52,9 @@ define(["actions","layer","canvas"],function Engine(Actions, Layer, Canvas) {
 		initDialogs: function() {
 			$("#toolbar").dialog({
 				dialogClass: "no-close",
-				position: [canvas.width/2-274,41],
+				position: [canvas.width/2-253,41],
 				resizable: false,
-				width:552,
+				width:506,
 				height:56
 			});
 			$("#colors").dialog({
@@ -125,18 +124,18 @@ define(["actions","layer","canvas"],function Engine(Actions, Layer, Canvas) {
 			var size = sizes[s], visible = 0;
 			var width = Math.ceil(canvas.width/size);
 			var height = Math.ceil(canvas.height/size);
-			var xrem = Math.ceil(canvas.width/2)+buf.offset.x + pan.x;
+			var xrem = Math.ceil(canvas.width/2) + pan.x;
 			xrem = xrem%size - ((xrem%size > 0) ? size : 0);
-			var yrem = Math.ceil(canvas.height/2)+buf.offset.y + pan.y;
+			var yrem = Math.ceil(canvas.height/2) + pan.y;
 			yrem = yrem%size - ((yrem%size > 0) ? size : 0);
 
 			bg.context.fillStyle = darkPattern;
 			bg.context.fillRect(0,0,bg.canvas.width,bg.canvas.height);
 			var v = layers[activeLayer].buf.viewable(width,height);
 
-			var remx = Math.ceil(canvas.width/2)+buf.offset.x;
+			var remx = Math.ceil(canvas.width/2);
 			remx = remx%size - ((remx%size > 0) ? size : 0);
-			var remy = Math.ceil(canvas.height/2)+buf.offset.y;
+			var remy = Math.ceil(canvas.height/2);
 			remy = remy%size - ((remy%size > 0) ? size : 0);
 
 			var dx = pan.x-xrem+remx, dy = pan.y-yrem+remy;
@@ -184,8 +183,8 @@ define(["actions","layer","canvas"],function Engine(Actions, Layer, Canvas) {
 				cursor.context.strokeStyle = context.createPattern(dotted,"repeat");
 				cursor.context.lineWidth = 2;
 				cursor.context.strokeRect(1,1,width*size,height*size);
-				mx = mx*size + Math.ceil(canvas.width/2)+buf.offset.x + pan.x;
-				my = my*size + Math.ceil(canvas.height/2)+buf.offset.y + pan.y;
+				mx = mx*size + Math.ceil(canvas.width/2) + pan.x;
+				my = my*size + Math.ceil(canvas.height/2) + pan.y;
 				context.drawImage(cursor.canvas,mx,my);
 				if (selected.done && cx >= mx && cx <= mx+width*size && cy >= my && cy <= my+height*size) {
 					canvas.style.cursor = "move";
@@ -212,8 +211,6 @@ define(["actions","layer","canvas"],function Engine(Actions, Layer, Canvas) {
 			$(canvas).removeClass();
 			if (mode === 'pan') {
 				$(canvas).addClass((pressed) ? "handclosed" : "handopen");
-			} else if (mode === 'move') {
-				canvas.style.cursor = "move";
 			} else if (typeof cx !== 'undefined' && typeof cy !== 'undefined') {
 				cx = Math.floor((cx-xrem)/size)*size + xrem - 1;
 				cy = Math.floor((cy-yrem)/size)*size + yrem - 1;
@@ -529,7 +526,6 @@ define(["actions","layer","canvas"],function Engine(Actions, Layer, Canvas) {
 			case 'pan': 	return _this.pan(x,y);
 			case 'dropper': changed = _this.selectColor(x,y); break;
 			case 'select': 	return _this.select(x,y);
-			case 'move':	changed = _this.move(x,y); break;
 			}
 			if (changed) {
 				_this.queueSave();
@@ -951,22 +947,6 @@ define(["actions","layer","canvas"],function Engine(Actions, Layer, Canvas) {
 			}
 			_this.refresh();
 		},
-		move: function(x,y) {
-			var size = sizes[s];
-			pressed.mx += x-pressed.x;
-			pressed.my += y-pressed.y;
-			x = (pressed.mx > 0) ? Math.floor(pressed.mx/size) : Math.ceil(pressed.mx/size);
-			y = (pressed.my > 0) ? Math.floor(pressed.my/size) : Math.ceil(pressed.my/size);
-			if (x !== 0 || y !== 0) {
-				pressed.mx -= x*size;
-				pressed.my -= y*size;
-				if (!moving) {
-					moving = layers[activeLayer].buf.getOffset();
-				}
-				layers[activeLayer].buf.move(-x,-y);
-				_this.refresh();
-			}
-		},
 		select: function(cx,cy) {
 			var size = sizes[s];
 			var x = Math.floor((cx-canvas.width/2-pan.x)/size)+Math.ceil(g.width/2);
@@ -1181,9 +1161,6 @@ define(["actions","layer","canvas"],function Engine(Actions, Layer, Canvas) {
 			if (drawing) {
 				actions.endDraw();
 				drawing = false;
-			} else if (moving) {
-				actions.move(layers[activeLayer],moving);
-				moving = false;
 			} else if (selected) {
 				if (selected.done) {
 					// if references are same, it's a paste

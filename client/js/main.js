@@ -102,7 +102,7 @@ function Main(Engine) {
 		key('1,2,3,4,5,6,7,8,9,0', function(e,h) {
 			engine.setColorIndex(colororder[h.shortcut]);
 		});
-		var paintKeys = ['q','w','e','r','t','y','u'];
+		var paintKeys = ['q','w','e','r','t','y'];
 		key(paintKeys.join(','), function(e,h) {
 			var id = '';
 			switch (h.shortcut) {
@@ -112,7 +112,6 @@ function Main(Engine) {
 				case 'r': id = 'pan'; break;
 				case 't': id = 'dropper'; break;
 				case 'y': id = 'select'; break;
-				case 'u': id = 'move'; break;
 			}
 			if (id.length > 0) {
 				if (engine.setMode(id)) {

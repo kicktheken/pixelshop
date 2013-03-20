@@ -9,7 +9,6 @@ define(["pixel","map"],function Canvas(Pixel,Map) {
 			this.canvas.width = width;
 			this.canvas.height = height;
 			this.context = this.canvas.getContext('2d');
-			this.offset = {x:0,y:0};
 		},
 		updateBounds: function(minx,miny,maxx,maxy) {
 			if (!this.bounds) {
@@ -94,8 +93,8 @@ define(["pixel","map"],function Canvas(Pixel,Map) {
 			}
 		},
 		pixel: function(x,y,color) {
-			x += this.offset.x + Math.ceil(this.canvas.width/2);
-			y += this.offset.y + Math.ceil(this.canvas.height/2);
+			x += Math.ceil(this.canvas.width/2);
+			y += Math.ceil(this.canvas.height/2);
 			if (color) {
 				return new Pixel(color,x,y);
 			}
@@ -145,30 +144,9 @@ define(["pixel","map"],function Canvas(Pixel,Map) {
 		loadData: function(data,x,y) {
 			this.context.putImageData(data,x,y);
 		},
-		move: function(x,y) {
-			this.offset.x += x;
-			this.offset.y += y;
-			if (this.offset.x < -this.canvas.width+1) {
-				this.offset.x = -this.canvas.width+1;
-			} else if (this.offset.x > this.canvas.width-1) {
-				this.offset.x = this.canvas.width-1;
-			}
-			if (this.offset.y < -this.canvas.height+1) {
-				this.offset.y = -this.canvas.height+1;
-			} else if (this.offset.y > this.canvas.height-1) {
-				this.offset.y = this.canvas.height-1;
-			}
-		},
-		getOffset: function() {
-			return {x:this.offset.x,y:this.offset.y};
-		},
-		setOffset: function(offset) {
-			this.offset.x = offset.x;
-			this.offset.y = offset.y;
-		},
 		viewable: function(width,height) {
-			var x = Math.ceil(width/2) - Math.ceil(this.canvas.width/2) - this.offset.x;
-			var y = Math.ceil(height/2) - Math.ceil(this.canvas.height/2) - this.offset.y;
+			var x = Math.ceil(width/2) - Math.ceil(this.canvas.width/2);
+			var y = Math.ceil(height/2) - Math.ceil(this.canvas.height/2);
 			var ret = {x:x, y:y, width:this.canvas.width, height:this.canvas.height};
 			return ret;
 		},
@@ -176,18 +154,14 @@ define(["pixel","map"],function Canvas(Pixel,Map) {
 			this.canvas.width = buf.canvas.width;
 			this.canvas.height = buf.canvas.height;
 			this.context.drawImage(buf.canvas,0,0);
-			this.offset.x = buf.offset.x;
-			this.offset.y = buf.offset.y;
 			var b = buf.bounds;
 			if (b) {
 				this.updateBounds(b[0],b[1],b[2],b[3]);
 			}
 		},
 		collapse: function(buf) {
-			var x = this.offset.x - buf.offset.x;
-			var y = this.offset.y - buf.offset.y;
 			var b = buf.bounds;
-			this.context.drawImage(buf.canvas,x,y);
+			this.context.drawImage(buf.canvas,0,0);
 			if (b) {
 				this.updateBounds(b[0],b[1],b[2],b[3]);
 			}
@@ -202,11 +176,8 @@ define(["pixel","map"],function Canvas(Pixel,Map) {
 		},
 		reset: function() {
 			this.clear();
-			this.offset = defaultOffset(this.canvas.width,this.canvas.height);
 		},
 		setCanvas: function(obj) {
-			this.offset.x = obj.ox;
-			this.offset.y = obj.oy;
 			this.context.clearRect(0,0,this.canvas.width,this.canvas.height);
 			if (!obj.w || !obj.h) {
 				return;
@@ -215,10 +186,7 @@ define(["pixel","map"],function Canvas(Pixel,Map) {
 			this.context.drawImage(obj.img,obj.x,obj.y);
 		},
 		toDataObject: function(local) {
-			var ret = {
-				ox: this.offset.x,
-				oy: this.offset.y
-			};
+			var ret = {};
 			if (!this.bounds) {
 				return ret;
 			}
@@ -271,12 +239,7 @@ define(["pixel","map"],function Canvas(Pixel,Map) {
 			this.context.putImageData(data,0,0);
 		},
 		getData: function(width,height) {
-			if (arguments.length === 0) {
-				return this.context.getImageData(0,0,this.canvas.width,this.canvas.height);
-			}
-			var x = this.offset.x - width/2;
-			var y = this.offset.y - height/2;
-			return this.context.getImageData(x,y,width,height);
+			return this.context.getImageData(0,0,this.canvas.width,this.canvas.height);
 		},
 		getViewData: function(x,y,width,height) {
 			x += Math.ceil(this.canvas.width/2) - Math.ceil(width/2);
