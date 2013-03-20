@@ -64,12 +64,15 @@ define(["action","pixel"], function Actions(Action,Pixel) {
 		fill: function(layer,color,x,y) {
 			var oldp = layer.buf.pixel(x,y);
 			var newp = layer.buf.pixel(x,y,color);
-			if (!newp.diffColor(oldp) || !layer.buf.isValid(newp)) {
+			if (!newp.diffColor(oldp) || !layer.buf.isValid(newp) || layer.buf.queue) {
 				return false;
 			}
 			var map;
 			var undo = function() {
-				layer.buf.fill(oldp,map);
+				if (layer.buf.queue) {
+					return false;
+				}
+				layer.buf.fillMap(oldp,map);
 				layer.refresh();
 				return true;
 			};

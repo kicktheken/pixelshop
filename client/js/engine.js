@@ -220,7 +220,7 @@ define(["actions","layer","canvas"],function Engine(Actions, Layer, Canvas) {
 				context.textBaseline="top";
 				context.fillStyle = 'black';
 				context.shadowColor = 'white';
-				context.shadowBlur = 3;
+				context.shadowBlur = 10;
 				var hx = Math.ceil((cx - (v.x*size+dx))/size)+1;
 				var hy = Math.ceil((cy - (v.y*size+dy))/size)+1;
 				context.fillText(hx+","+hy,canvas.width-10,10);
@@ -644,7 +644,7 @@ define(["actions","layer","canvas"],function Engine(Actions, Layer, Canvas) {
 			}
 			var w = workspace.layers;
 			for (var i in w) {
-				if (typeof w[i] !== 'object' || !isInt(w[i].ox) || !isInt(w[i].oy)) {
+				if (typeof w[i] !== 'object') {
 					_this.deleteLocalWorkspace();
 					return false;
 				}

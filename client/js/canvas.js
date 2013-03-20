@@ -26,6 +26,7 @@ define(["pixel","map"],function Canvas(Pixel,Map) {
 					b[3] = maxy;
 				}
 			}
+			this.dirty = true;
 		},
 		setDimensions: function(width,height) {
 			var canvas = document.createElement('canvas');
@@ -51,45 +52,79 @@ define(["pixel","map"],function Canvas(Pixel,Map) {
 			return p.x < this.canvas.width && p.x >= 0 &&
 				p.y < this.canvas.height && p.y >=0;
 		},
-		fill: function(pixel,map) {
-			if (typeof map === 'undefined') {
-				map = this.map = new Map();
-				this.fillColor(new Pixel(this.context,pixel.x,pixel.y),pixel);
-				var b = map.bounds;
-				this.updateBounds(b[0],b[1],b[2],b[3]);
-				delete this.map;
-				return map;
-			} else {
-				this.fillMap(map,pixel);
+		fill: function(pixel) {
+			if (!this.dirty) {
+				this.fillAll(pixel);
+				return;
 			}
+			var map = this.map = new Map();
+			this.queue = [pixel];
+			var oldpixel = new Pixel(this.context,pixel.x,pixel.y);
+			if (this.fillColor(oldpixel)) {
+				delete this.queue;
+			} else {
+				var _this = this, interval;
+				function fill() {
+					if (_this.fillColor(oldpixel)) {
+						delete _this.queue;
+						clearInterval(interval);
+					} else {
+						interval = setTimeout(fill,0);
+					}
+				}
+				interval = setTimeout(fill,0);
+			}
+			return map;
 		},
-		fillColor: function(oldp,newp) {
-			var queue = [newp], p, np;
-			while (queue.length > 0) {
-				p = queue.shift();
+		fillColor: function(oldp) {
+			var p, np, i = 0;
+			while (this.queue.length > 0 && i < 10000) {
+				p = this.queue.shift();
 				if (!oldp.diffColor(new Pixel(this.context,p.x,p.y))) {
 					p.draw(this.context);
 					this.map.set(p.x,p.y,true);
-					if (p.x < this.canvas.width-1) {
-						queue.push(new Pixel(p,p.x+1,p.y));
+					if (p.x < this.canvas.width-1 && typeof this.map.get(p.x+1,p.y) !== 'boolean') {
+						this.map.set(p.x+1,p.y,false);
+						this.queue.push(new Pixel(p,p.x+1,p.y));
 					}
-					if (p.y < this.canvas.height-1) {
-						queue.push(new Pixel(p,p.x,p.y+1));
+					if (p.y < this.canvas.height-1 && typeof this.map.get(p.x,p.y+1) !== 'boolean') {
+						this.map.set(p.x,p.y+1,false);
+						this.queue.push(new Pixel(p,p.x,p.y+1));
 					}
-					if (p.x > 0) {
-						queue.push(new Pixel(p,p.x-1,p.y));
+					if (p.x > 0 && typeof this.map.get(p.x-1,p.y) !== 'boolean') {
+						this.map.set(p.x-1,p.y,false);
+						this.queue.push(new Pixel(p,p.x-1,p.y));
 					}
-					if (p.y > 0) {
-						queue.push(new Pixel(p,p.x,p.y-1));
+					if (p.y > 0 && typeof this.map.get(p.x,p.y-1) !== 'boolean') {
+						this.map.set(p.x,p.y-1,false);
+						this.queue.push(new Pixel(p,p.x,p.y-1));
+					}
+					this.updateBounds(p.x,p.y,p.x,p.y);
+				}
+				i++;
+			}
+			return (this.queue.length === 0);
+		},
+		fillMap: function(pixel,m) {
+			if (!m) {
+				this.fillAll(pixel);
+				return;
+			}
+			for (var y in m.map) {
+				for (var x in m.map[y]) {
+					if (m.map[y][x]) {
+						this.context.putImageData(pixel.d,x,y);
 					}
 				}
 			}
 		},
-		fillMap: function(m,pixel) {
-			for (var y in m.map) {
-				for (var x in m.map[y]) {
-					this.context.putImageData(pixel.d,x,y);
-				}
+		fillAll: function(pixel) {
+			if (pixel.d.data[3] === 0) {
+				this.clear();
+			} else {
+				this.context.fillStyle = pixel.toColorString();
+				this.context.fillRect(0,0,this.canvas.width,this.canvas.height);
+				this.updateBounds(0,0,this.canvas.width,this.canvas.height);
 			}
 		},
 		pixel: function(x,y,color) {
@@ -141,9 +176,6 @@ define(["pixel","map"],function Canvas(Pixel,Map) {
 			this.context.restore();
 			this.updateBounds(0,y,this.canvas.width,y+height);
 		},
-		loadData: function(data,x,y) {
-			this.context.putImageData(data,x,y);
-		},
 		viewable: function(width,height) {
 			var x = Math.ceil(width/2) - Math.ceil(this.canvas.width/2);
 			var y = Math.ceil(height/2) - Math.ceil(this.canvas.height/2);
@@ -169,13 +201,14 @@ define(["pixel","map"],function Canvas(Pixel,Map) {
 		clear: function() {
 			if (arguments.length === 4) {
 				var a = arguments;
+				if (a[0] === 0 && a[1] === 0 && a[2] === this.canvas.width && a[3] === this.canvas.height) {
+					this.dirty = false;
+				}
 				this.context.clearRect(a[0],a[1],a[2],a[3]);
 			} else {
+				this.dirty = false;
 				this.context.clearRect(0,0,this.canvas.width,this.canvas.height);
 			}
-		},
-		reset: function() {
-			this.clear();
 		},
 		setCanvas: function(obj) {
 			this.context.clearRect(0,0,this.canvas.width,this.canvas.height);
@@ -184,6 +217,7 @@ define(["pixel","map"],function Canvas(Pixel,Map) {
 			}
 			this.bounds = [obj.x, obj.y, obj.x+obj.w, obj.y+obj.h];
 			this.context.drawImage(obj.img,obj.x,obj.y);
+			this.dirty = true;
 		},
 		toDataObject: function(local) {
 			var ret = {};
@@ -237,6 +271,7 @@ define(["pixel","map"],function Canvas(Pixel,Map) {
 		},
 		putData: function(data) {
 			this.context.putImageData(data,0,0);
+			this.dirty = true;
 		},
 		getData: function(width,height) {
 			return this.context.getImageData(0,0,this.canvas.width,this.canvas.height);

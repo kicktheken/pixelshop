@@ -90,7 +90,7 @@ define(["canvas"], function Layer(Canvas) {
 			this.refresh();
 		},
 		resetWorkspace: function() {
-			this.buf.reset();
+			this.buf.clear();
 			this.refresh();
 		},
 		load: function(method,image) {
