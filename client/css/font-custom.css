@@ -385,3 +385,6 @@ ul.icons li [class*=" icon-"] {
 .icon-download-alt:before {
 	content: "\f019";
 }
+.icon-file:before {
+	content: "\f016";
+}

@@ -24,6 +24,7 @@ if (!document.styleSheets[0] || document.styleSheets[0].cssRules.length === 0) {
 		<div class="container">
 			<a class="brand" href="#"><i class="icon-space-invaders"></i>Pixelshop <small></small></a>
 			<div class="input-prepend input-append">
+				<button id="newworkspace" class="btn btn-success"><i class="icon-file"></i></button>
 				<button id="upload" class="btn btn-warning"><i class="icon-upload-alt"></i></button>
 				<input type="text" id="searchbox" placeholder="Image URL" />
 				<button id="download" class="btn btn-primary"><i class="icon-download-alt"></i></button>
@@ -80,7 +81,16 @@ if (!document.styleSheets[0] || document.styleSheets[0].cssRules.length === 0) {
 	</ul>
 </div>
 
-<div id="resize-dialog" style="display:none;">
+<div id="reset-dialog" style="display:none;padding:10px;">
+	<fieldset>
+		<label class="modalinput">
+			Dimensions:
+			<input id="resetdimensions" type="text" placeholder="40x40" class="numeric" maxlength="9">
+		</label>
+		<label><input type="checkbox" id="resetcolors"> Reset colors</label>
+	</fieldset>
+</div>
+<div id="resize-dialog" style="display:none;padding:10px;">
 	<fieldset>
 		<label class="modalinput">
 			Dimensions:
@@ -88,7 +98,7 @@ if (!document.styleSheets[0] || document.styleSheets[0].cssRules.length === 0) {
 		</label>
 	</fieldset>
 </div>
-<div id="download-dialog" style="display:none;">
+<div id="download-dialog" style="display:none;padding:10px;">
 	<fieldset>
 		<label class="modalinput">
 			Filename:
@@ -102,11 +112,11 @@ if (!document.styleSheets[0] || document.styleSheets[0].cssRules.length === 0) {
 		<div id="slider"></div>
 	</fieldset>
 </div>
-<div id="upload-dialog" style="display:none;">
+<div id="upload-dialog" style="display:none;padding:10px;">
 	<canvas id="upload-preview"></canvas>
-	<label><input type="checkbox" id="expand">Expand on overflow</label>
+	<label><input type="checkbox" id="expand"> Expand on overflow</label>
 </div>
-<div id="feedback-dialog" style="display:none;">
+<div id="feedback-dialog" style="display:none;padding:10px;">
 	<label><input type='checkbox' name="f0"> Draw lines</label>
 	<label><input type='checkbox' name="f1"> Resizable selection box</label>
 	<label><input type='checkbox' name="f2"> More color hotkeys</label>

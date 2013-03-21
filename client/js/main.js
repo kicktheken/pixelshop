@@ -162,6 +162,7 @@ function Main(Engine) {
 		tooltip('#removelayer','Remove Layer');
 		tooltip('#download','Download','bottom');
 		tooltip('#upload','Upload','bottom');
+		tooltip('#newworkspace','New Workspace','bottom');
 
 		var cheight = $(".container").height()+1;
 		function canvasCoords(f,e,$this) {
@@ -209,6 +210,7 @@ function Main(Engine) {
 			e.initEvent("click", true, false);
 			$('#upload-file').get(0).dispatchEvent(e);
 		});
+		$('#newworkspace').click(engine.newWorkspace);
 		$('#resize').click(engine.resizeCanvas);
 		$('#feedback').click(engine.feedback);
 		key('⌘+z, ctrl+z', engine.undo);
@@ -220,6 +222,10 @@ function Main(Engine) {
 		key('shift+=,+', engine.zoomIn);
 		key('-', engine.zoomOut);
 		key('⌘+shift+s, ctrl+shift+s', engine.purge); // purge corrupted workspace
+		key('backspace', function(e) {
+			e.preventDefault();
+			engine.cut();
+		});
 
 		$('#searchbox').keyup(function(e) {
 			var val = $(this).val();

@@ -174,9 +174,6 @@ form {
 	background-color: #bd362f;
 }
 
-.modalinput {
-	margin: 10px;
-}
 .modalinput input {
 	height:14px;
 	float: right;
@@ -207,18 +204,15 @@ hr {
 	display:none;
 }
 #upload-preview {
-	margin:10px;
 	width:497px;
 	height:257px;
 	border:1px solid #ccc;
+	margin-bottom:10px;
 }
-#expand {
-	margin:0 10px;
+#upload-dialog {
+	overflow:hidden;
 }
-#feedback-dialog {
-	padding:10px;
-}
-#feedback-dialog input {
+.ui-dialog-content input {
 	vertical-align:top;
 }
 #feedback-dialog textarea {

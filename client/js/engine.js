@@ -547,6 +547,45 @@ define(["actions","layer","canvas","pixel"],function Engine(Actions, Layer, Canv
 				}
 			}
 		},
+		newWorkspace: function() {
+			var $dialog = $('#reset-dialog');
+			function reset() {
+				var val = $('#resetdimensions').val();
+				if (!/[0-9]+[^0-9]+[0-9]+/.test(val)) {
+					val = "40x40";
+				}
+				_this.setDimensions.apply(_this,val.split(/[^0-9]+/));
+				if ($('#resetcolors').is(':checked')) {
+					_this.defaultWorkspace();
+				}
+				_this.resetWorkspace();
+				$dialog.dialog('close');
+			}
+			$('#resetdimensions').keyup(function (e) {
+				if (e.keyCode == 13) { // enter key
+					reset();
+				}
+			});
+			$dialog.dialog({
+				dialogClass: "no-close",
+				modal:true,
+				draggable:false,
+				resizable:false,
+				width:200,
+				height:180,
+				title:"New Workspace",
+				buttons: {
+					"Apply": function() {
+						reset();
+					},
+					"Cancel": function() {
+						$(this).dialog('close');
+					}
+				}
+			});
+			$dialog.parent().find('.ui-dialog-title').css('display','inherit');
+			$dialog.dialog('close').dialog('open'); // hack to update height for adding titlebar
+		},
 		resetWorkspace: function() {
 			var toRemove = layers.splice(1,layers.length-1);
 			for (var i in toRemove) {
@@ -1028,15 +1067,13 @@ define(["actions","layer","canvas","pixel"],function Engine(Actions, Layer, Canv
 			$('#dimensions').val("");
 		},
 		resizeCanvas: function() {
-			$('#dimensions').attr('placeholder',g.width+'x'+g.height);
-			$('#frame').attr('placeholder',g.width+'x'+g.height);
-			$("#dimensions,#frame").keyup(function (e) {
+			var $dialog = $('#resize-dialog');
+			$('#dimensions').attr('placeholder',g.width+'x'+g.height).keyup(function (e) {
 				if (e.keyCode == 13) { // enter key
 					_this.setDimensions.apply(_this,$('#dimensions').val().split(/[^0-9]+/));
-					$('#resize-dialog').dialog('close');
+					$dialog.dialog('close');
 				}
 			});
-			var $dialog = $('#resize-dialog');
 			$dialog.dialog({
 				dialogClass: "no-close",
 				modal:true,
