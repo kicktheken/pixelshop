@@ -636,7 +636,7 @@ define(["actions","layer","canvas","pixel"],function Engine(Actions, Layer, Canv
 						$('#email').text(email);
 						log.info("commencing signoff");
 						$(this).unbind('click');
-
+						_this.initSignin();
 						_this.saveWorkspace('logoff');
 					});
 				}
