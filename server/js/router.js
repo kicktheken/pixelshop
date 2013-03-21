@@ -1,5 +1,7 @@
 var crypto = require('crypto');
 var request = require('request');
+var couchbase = require('couchbase');
+var step = require('step');
 var config = require('./config');
 var mailgun = false;
 if (config.mailgun && config.mailgun.api_key.length > 0 && config.mailgun.api_key.length > 0) {
@@ -34,56 +36,50 @@ function user(req,res,getonly) {
 	return cookies['userid'];
 }
 
-module.exports.init = function(cb) {
-	function cbGet(key,success,failure) {
-		var timeout = setTimeout(failure, config.timeout);
-		cb.get(key, function(err,data,meta) {
-			clearTimeout(timeout);
-			if (err && typeof failure === 'function') {
-				failure(err);
-			} else if (typeof success === 'function') {
-				success(data);
+module.exports.init = function() {
+	function couchbaseInit(callback) {
+		step(function() {
+			couchbase.connect(config, this);
+		},function(err,bucket) {
+			if (err) {
+				console.log(err);
+				console.log("failed to connect to cluster");
+				return;
 			}
+			callback(bucket);
 		});
 	}
-	function cbSet(key,data,success,failure) {
-		var timeout = setTimeout(failure, config.timeout);
-		cb.set(key, data, function(err,meta) {
-			clearTimeout(timeout);
-			if (err && typeof failure === 'function') {
-				failure(err);
-			} else if (typeof success === 'function') {
-				success(data);
-			}
-		});
-	}
-	function sendWorkspace(req,res,key,email) {
+	function sendWorkspace(bucket,req,res,key,email) {
 		if (!key) {
 			key = user(req,res) + '.wks';
 		}
-		cbGet(key, function(data) {
-			data = typeof data === 'object' ? data : JSON.parse(data);
-			if (email) {
-				data.email = email;
-				console.log("sending key: "+key+" "+email);
+		step(function() {
+			bucket.get(key, this);
+		},function (err,data,meta) {
+			if (err) {
+				console.log("failed to fetch key: "+key);
+				if (email) {
+					var data = { email: email };
+					res.send(data);
+					res.end();
+					bucket.set(key,data);
+				} else {
+					res.send(204);
+				}
 			} else {
-				console.log("sending key: "+key);
-			}
-			res.send(data);
-			res.end();
-			if (email) {
-				cbSet(key,data);
-			}
-		}, function(err) {
-			console.log("failed to fetch key: "+key);
-			if (email) {
-				var data = { email: email };
+				data = typeof data === 'object' ? data : JSON.parse(data);
+				if (email) {
+					data.email = email;
+					console.log("sending key: "+key+" "+email);
+				} else {
+					console.log("sending key: "+key);
+				}
 				res.send(data);
 				res.end();
-				cbSet(key,data);
-			} else {
-				res.send(204);
-			}
+				if (email) {
+					bucket.set(key,data);
+				}
+			}	
 		});
 	}
 	function saveWorkspace(req,res,callback) {
@@ -101,14 +97,22 @@ module.exports.init = function(cb) {
 					res.send(204);
 					return;
 				}
-				cbSet(key, data, function() {
-					if (typeof callback === 'function') {
-						callback();
+				step(function() {
+					couchbaseInit(this);
+				},function(bucket) {
+					bucket.set(key, data, this);
+				},function(err,meta) {
+					if (err) {
+						console.log('save errored for key: '+key);
+						console.log(err);
+						res.send(400);
+					} else {
+						if (typeof callback === 'function') {
+							callback();
+						}
+						console.log('saved key: '+key);
+						res.send(204);
 					}
-					res.send(204);
-				}, function(err) {
-					console.log(err);
-					res.send(400);
 				});
 			});
 		} catch(err) {
@@ -120,35 +124,47 @@ module.exports.init = function(cb) {
 		'/getworkspace': function(req,res) {
 			try {
 				if (req.query.access_token) {
-					request(config.oauthURL+req.query.access_token, function(err,resp,body) {
+					var bucket, profile, userid;
+					step(function() {
+						couchbaseInit(this);
+					},function(bkt) {
+						bucket = bkt;
+						request(config.oauthURL+req.query.access_token, this);
+					},function(err,resp,body) {
 						if (!err && resp.statusCode == 200) {
-							var profile = JSON.parse(body);
+							profile = JSON.parse(body);
 							if (profile.id && profile.email && profile.verified_email) {
-								cbGet(config.oauthPrefix+profile.id, function(wksKey) {
-									var userid = wksKey.substr(0,40);
-									var prevuserid = user(req,res,true);
-									if (prevuserid.length > 0 && userid !== prevuserid) {
-										cb.remove(prevuserid+".wks", function (err, meta) {});
-										res.cookie('userid', userid, {maxAge: 1000*3600*24*30, httpOnly: true });
-									}
-									sendWorkspace(req,res,wksKey,profile.email);
-								}, function(err) {
-									var userid = user(req,res);
-									cbSet(config.oauthPrefix+profile.id, userid+'.wks', function() {
-										sendWorkspace(req,res,userid+'.wks',profile.email);
-									}, function(err) {
-										console.log(err);
-										res.send(204);
-									})
-								});
+								bucket.get(config.oauthPrefix+profile.id,this);
 							}
 						} else {
 							console.log(err);
 							res.send(204);
 						}
+					},function(err,data,meta) {
+						if (err) {
+							userid = user(req,res);
+							bucket.set(config.oauthPrefix+profile.id, userid+'.wks',this);
+						}
+						var wksKey = data;
+						userid = wksKey.substr(0,40);
+						var prevuserid = user(req,res,true);
+						if (prevuserid.length > 0 && userid !== prevuserid) {
+							bucket.remove(prevuserid+".wks");
+							res.cookie('userid', userid, {maxAge: 1000*3600*24*30, httpOnly: true });
+						}
+						sendWorkspace(bucket,req,res,wksKey,profile.email);
+					},function() {
+						if (err) {
+							console.log(err);
+							res.send(204);
+						} else {
+							sendWorkspace(bucket,req,res,userid+'.wks',profile.email);
+						}
 					});
 				} else {
-					sendWorkspace(req,res);
+					couchbaseInit(function(bucket) {
+						sendWorkspace(bucket,req,res);
+					});
 				}
 			} catch(err) {
 				console.log(err);
@@ -166,7 +182,9 @@ module.exports.init = function(cb) {
 		'/deleteworkspace': function(req,res) {
 			var userid = user(req,res,true);
 			if (userid.length > 0) {
-				cb.remove(userid +'.wks', function (err, meta) {});
+				coucbhaseInit(function(bucket) {
+					bucket.remove(userid +'.wks');
+				});
 			}
 		},
 		'/proxy': function(req,res) { // to bypass same origin restrictions
