@@ -51,9 +51,7 @@ define(["canvas"], function Layer(Canvas) {
 				g.Engine.setActiveLayer(g.Engine.indexTranslation(index));
 			});
 			this.index = index;
-			this.preview = pcanvas.getContext('2d');
-			this.preview.width = pcanvas.width;
-			this.preview.height = pcanvas.height;
+			this.preview = new Canvas(pcanvas.width,pcanvas.height,pcanvas);
 			this.buf = new Canvas(g.width,g.height);
 			this.visible = true;
 			this.initEvents(index);
@@ -102,12 +100,8 @@ define(["canvas"], function Layer(Canvas) {
 			this.refresh();
 		},
 		refresh: function() {
-			var width = this.preview.width, height = this.preview.height;
-			var data = this.buf.getViewDataFromBounds(width,height);
-			this.preview.clearRect(0,0,width,height);
-			if (data) {
-				this.preview.putImageData(data,0,0);
-			}
+			this.preview.clear();
+			this.preview.loadFit(this.buf.canvas);
 		}
 		
 	});

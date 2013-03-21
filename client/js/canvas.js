@@ -296,15 +296,6 @@ define(["pixel","map"],function Canvas(Pixel,Map) {
 			x += Math.ceil(this.canvas.width/2) - Math.ceil(width/2);
 			y += Math.ceil(this.canvas.height/2) - Math.ceil(height/2);
 			return this.context.getImageData(x,y,width+1,height+1);
-		},
-		getViewDataFromBounds: function(width,height) {
-			if (!this.bounds) {
-				return;
-			}
-			var b = this.bounds;
-			var x = (b[0]+b[2]-width)/2, y = (b[1]+b[3]-height)/2;
-			return this.context.getImageData(x,y,width,height);
-
 		}
 	});
 });
