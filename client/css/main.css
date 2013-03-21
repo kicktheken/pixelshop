@@ -17,6 +17,7 @@ canvas
 	display:block;
 }
 .brand small {
+	vertical-align:middle;
 	font-size:50%;
 }
 a:focus {
@@ -204,12 +205,12 @@ hr {
 	display:none;
 }
 #upload-preview {
-	width:497px;
+	width:527px;
 	height:257px;
 	border:1px solid #ccc;
 	margin-bottom:10px;
 }
-#upload-dialog {
+.ui-dialog .ui-dialog-content {
 	overflow:hidden;
 }
 .ui-dialog-content input {

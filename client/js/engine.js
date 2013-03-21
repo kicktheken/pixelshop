@@ -24,7 +24,7 @@ define(["actions","layer","canvas","pixel"],function Engine(Actions, Layer, Canv
 			buf = new Canvas(g.width,g.height);
 			bg = new Canvas(g.width,g.height);
 			cursor = new Canvas(sizes[s],sizes[s]);
-			uploadPreview = new Canvas(497,257,$('#upload-preview').get(0));
+			uploadPreview = new Canvas(527,257,$('#upload-preview').get(0));
 			selected = false;
 			clipboard = false;
 			colorsel = new Object();
@@ -840,7 +840,7 @@ define(["actions","layer","canvas","pixel"],function Engine(Actions, Layer, Canv
 				modal:true,
 				draggable:false,
 				resizable:false,
-				width:520,
+				width:550,
 				height:428,
 				title:"Load Image",
 				buttons: {
