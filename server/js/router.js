@@ -65,8 +65,10 @@ module.exports.init = function(cb) {
 			data = typeof data === 'object' ? data : JSON.parse(data);
 			if (email) {
 				data.email = email;
+				console.log("sending key: "+key+" "+email);
+			} else {
+				console.log("sending key: "+key);
 			}
-			console.log("sending key: "+key);
 			res.send(data);
 			res.end();
 			if (email) {
