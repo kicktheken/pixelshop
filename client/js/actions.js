@@ -12,10 +12,10 @@ define(["action","pixel"], function Actions(Action,Pixel) {
 			canvas = document.createElement("canvas");
 			context = canvas.getContext('2d');
 		},
-		draw: function(layer,color,x,y) {
+		draw: function(layer,color,x,y,drawing) {
 			var oldp = layer.buf.pixel(x,y);
 			var newp = layer.buf.pixel(x,y,color);
-			if (!newp.diffColor(oldp) || !layer.buf.isValid(newp)) {
+			if (!newp.diffColor(oldp)) {
 				return false;
 			}
 			var undoPixels = [oldp], redoPixels = [newp];
@@ -23,8 +23,13 @@ define(["action","pixel"], function Actions(Action,Pixel) {
 			if (!action || action.isComplete()) {
 				action = actions[index] = new Action(layer);
 				actions = actions.slice(0,index+1);
-			} else if (action.pixel) {
-				var line = action.pixel.line(newp);
+			} else if (action.pixel || typeof drawing !== 'boolean') {
+				var line;
+				if (typeof drawing !== 'boolean') {
+					line = newp.line(drawing);
+				} else {
+					line = action.pixel.line(newp);
+				}
 				for (var i in line) {
 					var px = line[i][0], py = line[i][1];
 					var prevp = new Pixel(layer.buf.context,px,py);

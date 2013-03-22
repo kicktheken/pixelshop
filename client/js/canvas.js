@@ -144,8 +144,6 @@ define(["pixel","map"],function Canvas(Pixel,Map) {
 			}
 		},
 		pixel: function(x,y,color) {
-			x += Math.ceil(this.canvas.width/2);
-			y += Math.ceil(this.canvas.height/2);
 			if (color) {
 				return new Pixel(color,x,y);
 			}

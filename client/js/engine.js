@@ -940,27 +940,33 @@ define(["actions","layer","canvas","pixel"],function Engine(Actions, Layer, Canv
 			$('form').attr("action",host+'/exportpng').submit();
 		},
 		draw: function(color,cx,cy) {
-			drawing = true;
 			var size = sizes[s];
-			var x = Math.floor((cx-canvas.width/2-pan.x)/size);
-			var y = Math.floor((cy-canvas.height/2-pan.y)/size);
-			var ret = actions.draw(layers[activeLayer],color,x,y);
+			var x = Math.floor((cx-canvas.width/2-pan.x)/size) + Math.ceil(g.width/2);
+			var y = Math.floor((cy-canvas.height/2-pan.y)/size) + Math.ceil(g.height/2);
+			var ret, layer = layers[activeLayer];
+			if (typeof drawing === 'boolean' || typeof drawing !== 'boolean' && layer.buf.isValid(drawing)) {
+				ret = actions.draw(layer,color,x,y,drawing);
+				drawing = true;
+			} else {
+				drawing = {x:x,y:y};
+				ret = false;
+			}
 			_this.refresh(cx,cy);
 			_this._updateDo();
 			return ret;
 		},
 		fill: function(color,cx,cy) {
 			var size = sizes[s];
-			var x = Math.floor((cx-canvas.width/2-pan.x)/size);
-			var y = Math.floor((cy-canvas.height/2-pan.y)/size);
+			var x = Math.floor((cx-canvas.width/2-pan.x)/size) + Math.ceil(g.width/2);
+			var y = Math.floor((cy-canvas.height/2-pan.y)/size) + Math.ceil(g.height/2);
 			var ret = actions.fill(layers[activeLayer],color,x,y);
 			_this.refresh(cx,cy);
 			return ret;
 		},
 		selectColor: function(cx,cy) {
 			var size = sizes[s];
-			var x = Math.floor((cx-canvas.width/2-pan.x)/size);
-			var y = Math.floor((cy-canvas.height/2-pan.y)/size);
+			var x = Math.floor((cx-canvas.width/2-pan.x)/size) + Math.ceil(g.width/2);
+			var y = Math.floor((cy-canvas.height/2-pan.y)/size) + Math.ceil(g.height/2);
 			var pixel = layers[activeLayer].buf.pixel(x,y);
 			_this.refresh(cx,cy);
 			if (pixel.isClear()) {
@@ -1241,6 +1247,10 @@ define(["actions","layer","canvas","pixel"],function Engine(Actions, Layer, Canv
 			}
 		},
 		cursorOut: function() {
+			if (drawing) {
+				actions.endDraw();
+				drawing = false;
+			}
 			_this.refresh();
 		},
 		zoomIn: function() {
