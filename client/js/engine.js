@@ -1034,11 +1034,11 @@ define(["actions","layer","canvas","pixel"],function Engine(Actions, Layer, Canv
 			width = parseInt(width);
 			height = parseInt(height);
 			if (isInt(width) && isInt(height)) {
-				if (width > 1024) {
-					width = 1024;
+				if (width > 256) {
+					width = 256;
 				}
-				if (height > 1024) {
-					height = 1024;
+				if (height > 256) {
+					height = 256;
 				}
 				var oldwidth = g.width, oldheight = g.height, restore = [];
 				var undo = function() {
