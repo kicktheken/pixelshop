@@ -55,7 +55,8 @@ define(["actions","layer","canvas","pixel"],function Engine(Actions, Layer, Canv
 				position: [canvas.width/2-253,41],
 				resizable: false,
 				width:506,
-				height:56
+				height:56,
+				closeOnEscape:false
 			});
 			$("#colors").dialog({
 				dialogClass: "no-close",
@@ -63,13 +64,15 @@ define(["actions","layer","canvas","pixel"],function Engine(Actions, Layer, Canv
 				resizable: false,
 				width:90,
 				minWidth:90,
-				height:426
+				height:426,
+				closeOnEscape:false
 			});
 			$("#layers").dialog({
 				dialogClass: "no-close",
 				position: [canvas.width-140,100],
 				width:140,
-				height:400
+				height:400,
+				closeOnEscape:false
 			});
 			$(".ui-dialog").draggable("option", "containment", "#canvas");
 		},
