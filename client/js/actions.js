@@ -91,7 +91,9 @@ define(["action","pixel"], function Actions(Action,Pixel) {
 			v.x = selected.src.x;
 			v.y = selected.src.y;
 			v.data = layer.buf.context.getImageData(v.x,v.y,v.width,v.height);
-			r.data = selected.data;
+			if (selected.data) {
+				r.data = selected.data;
+			}
 			r.x = selected.x;
 			r.y = selected.y;
 			var restore = layer.buf.context.getImageData(r.x,r.y,r.width,r.height);
@@ -102,7 +104,9 @@ define(["action","pixel"], function Actions(Action,Pixel) {
 				canvas.height = v.height;
 				context.putImageData(v.data,0,0);
 				layer.buf.context.drawImage(canvas,v.x,v.y);
-				context.putImageData(r.data,0,0);
+				if (r.data) {
+					context.putImageData(r.data,0,0);
+				}
 				layer.buf.context.drawImage(canvas,v.x,v.y);
 				layer.refresh();
 				return true;
