@@ -12,6 +12,24 @@ function Main(Engine) {
 	document.onselectstart = function() {return false;};
 
 	function init() {
+		var unsupported = [], capabilities = [
+			"cookies",
+			"canvas",
+			"canvastext",
+			"cssgradients",
+			"draganddrop",
+			"borderradius",
+			"localstorage"
+		];
+		for (var i=0; i<capabilities.length; i++) {
+			if (!Modernizr[capabilities[i]]) {
+				log.info("Your browser does not support "+capabilities[i]);
+				unsupported.push(capabilities[i]);
+			}
+		}
+		if (unsupported.length > 0) {
+			alert("Your browser does not support: "+unsupported.join()+". Your experience will be hindered");
+		}
 		var $canvas = $('#canvas');
 
 		// default globals
