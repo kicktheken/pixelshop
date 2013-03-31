@@ -1,10 +1,11 @@
-Pixelshop
-=========
+# Pixelshop
 
 Pixelshop is an online pixel art editing tool with layering and color switching hotkeys.
 
-Installation
-------------
+<img src="http://i.imgur.com/qmtyvN0.png" style="border:0">
+
+## Installation
+
 1. Rename config_default.js to config.js
 2. set up your own Google Analytics key for the client in config.js
 3. set up your Couchbase credentials for server in config.js
