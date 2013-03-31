@@ -884,9 +884,11 @@ define(["actions","layer","canvas","pixel"],function Engine(Actions, Layer, Canv
 			$dialog.dialog('close').dialog('open'); // hack to update height for adding titlebar
 			var methodMap = ['loadActualSize','loadFit','loadFitVertical','loadFitHorizontal'];
 			$dialog.next().find('.ui-button').each(function(i) {
-				$(this).hover(function(e) {
-					uploadPreview[methodMap[i]](image);
-				});
+				if (i < methodMap.length) {
+					$(this).hover(function(e) {
+						uploadPreview[methodMap[i]](image);
+					});
+				}
 			});
 		},
 		loadExternal: function(url) { // to bypass same origin security restrictions
