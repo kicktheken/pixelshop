@@ -621,48 +621,54 @@ define(["actions","layer","canvas","pixel"],function Engine(Actions, Layer, Canv
 				log.info(query);
 				window.location.hash = "";
 			}
-			$.get(host+'/getworkspace'+query, function(data) {
-				if (!data || data.length === 0) {
-					_this.defaultWorkspace();
-					return;
-				}
-				var workspace = typeof data === 'object' ? data : JSON.parse(data);
-				if (workspace.email) {
-					email = workspace.email;
-					$('#email').text(email);
-					$('#signin').removeClass('btn-danger')
-					.attr("href","#").text("Sign out")
-					.click(function(e) {
-						e.preventDefault();
-						$(this).addClass('btn-danger').text("Sign in");
-						email = "";
-						$('#email').text(email);
-						log.info("commencing signoff");
-						$(this).unbind('click');
-						_this.initSignin();
-						_this.saveWorkspace('logoff');
-					});
-				}
-				if (!workspace.layers) {
-					_this.defaultWorkspace();
-					return;
-				}
-				var binarray = [];
-				for (var i=0; i<workspace.layers.length; i++) {
-					binarray.push(workspace.layers.charCodeAt(i));
-				}
-				LZMA.decompress(binarray, function(json) {
-					workspace.layers = JSON.parse(json);
-					var localWorkspace = _this.getLocalWorkspace();
-					if (localWorkspace) {
-						localWorkspace.email = workspace.email;
-						_this._loadWorkspace(localWorkspace);
-					} else {
-						_this._loadWorkspace(workspace);
+			$.ajax({
+				type: "GET",
+				url: host+'/getworkspace'+query,
+				success: function(data) {
+					if (!data || data.length === 0) {
+						_this.defaultWorkspace();
+						return;
 					}
-				});
-			}).fail(function(err) {
-				_this.defaultWorkspace();
+					var workspace = typeof data === 'object' ? data : JSON.parse(data);
+					if (workspace.email) {
+						email = workspace.email;
+						$('#email').text(email);
+						$('#signin').removeClass('btn-danger')
+						.attr("href","#").text("Sign out")
+						.click(function(e) {
+							e.preventDefault();
+							$(this).addClass('btn-danger').text("Sign in");
+							email = "";
+							$('#email').text(email);
+							log.info("commencing signoff");
+							$(this).unbind('click');
+							_this.initSignin();
+							_this.saveWorkspace('logoff');
+						});
+					}
+					if (!workspace.layers) {
+						_this.defaultWorkspace();
+						return;
+					}
+					var binarray = [];
+					for (var i=0; i<workspace.layers.length; i++) {
+						binarray.push(workspace.layers.charCodeAt(i));
+					}
+					LZMA.decompress(binarray, function(json) {
+						workspace.layers = JSON.parse(json);
+						var localWorkspace = _this.getLocalWorkspace();
+						if (localWorkspace) {
+							localWorkspace.email = workspace.email;
+							_this._loadWorkspace(localWorkspace);
+						} else {
+							_this._loadWorkspace(workspace);
+						}
+					});
+				},
+				error: function(err) {
+					_this.defaultWorkspace();
+				},
+				timeout: g.timeout
 			});
 		},
 		deleteLocalWorkspace: function() {
