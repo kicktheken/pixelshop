@@ -913,12 +913,13 @@ define(["actions","layer","canvas","pixel"],function Engine(Actions, Layer, Canv
 			_this.refreshBackground();
 		},
 		download: function() {
+			var $dialog = $('#download-dialog');
 			$("#exportname").keyup(function (e) {
 				if (e.keyCode == 13) { // enter key
 					_this.export($(this).val(),/\d+/.exec($('#scale').val()));
+					$dialog.dialog('close');
 				}
 			});
-			var dialog = $dialog = $('#download-dialog');
 			$dialog.dialog({
 				dialogClass: "no-close",
 				modal:true,
@@ -930,7 +931,6 @@ define(["actions","layer","canvas","pixel"],function Engine(Actions, Layer, Canv
 				buttons: {
 					Download: function() {
 						_this.export($('#exportname').val(),/\d+/.exec($('#scale').val()));
-						$(this).dialog('close');
 					},
 					Cancel: function() {
 						$(this).dialog('close');
